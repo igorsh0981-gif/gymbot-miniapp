@@ -1,595 +1,247 @@
-import { useState, useEffect } from "react";
+"""
+api.py — REST API для GymBot Mini App (Telegram WebApp)
+Запуск: uvicorn api:app --host 0.0.0.0 --port 8081
+"""
+import os, logging
+from datetime import datetime, timedelta
+from typing import Optional
 
-const tg = window.Telegram?.WebApp;
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+from sqlalchemy import create_engine, text
+from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
 
-const API_BASE = "https://web-production-4fe0b.up.railway.app/api";
+load_dotenv()
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-const COLORS = {
-  bg: "#0F0F0F",
-  surface: "#1A1A1A",
-  card: "#222222",
-  accent: "#C8FF00",
-  accentDim: "#8FB300",
-  text: "#FFFFFF",
-  muted: "#888888",
-  border: "#2A2A2A",
-  danger: "#FF4444",
-  success: "#00CC66",
-};
+DATABASE_URL = os.getenv("DATABASE_URL")
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL not set")
+if DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql+pg8000://", 1)
+elif DATABASE_URL.startswith("postgresql://"):
+    DATABASE_URL = DATABASE_URL.replace("postgresql://", "postgresql+pg8000://", 1)
 
-const rule = "─".repeat(16);
+engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+SessionLocal = sessionmaker(bind=engine)
 
-function Hero({ children }) {
-  return (
-    <div style={{ fontWeight: 700, fontSize: 26, letterSpacing: -0.5, lineHeight: 1.15, color: COLORS.text, textTransform: "uppercase" }}>
-      {children}
-    </div>
-  );
-}
+R2_PUBLIC_URL = os.getenv("R2_PUBLIC_URL", "").rstrip("/")
+ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+AI_DAILY_LIMIT = 5
 
-function Kicker({ children }) {
-  return (
-    <div style={{ fontFamily: "monospace", fontSize: 11, color: COLORS.muted, letterSpacing: 2, textTransform: "uppercase", marginBottom: 4 }}>
-      {children}
-    </div>
-  );
-}
+def r2_photo_url(slug: str) -> Optional[str]:
+    if not slug or not R2_PUBLIC_URL:
+        return None
+    from urllib.parse import quote
+    return f"{R2_PUBLIC_URL}/{quote(f'exercises/{slug}/photo.jpg', safe='/')}"
 
-function Stat({ value, unit }) {
-  return (
-    <span style={{ fontFamily: "monospace", fontWeight: 700, fontSize: 18, color: COLORS.accent }}>
-      {value}{unit ? <span style={{ fontSize: 13, color: COLORS.muted }}> {unit}</span> : null}
-    </span>
-  );
-}
+app = FastAPI(title="GymBot Mini App API", docs_url="/api/docs")
+app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["GET", "POST"], allow_headers=["*"])
 
-function ProgressBar({ done, total, width = 10 }) {
-  const t = Math.max(total, 1);
-  const filled = Math.round(width * done / t);
-  return (
-    <span style={{ fontFamily: "monospace", fontSize: 13, color: COLORS.accent }}>
-      {"▰".repeat(filled)}
-      <span style={{ color: COLORS.border }}>{"▱".repeat(width - filled)}</span>
-      <span style={{ color: COLORS.muted, fontSize: 11, marginLeft: 8 }}>{done}/{total}</span>
-    </span>
-  );
-}
+@app.get("/api/health")
+def health():
+    return {"status": "ok", "service": "GymBot Mini App API"}
 
-function Card({ children, accent, style = {} }) {
-  return (
-    <div style={{
-      background: COLORS.card,
-      border: `0.5px solid ${accent ? COLORS.accent : COLORS.border}`,
-      borderRadius: 12,
-      padding: "14px 16px",
-      ...style
-    }}>
-      {children}
-    </div>
-  );
-}
+@app.get("/api/user/{tg_id}")
+def get_user(tg_id: int):
+    with SessionLocal() as db:
+        user = db.execute(text("""
+            SELECT id, telegram_id, first_name, username,
+                   age, weight, height, gender, fitness_level,
+                   desired_result, desired_value_text,
+                   medical_conditions, allergies,
+                   profile_complete, is_minor,
+                   ai_requests_today, ai_requests_reset_date, lang, created_at
+            FROM users WHERE telegram_id=:tg_id
+        """), {"tg_id": tg_id}).fetchone()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        bmi = None
+        if user.weight and user.height:
+            h = user.height / 100
+            bmi = round(float(user.weight) / (h * h), 1)
+        streak = db.execute(text("""
+            SELECT COUNT(DISTINCT DATE(date)) FROM workouts
+            WHERE user_id=:uid AND date >= NOW() - INTERVAL '30 days'
+        """), {"uid": user.id}).scalar() or 0
+        return {
+            "id": user.id, "telegram_id": user.telegram_id,
+            "first_name": user.first_name, "username": user.username,
+            "age": user.age, "weight": float(user.weight) if user.weight else None,
+            "height": user.height, "gender": user.gender,
+            "fitness_level": user.fitness_level, "desired_result": user.desired_result,
+            "desired_value_text": user.desired_value_text,
+            "medical_conditions": user.medical_conditions or [],
+            "allergies": user.allergies or [],
+            "profile_complete": user.profile_complete,
+            "ai_requests_today": user.ai_requests_today or 0,
+            "lang": user.lang or "ru", "bmi": bmi, "streak_days": streak,
+        }
 
-function NavBar({ active, onChange }) {
-  const tabs = [
-    { id: "menu", icon: "⊞", label: "Меню" },
-    { id: "workout", icon: "▶", label: "Тренировка" },
-    { id: "progress", icon: "↗", label: "Прогресс" },
-    { id: "catalog", icon: "☰", label: "Каталог" },
-    { id: "ai", icon: "●", label: "Тренер" },
-  ];
-  return (
-    <div style={{
-      position: "fixed", bottom: 0, left: 0, right: 0,
-      background: COLORS.surface,
-      borderTop: `0.5px solid ${COLORS.border}`,
-      display: "flex",
-      padding: "8px 0 calc(8px + env(safe-area-inset-bottom))",
-      zIndex: 100,
-    }}>
-      {tabs.map(t => (
-        <button key={t.id} onClick={() => onChange(t.id)} style={{
-          flex: 1, background: "none", border: "none", cursor: "pointer",
-          display: "flex", flexDirection: "column", alignItems: "center", gap: 3,
-          padding: "4px 0",
-        }}>
-          <span style={{ fontSize: 18, color: active === t.id ? COLORS.accent : COLORS.muted }}>{t.icon}</span>
-          <span style={{ fontSize: 10, fontFamily: "monospace", letterSpacing: 0.5, color: active === t.id ? COLORS.accent : COLORS.muted }}>
-            {t.label}
-          </span>
-        </button>
-      ))}
-    </div>
-  );
-}
+@app.get("/api/workouts/{tg_id}")
+def get_workouts(tg_id: int, limit: int = 20):
+    with SessionLocal() as db:
+        user = db.execute(text("SELECT id FROM users WHERE telegram_id=:tg_id"), {"tg_id": tg_id}).fetchone()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        rows = db.execute(text("""
+            SELECT w.id, w.date, w.status,
+                   COALESCE(w.total_volume, 0) as total_volume,
+                   COUNT(ws.id) as sets_count,
+                   0 as duration_min
+            FROM workouts w
+            LEFT JOIN workout_sets ws ON ws.workout_id = w.id
+            WHERE w.user_id=:uid
+            GROUP BY w.id ORDER BY w.date DESC LIMIT :limit
+        """), {"uid": user.id, "limit": limit}).fetchall()
+        return {"workouts": [{"id": r.id, "date": r.date.isoformat() if r.date else None,
+            "workout_type": r.workout_type, "sets_count": r.sets_count or 0,
+            "total_volume": float(r.total_volume or 0),
+            "duration_min": round(float(r.duration_min or 0))} for r in rows]}
 
-function MenuScreen({ user }) {
-  const streak = user?.streak_days || 0;
-  const goal = user?.desired_result;
-  const goalLabels = {
-    lose_weight: "Похудение", gain_muscle: "Набор массы",
-    gain_strength: "Сила", improve_endurance: "Выносливость", stay_healthy: "Здоровье"
-  };
+@app.get("/api/stats/{tg_id}")
+def get_stats(tg_id: int, days: int = 30):
+    with SessionLocal() as db:
+        user = db.execute(text("SELECT id FROM users WHERE telegram_id=:tg_id"), {"tg_id": tg_id}).fetchone()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        uid = user.id
+        since = datetime.utcnow() - timedelta(days=days)
+        totals = db.execute(text("""
+            SELECT COUNT(DISTINCT w.id) as total_workouts, COUNT(ws.id) as total_sets,
+                   COALESCE(SUM(ws.reps * ws.weight), 0) as total_volume
+            FROM workouts w LEFT JOIN workout_sets ws ON ws.workout_id = w.id
+            WHERE w.user_id=:uid AND w.date >= :since AND w.status = 'finished'
+        """), {"uid": uid, "since": since}).fetchone()
+        weekly = db.execute(text("""
+            SELECT DATE_TRUNC('week', date) as week, COUNT(*) as cnt
+            FROM workouts WHERE user_id=:uid AND date >= NOW() - INTERVAL '56 days'
+            AND status = 'finished' GROUP BY week ORDER BY week
+        """), {"uid": uid}).fetchall()
+        weight_logs = db.execute(text("""
+            SELECT weight, logged_at FROM weight_log
+            WHERE user_id=:uid ORDER BY logged_at DESC LIMIT 10
+        """), {"uid": uid}).fetchall()
+        return {
+            "period_days": days,
+            "total_workouts": totals.total_workouts or 0,
+            "total_sets": totals.total_sets or 0,
+            "total_volume": float(totals.total_volume or 0),
+            "weekly_workouts": [int(r.cnt) for r in weekly],
+            "streak_days": db.execute(text("""
+                SELECT COUNT(DISTINCT DATE(date)) FROM workouts
+                WHERE user_id=:uid AND status = 'finished'
+            """), {"uid": uid}).scalar() or 0,
+            "weight_logs": [{"weight": float(w.weight), "logged_at": w.logged_at.isoformat()} for w in weight_logs],
+        }
 
-  const quickActions = [
-    { label: "Начать тренировку", icon: "▶", accent: true, cb: "start_workout" },
-    { label: "Мои тренировки", icon: "☰", cb: "my_workouts" },
-    { label: "Запланировать", icon: "◷", cb: "plan_workout" },
-    { label: "Питание", icon: "◈", cb: "nutrition_menu" },
-    { label: "Добавки", icon: "◆", cb: "supplements_menu" },
-    { label: "Замеры", icon: "○", cb: "body_measurements" },
-    { label: "Чек-ин", icon: "✓", cb: "start_checkin" },
-    { label: "Поддержка", icon: "?", cb: "open_support" },
-  ];
+@app.get("/api/exercises")
+def get_exercises(group_id: Optional[int] = None, search: Optional[str] = None):
+    with SessionLocal() as db:
+        where = "WHERE 1=1"
+        params = {}
+        if group_id:
+            where += " AND e.muscle_group_id=:gid"
+            params["gid"] = group_id
+        if search:
+            where += " AND LOWER(e.name) LIKE :q"
+            params["q"] = f"%{search.lower()}%"
+        exercises = db.execute(text(f"""
+            SELECT e.id, e.name, e.description, e.difficulty, e.equipment,
+                   e.sets_recommended, e.reps_recommended, e.muscle_group_id, e.r2_slug,
+                   mg.name as group_name, mg.emoji as group_emoji
+            FROM exercises e JOIN muscle_groups mg ON mg.id = e.muscle_group_id
+            {where} ORDER BY mg.id, e.name LIMIT 200
+        """), params).fetchall()
+        groups = db.execute(text("SELECT id, name, emoji FROM muscle_groups ORDER BY id")).fetchall()
+        return {
+            "exercises": [{"id": e.id, "name": e.name, "description": e.description,
+                "difficulty": e.difficulty, "equipment": e.equipment,
+                "sets_recommended": e.sets_recommended, "reps_recommended": e.reps_recommended,
+                "muscle_group_id": e.muscle_group_id, "group_name": e.group_name,
+                "group_emoji": e.group_emoji, "photo_url": r2_photo_url(e.r2_slug)} for e in exercises],
+            "muscle_groups": [{"id": g.id, "name": g.name, "emoji": g.emoji} for g in groups],
+        }
 
-  function sendToBot(cb) {
-    tg?.sendData(JSON.stringify({ action: cb }));
-  }
+class AIRequest(BaseModel):
+    question: str
+    tg_id: Optional[int] = None
 
-  return (
-    <div style={{ padding: "16px 16px 100px" }}>
-      <div style={{ marginBottom: 20 }}>
-        {streak > 0 && (
-          <div style={{ fontFamily: "monospace", fontSize: 12, color: COLORS.accent, marginBottom: 8 }}>
-            🔥 {streak} {streak === 1 ? "ДЕНЬ" : "ДНЯ"} ПОДРЯД · НЕ СЛЕЙ СЕРИЮ
-          </div>
-        )}
-        <Hero>О, ТЫ ВЕРНУЛСЯ{user?.first_name ? `, ${user.first_name.split(" ")[0].toUpperCase()}` : ""}</Hero>
-        {goal && (
-          <div style={{ color: COLORS.muted, fontSize: 13, marginTop: 6, fontFamily: "monospace" }}>
-            ЦЕЛЬ · {goalLabels[goal] || goal}
-          </div>
-        )}
-      </div>
+@app.post("/api/ai/ask")
+async def ai_ask(req: AIRequest):
+    if not ANTHROPIC_API_KEY:
+        raise HTTPException(status_code=503, detail="AI not configured")
+    with SessionLocal() as db:
+        user = None
+        requests_today = 0
+        if req.tg_id:
+            user = db.execute(text("""
+                SELECT id, age, weight, height, gender, fitness_level,
+                       desired_result, medical_conditions, allergies,
+                       ai_requests_today, ai_requests_reset_date, lang
+                FROM users WHERE telegram_id=:tg_id
+            """), {"tg_id": req.tg_id}).fetchone()
+        if user:
+            today = datetime.utcnow().date()
+            reset_date = user.ai_requests_reset_date
+            if hasattr(reset_date, 'date'):
+                reset_date = reset_date.date()
+            requests_today = user.ai_requests_today or 0
+            if reset_date != today:
+                requests_today = 0
+                db.execute(text("UPDATE users SET ai_requests_today=0, ai_requests_reset_date=:today WHERE id=:uid"),
+                           {"today": today, "uid": user.id})
+                db.commit()
+            if requests_today >= AI_DAILY_LIMIT:
+                raise HTTPException(status_code=429, detail=f"Daily limit {AI_DAILY_LIMIT} reached")
+        lang = (user.lang if user else None) or "ru"
+        lang_hint = "Reply in Russian." if lang == "ru" else ("Reply in Uzbek." if lang == "uz" else "Reply in English.")
+        if user:
+            context = (f"You are GymBot AI Coach. Client: {user.age}y, {user.weight}kg, {user.height}cm, "
+                       f"level={user.fitness_level}, goal={user.desired_result}. {lang_hint} "
+                       f"Be practical, max 300 words.\nQUESTION: {req.question}")
+        else:
+            context = f"You are GymBot AI fitness coach. {lang_hint} Be practical, max 300 words.\nQUESTION: {req.question}"
+        import anthropic
+        client = anthropic.Anthropic(api_key=ANTHROPIC_API_KEY)
+        message = client.messages.create(
+            model="claude-sonnet-4-6", max_tokens=1000,
+            messages=[{"role": "user", "content": context}]
+        )
+        answer = message.content[0].text
+        if user:
+            db.execute(text("UPDATE users SET ai_requests_today=COALESCE(ai_requests_today,0)+1, ai_requests_reset_date=:today WHERE id=:uid"),
+                       {"today": datetime.utcnow().date(), "uid": user.id})
+            db.commit()
+        return {"answer": answer, "requests_used": requests_today + 1}
 
-      <button
-        onClick={() => sendToBot("start_workout")}
-        style={{
-          width: "100%", background: COLORS.accent, border: "none", borderRadius: 12,
-          padding: "18px", color: COLORS.bg, fontWeight: 700, fontSize: 18,
-          letterSpacing: 1, textTransform: "uppercase", cursor: "pointer", marginBottom: 16,
-        }}
-      >
-        ▶ НАЧАТЬ ТРЕНИРОВКУ
-      </button>
-
-      <div style={{ fontFamily: "monospace", fontSize: 10, color: COLORS.muted, letterSpacing: 2, marginBottom: 10 }}>
-        БЫСТРЫЙ ДОСТУП
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-        {quickActions.slice(1).map(a => (
-          <Card key={a.cb} style={{ cursor: "pointer" }} onClick={() => sendToBot(a.cb)}>
-            <div style={{ fontSize: 18, color: COLORS.accent, marginBottom: 4 }}>{a.icon}</div>
-            <div style={{ fontSize: 13, color: COLORS.text, fontWeight: 500 }}>{a.label}</div>
-          </Card>
-        ))}
-      </div>
-
-      {user && (
-        <div style={{ marginTop: 16 }}>
-          <div style={{ fontFamily: "monospace", fontSize: 10, color: COLORS.muted, letterSpacing: 2, marginBottom: 10 }}>
-            ПРОФИЛЬ
-          </div>
-          <Card>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-              <div>
-                <div style={{ fontWeight: 600, fontSize: 15, color: COLORS.text }}>{user.first_name}</div>
-                <div style={{ fontSize: 12, color: COLORS.muted, marginTop: 2 }}>
-                  {user.age} лет · {user.weight} кг · {user.height} см
-                </div>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 11, fontFamily: "monospace", color: COLORS.accent }}>
-                  {user.fitness_level?.toUpperCase() || "—"}
-                </div>
-              </div>
-            </div>
-            <div style={{ borderTop: `0.5px solid ${COLORS.border}`, marginTop: 10, paddingTop: 10, display: "flex", gap: 16 }}>
-              <div>
-                <div style={{ fontSize: 10, color: COLORS.muted, fontFamily: "monospace" }}>ИМТ</div>
-                <Stat value={user.bmi || "—"} />
-              </div>
-              <div>
-                <div style={{ fontSize: 10, color: COLORS.muted, fontFamily: "monospace" }}>AI ЗАПРОСОВ</div>
-                <Stat value={`${user.ai_requests_today || 0}/5`} />
-              </div>
-            </div>
-          </Card>
-        </div>
-      )}
-    </div>
-  );
-}
-
-function WorkoutScreen({ workouts }) {
-  if (!workouts) return <Loader text="ЗАГРУЗКА ТРЕНИРОВОК" />;
-
-  return (
-    <div style={{ padding: "16px 16px 100px" }}>
-      <Kicker>ИСТОРИЯ ТРЕНИРОВОК</Kicker>
-      <Hero>МОИ ТРЕНИРОВКИ</Hero>
-      <div style={{ height: 16 }} />
-
-      {workouts.length === 0 ? (
-        <Card>
-          <div style={{ textAlign: "center", padding: "20px 0" }}>
-            <div style={{ fontSize: 32, marginBottom: 8 }}>◎</div>
-            <div style={{ color: COLORS.muted, fontSize: 14 }}>Тренировок пока нет</div>
-            <div style={{ color: COLORS.accent, fontSize: 13, marginTop: 4, fontFamily: "monospace" }}>
-              НАЧНИ ПЕРВУЮ →
-            </div>
-          </div>
-        </Card>
-      ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {workouts.map((w, i) => (
-            <Card key={i}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                <div>
-                  <Kicker>{new Date(w.started_at).toLocaleDateString("ru", { day: "numeric", month: "short" })}</Kicker>
-                  <div style={{ fontWeight: 600, fontSize: 15, color: COLORS.text }}>
-                    {w.workout_type || "Тренировка"}
-                  </div>
-                </div>
-                <div style={{ textAlign: "right" }}>
-                  <Stat value={w.duration_min || "—"} unit="мин" />
-                </div>
-              </div>
-              <div style={{ borderTop: `0.5px solid ${COLORS.border}`, marginTop: 10, paddingTop: 10, display: "flex", gap: 20 }}>
-                <div>
-                  <div style={{ fontSize: 10, color: COLORS.muted, fontFamily: "monospace" }}>ПОДХОДОВ</div>
-                  <Stat value={w.sets_count || 0} />
-                </div>
-                <div>
-                  <div style={{ fontSize: 10, color: COLORS.muted, fontFamily: "monospace" }}>ТОННАЖ</div>
-                  <Stat value={Math.round((w.total_volume || 0) / 1000 * 10) / 10} unit="т" />
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-
-function ProgressScreen({ stats }) {
-  if (!stats) return <Loader text="ЗАГРУЗКА ПРОГРЕССА" />;
-
-  const weekly = stats.weekly_workouts || [0, 0, 0, 0];
-  const peak = Math.max(...weekly, 1);
-  const blocks = " ▁▂▃▄▅▆▇█";
-  const spark = weekly.map(v => blocks[Math.min(8, Math.round(8 * v / peak))]).join("");
-
-  return (
-    <div style={{ padding: "16px 16px 100px" }}>
-      <Kicker>{stats.period_days || 30} ДНЕЙ</Kicker>
-      <Hero>{stats.period_days || 30} ДНЕЙ ОГНЯ</Hero>
-      <div style={{ height: 16 }} />
-
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
-        <Card>
-          <div style={{ fontSize: 10, color: COLORS.muted, fontFamily: "monospace", marginBottom: 4 }}>ТРЕНИРОВОК</div>
-          <Stat value={stats.total_workouts || 0} />
-        </Card>
-        <Card>
-          <div style={{ fontSize: 10, color: COLORS.muted, fontFamily: "monospace", marginBottom: 4 }}>ПОДХОДОВ</div>
-          <Stat value={stats.total_sets || 0} />
-        </Card>
-        <Card>
-          <div style={{ fontSize: 10, color: COLORS.muted, fontFamily: "monospace", marginBottom: 4 }}>ТОННАЖ</div>
-          <Stat value={Math.round((stats.total_volume || 0) / 1000 * 10) / 10} unit="т" />
-        </Card>
-        <Card>
-          <div style={{ fontSize: 10, color: COLORS.muted, fontFamily: "monospace", marginBottom: 4 }}>СЕРИЯ</div>
-          <Stat value={stats.streak_days || 0} unit="дн" />
-        </Card>
-      </div>
-
-      {weekly.length > 0 && (
-        <Card style={{ marginBottom: 16 }}>
-          <Kicker>ПО НЕДЕЛЯМ</Kicker>
-          <div style={{ fontFamily: "monospace", fontSize: 22, color: COLORS.accent, letterSpacing: 2, margin: "8px 0" }}>
-            {spark}
-          </div>
-          <div style={{ fontSize: 11, color: COLORS.muted, fontFamily: "monospace" }}>
-            тренировок в неделю
-          </div>
-        </Card>
-      )}
-
-      {stats.weight_logs && stats.weight_logs.length > 0 && (
-        <Card>
-          <Kicker>ДИНАМИКА ВЕСА</Kicker>
-          <div style={{ marginTop: 8 }}>
-            {stats.weight_logs.slice(-5).map((w, i) => (
-              <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "4px 0", borderBottom: `0.5px solid ${COLORS.border}` }}>
-                <span style={{ fontSize: 12, color: COLORS.muted, fontFamily: "monospace" }}>
-                  {new Date(w.logged_at).toLocaleDateString("ru", { day: "numeric", month: "short" })}
-                </span>
-                <Stat value={w.weight} unit="кг" />
-              </div>
-            ))}
-          </div>
-        </Card>
-      )}
-    </div>
-  );
-}
-
-function CatalogScreen({ exercises, muscleGroups }) {
-  const [activeGroup, setActiveGroup] = useState(null);
-  const [search, setSearch] = useState("");
-
-  const filtered = exercises?.filter(e => {
-    const matchGroup = !activeGroup || e.muscle_group_id === activeGroup;
-    const matchSearch = !search || e.name.toLowerCase().includes(search.toLowerCase());
-    return matchGroup && matchSearch;
-  }) || [];
-
-  const diffColor = { easy: COLORS.success, medium: COLORS.accent, hard: COLORS.danger };
-  const diffLabel = { easy: "Лёгкое", medium: "Среднее", hard: "Сложное" };
-
-  return (
-    <div style={{ padding: "16px 16px 100px" }}>
-      <Kicker>БАЗА ЗНАНИЙ</Kicker>
-      <Hero>УПРАЖНЕНИЯ</Hero>
-      <div style={{ height: 12 }} />
-
-      <input
-        value={search}
-        onChange={e => setSearch(e.target.value)}
-        placeholder="ПОИСК..."
-        style={{
-          width: "100%", background: COLORS.card, border: `0.5px solid ${COLORS.border}`,
-          borderRadius: 8, padding: "10px 14px", color: COLORS.text, fontSize: 13,
-          fontFamily: "monospace", letterSpacing: 1, boxSizing: "border-box", marginBottom: 12,
-          outline: "none",
-        }}
-      />
-
-      <div style={{ display: "flex", gap: 6, overflowX: "auto", paddingBottom: 8, marginBottom: 12 }}>
-        <button
-          onClick={() => setActiveGroup(null)}
-          style={{
-            flexShrink: 0, padding: "6px 12px", borderRadius: 20,
-            background: !activeGroup ? COLORS.accent : COLORS.card,
-            color: !activeGroup ? COLORS.bg : COLORS.muted,
-            border: `0.5px solid ${!activeGroup ? COLORS.accent : COLORS.border}`,
-            fontSize: 11, fontFamily: "monospace", cursor: "pointer", fontWeight: 700,
-          }}
-        >ВСЕ</button>
-        {muscleGroups?.map(g => (
-          <button
-            key={g.id}
-            onClick={() => setActiveGroup(g.id === activeGroup ? null : g.id)}
-            style={{
-              flexShrink: 0, padding: "6px 12px", borderRadius: 20,
-              background: activeGroup === g.id ? COLORS.accent : COLORS.card,
-              color: activeGroup === g.id ? COLORS.bg : COLORS.muted,
-              border: `0.5px solid ${activeGroup === g.id ? COLORS.accent : COLORS.border}`,
-              fontSize: 11, fontFamily: "monospace", cursor: "pointer",
-            }}
-          >{g.emoji} {g.name.toUpperCase()}</button>
-        ))}
-      </div>
-
-      <div style={{ fontSize: 10, color: COLORS.muted, fontFamily: "monospace", marginBottom: 8 }}>
-        {filtered.length} УПРАЖНЕНИЙ
-      </div>
-
-      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-        {filtered.slice(0, 40).map(ex => (
-          <Card key={ex.id}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 600, fontSize: 14, color: COLORS.text }}>{ex.name}</div>
-                <div style={{ fontSize: 11, color: COLORS.muted, marginTop: 2 }}>{ex.description}</div>
-              </div>
-              <div style={{ marginLeft: 8 }}>
-                <span style={{
-                  fontSize: 10, fontFamily: "monospace", padding: "2px 6px", borderRadius: 4,
-                  background: `${diffColor[ex.difficulty]}22`,
-                  color: diffColor[ex.difficulty] || COLORS.muted,
-                }}>
-                  {diffLabel[ex.difficulty] || ex.difficulty}
-                </span>
-              </div>
-            </div>
-            <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
-              <div style={{ fontSize: 10, color: COLORS.muted, fontFamily: "monospace" }}>
-                {ex.sets_recommended} ПОДХ
-              </div>
-              <div style={{ fontSize: 10, color: COLORS.muted, fontFamily: "monospace" }}>
-                {ex.reps_recommended} ПОВТ
-              </div>
-              <div style={{ fontSize: 10, color: COLORS.muted, fontFamily: "monospace" }}>
-                {ex.equipment}
-              </div>
-            </div>
-          </Card>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function AIScreen({ user }) {
-  const [question, setQuestion] = useState("");
-  const [answer, setAnswer] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const requestsLeft = 5 - (user?.ai_requests_today || 0);
-
-  const suggestions = [
-    "Сплит на 3 дня под набор массы",
-    "Что есть до и после тренировки",
-    "Техника приседаний со штангой",
-    "Программа для похудения на месяц",
-  ];
-
-  async function ask(q) {
-    if (!q.trim() || loading) return;
-    setLoading(true);
-    setAnswer(null);
-    setQuestion("");
-    try {
-      const res = await fetch(`${API_BASE}/ai/ask`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: q, tg_id: tg?.initDataUnsafe?.user?.id }),
-      });
-      const data = await res.json();
-      setAnswer(data.answer || "Нет ответа");
-    } catch {
-      setAnswer("Ошибка соединения с тренером. Попробуй позже.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  return (
-    <div style={{ padding: "16px 16px 100px" }}>
-      <Kicker>AI ТРЕНЕР</Kicker>
-      <Hero>ТРЕНЕР НА СВЯЗИ</Hero>
-      <div style={{ color: COLORS.muted, fontSize: 13, marginTop: 6, marginBottom: 16, fontFamily: "monospace" }}>
-        ЗАПРОСОВ СЕГОДНЯ ОСТАЛОСЬ · <span style={{ color: COLORS.accent }}>{requestsLeft}</span>
-      </div>
-
-      <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
-        <input
-          value={question}
-          onChange={e => setQuestion(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && ask(question)}
-          placeholder="СПРОСИ ЧТО УГОДНО..."
-          style={{
-            flex: 1, background: COLORS.card, border: `0.5px solid ${COLORS.border}`,
-            borderRadius: 8, padding: "10px 14px", color: COLORS.text, fontSize: 13,
-            fontFamily: "monospace", letterSpacing: 0.5, outline: "none",
-          }}
-        />
-        <button
-          onClick={() => ask(question)}
-          disabled={loading || !question.trim()}
-          style={{
-            background: COLORS.accent, border: "none", borderRadius: 8, padding: "10px 16px",
-            color: COLORS.bg, fontWeight: 700, fontSize: 14, cursor: "pointer",
-            opacity: loading || !question.trim() ? 0.5 : 1,
-          }}
-        >→</button>
-      </div>
-
-      <div style={{ marginBottom: 16 }}>
-        <div style={{ fontSize: 10, color: COLORS.muted, fontFamily: "monospace", marginBottom: 8 }}>БЫСТРЫЕ ВОПРОСЫ</div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-          {suggestions.map((s, i) => (
-            <button
-              key={i}
-              onClick={() => { setQuestion(s); ask(s); }}
-              style={{
-                background: COLORS.card, border: `0.5px solid ${COLORS.border}`,
-                borderRadius: 8, padding: "10px 14px", color: COLORS.text,
-                fontSize: 13, cursor: "pointer", textAlign: "left",
-              }}
-            >{s} →</button>
-          ))}
-        </div>
-      </div>
-
-      {loading && (
-        <Card>
-          <div style={{ textAlign: "center", padding: "16px 0" }}>
-            <div style={{ color: COLORS.accent, fontFamily: "monospace", fontSize: 12, letterSpacing: 2 }}>
-              ТРЕНЕР ДУМАЕТ...
-            </div>
-          </div>
-        </Card>
-      )}
-
-      {answer && (
-        <Card accent>
-          <Kicker>ОТВЕТ ТРЕНЕРА</Kicker>
-          <div style={{ fontSize: 14, color: COLORS.text, lineHeight: 1.6, marginTop: 8, whiteSpace: "pre-wrap" }}>
-            {answer}
-          </div>
-          <button
-            onClick={() => { setAnswer(null); }}
-            style={{
-              marginTop: 12, background: "none", border: "0.5px solid " + COLORS.accent,
-              borderRadius: 8, padding: "8px 16px", color: COLORS.accent,
-              fontSize: 12, fontFamily: "monospace", cursor: "pointer", letterSpacing: 1,
-            }}
-          >+ ЗАДАТЬ ЕЩЁ ВОПРОС</button>
-        </Card>
-      )}
-    </div>
-  );
-}
-
-function Loader({ text = "ЗАГРУЗКА" }) {
-  return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "60vh" }}>
-      <div style={{ textAlign: "center" }}>
-        <div style={{ fontFamily: "monospace", fontSize: 12, color: COLORS.accent, letterSpacing: 3 }}>{text}</div>
-        <div style={{ color: COLORS.muted, fontSize: 24, marginTop: 8 }}>◌</div>
-      </div>
-    </div>
-  );
-}
-
-export default function App() {
-  const [tab, setTab] = useState("menu");
-  const [user, setUser] = useState(null);
-  const [workouts, setWorkouts] = useState(null);
-  const [stats, setStats] = useState(null);
-  const [exercises, setExercises] = useState(null);
-  const [muscleGroups, setMuscleGroups] = useState(null);
-
-  useEffect(() => {
-    tg?.ready();
-    tg?.expand();
-
-    const tgUser = tg?.initDataUnsafe?.user;
-    if (tgUser) {
-      fetch(`${API_BASE}/user/${tgUser.id}`)
-        .then(r => r.json())
-        .then(setUser)
-        .catch(() => setUser({ first_name: tgUser.first_name, telegram_id: tgUser.id }));
-    } else {
-      setUser({ first_name: "Атлет", ai_requests_today: 0 });
-    }
-
-    fetch(`${API_BASE}/exercises`)
-      .then(r => r.json())
-      .then(data => { setExercises(data.exercises || []); setMuscleGroups(data.muscle_groups || []); })
-      .catch(() => { setExercises([]); setMuscleGroups([]); });
-  }, []);
-
-  useEffect(() => {
-    if (tab === "workout" && !workouts) {
-      const tgUser = tg?.initDataUnsafe?.user;
-      if (!tgUser) { setWorkouts([]); return; }
-      fetch(`${API_BASE}/workouts/${tgUser.id}`)
-        .then(r => r.json())
-        .then(data => setWorkouts(data.workouts || []))
-        .catch(() => setWorkouts([]));
-    }
-    if (tab === "progress" && !stats) {
-      const tgUser = tg?.initDataUnsafe?.user;
-      if (!tgUser) { setStats({}); return; }
-      fetch(`${API_BASE}/stats/${tgUser.id}`)
-        .then(r => r.json())
-        .then(setStats)
-        .catch(() => setStats({}));
-    }
-  }, [tab]);
-
-  return (
-    <div style={{ background: COLORS.bg, minHeight: "100vh", color: COLORS.text, fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" }}>
-      {tab === "menu" && <MenuScreen user={user} />}
-      {tab === "workout" && <WorkoutScreen workouts={workouts} />}
-      {tab === "progress" && <ProgressScreen stats={stats} />}
-      {tab === "catalog" && <CatalogScreen exercises={exercises} muscleGroups={muscleGroups} />}
-      {tab === "ai" && <AIScreen user={user} />}
-      <NavBar active={tab} onChange={setTab} />
-    </div>
-  );
-}
+@app.get("/api/nutrition/{tg_id}")
+def get_nutrition(tg_id: int):
+    with SessionLocal() as db:
+        user = db.execute(text("""
+            SELECT id, age, weight, height, gender, fitness_level, desired_result
+            FROM users WHERE telegram_id=:tg_id
+        """), {"tg_id": tg_id}).fetchone()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found")
+        today = datetime.utcnow().date()
+        logs = db.execute(text("""
+            SELECT meal_name, kcal, protein, fat, carb FROM food_log
+            WHERE user_id=:uid AND DATE(date)=:today ORDER BY date
+        """), {"uid": user.id, "today": today}).fetchall()
+        w, h, a = float(user.weight or 70), user.height or 175, user.age or 30
+        bmr = (10*w + 6.25*h - 5*a + 5) if user.gender == "male" else (10*w + 6.25*h - 5*a - 161)
+        tdee = round(bmr * {"beginner": 1.375, "intermediate": 1.55, "advanced": 1.725}.get(user.fitness_level, 1.375))
+        target = tdee + {"lose_weight": -500, "gain_muscle": 300, "gain_strength": 200}.get(user.desired_result, 0)
+        return {
+            "tdee": tdee, "target_kcal": target,
+            "today_logs": [{"meal_name": l.meal_name, "kcal": l.kcal,
+                "protein": float(l.protein or 0), "fat": float(l.fat or 0), "carb": float(l.carb or 0)} for l in logs],
+            "today_totals": {"kcal": sum(l.kcal or 0 for l in logs),
+                "protein": round(sum(float(l.protein or 0) for l in logs), 1),
+                "fat": round(sum(float(l.fat or 0) for l in logs), 1),
+                "carb": round(sum(float(l.carb or 0) for l in logs), 1)},
+        }
