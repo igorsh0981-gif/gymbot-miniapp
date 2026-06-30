@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>GymBot</title>
     <link rel="manifest" href="/gymbot-miniapp/manifest.json">
+    <link rel="icon" type="image/png" sizes="32x32" href="/gymbot-miniapp/favicon_32.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/gymbot-miniapp/icon_180.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="/gymbot-miniapp/icon_192.png">
     <meta name="theme-color" content="#0F0F0F">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -14,10 +17,46 @@
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { background: #0F0F0F; overflow-x: hidden; }
+
+      /* Splash screen - shown until React mounts */
+      #splash {
+        position: fixed; inset: 0; z-index: 9999;
+        background: #0F0F0F;
+        display: flex; align-items: center; justify-content: center;
+        transition: opacity 0.4s ease;
+      }
+      #splash img {
+        width: min(70vw, 320px);
+        animation: splash-pulse 1.6s ease-in-out infinite;
+      }
+      @keyframes splash-pulse {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.85; transform: scale(0.97); }
+      }
+      #splash.hidden { opacity: 0; pointer-events: none; }
     </style>
   </head>
   <body>
+    <div id="splash"><img src="/gymbot-miniapp/splash_full.png" alt="GymBot" /></div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
+    <script>
+      // Hide splash screen once React has mounted content into #root
+      (function () {
+        var tries = 0;
+        var iv = setInterval(function () {
+          var root = document.getElementById('root');
+          var splash = document.getElementById('splash');
+          tries++;
+          if ((root && root.children.length > 0) || tries > 100) {
+            clearInterval(iv);
+            if (splash) {
+              splash.classList.add('hidden');
+              setTimeout(function () { splash.remove(); }, 450);
+            }
+          }
+        }, 50);
+      })();
+    </script>
   </body>
 </html>
