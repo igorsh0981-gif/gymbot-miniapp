@@ -9,12 +9,144 @@ const API = "https://web-production-4fe0b.up.railway.app/api";
 const _originalFetch = window.fetch.bind(window);
 window.fetch = (url, options = {}) => {
   const urlStr = typeof url === "string" ? url : (url?.url || "");
-  if (urlStr.startsWith(API) && tg?.initData) {
-    const headers = { ...(options.headers || {}), "X-Telegram-Init-Data": tg.initData };
-    return _originalFetch(url, { ...options, headers });
+  const isOwn = urlStr.startsWith(API);
+  const method = (options.method || "GET").toUpperCase();
+  const opts = (isOwn && tg?.initData)
+    ? { ...options, headers: { ...(options.headers || {}), "X-Telegram-Init-Data": tg.initData } }
+    : options;
+  const res = _originalFetch(url, opts);
+  // Любой изменяющий запрос к своему API сбрасывает затронутые записи кэша.
+  // Делаем это здесь, а не в двадцати местах по экранам: про половину точек
+  // мутации рано или поздно забудешь, и человек увидит устаревшие данные.
+  if (isOwn && method !== "GET") {
+    return res.then(r => { if (r.ok) _invalidateByMutation(urlStr); return r; });
   }
-  return _originalFetch(url, options);
+  return res;
 };
+
+// ─────────────────────────────────────────────────────────────────────────────
+//  Кэш GET-запросов с инвалидацией по событиям
+//
+//  В логах одного сеанса: /home семь раз, /planned пять, /alternatives три,
+//  /sport-types три. Данные те же, а каждый возврат на экран ждёт сеть — отсюда
+//  и ощущение, что переходы стали долгими.
+//
+//  Кэш живёт в памяти вкладки, а не в localStorage: устаревшие данные после
+//  перезапуска приложения опаснее лишнего запроса.
+// ─────────────────────────────────────────────────────────────────────────────
+const _apiCache = new Map();   // url -> {t, data}
+const _apiInflight = new Map(); // url -> Promise, чтобы два экрана не дёргали одно и то же
+
+// Сколько живёт ответ. Короткий у того, что меняется от действий человека,
+// длинный у справочников.
+const API_TTL = [
+  [/\/sport-types$/,        60 * 60 * 1000],
+  [/\/exercises$/,          30 * 60 * 1000],
+  [/\/splits$/,             60 * 60 * 1000],
+  [/\/custom-exercises\//,   5 * 60 * 1000],
+  [/\/home\/\d+\/alternatives/, 3 * 60 * 1000],
+  [/\/home\/\d+$/,           2 * 60 * 1000],
+  [/\/planned\/\d+$/,        2 * 60 * 1000],
+  [/\/user\/\d+$/,           2 * 60 * 1000],
+  [/\/user\/\d+\/supplements/, 5 * 60 * 1000],
+];
+function _ttlFor(url){
+  for(const [re,ms] of API_TTL) if(re.test(url)) return ms;
+  return 0; // не кэшируем то, что не перечислено явно
+}
+
+// Поколение адреса растёт при каждом сбросе. Запрос, вылетевший ДО сброса,
+// снимает данные до изменения — и, вернувшись, не должен класть их в кэш.
+// Иначе так: открыт главный экран, запрос в полёте, человек жмёт «Завершить
+// тренировку», кэш сброшен — и приехавший следом старый ответ ложится свежим
+// на две минуты, показывая состояние до тренировки.
+let _apiGen = 0;
+
+/** GET с кэшем. force:true — сходить на сервер и обновить запись. */
+function apiGet(url,{force=false}={}){
+  const ttl=_ttlFor(url);
+  if(ttl===0) return fetch(url).then(r=>{if(!r.ok)throw new Error(r.status);return r.json();});
+  const now=Date.now();
+  if(!force){
+    const hit=_apiCache.get(url);
+    if(hit&&now-hit.t<ttl) return Promise.resolve(hit.data);
+    const flying=_apiInflight.get(url);
+    if(flying) return flying;
+  }
+  const genAtStart=_apiGen;
+  const p=fetch(url)
+    .then(r=>{if(!r.ok)throw new Error(r.status);return r.json();})
+    .then(d=>{
+      // Пока запрос летел, кэш сбросили — данные уже неактуальны, в кэш не кладём.
+      // Вызывающему отдаём как есть: экран хотя бы что-то покажет, а следующий
+      // заход сходит на сервер заново.
+      if(_apiGen===genAtStart) _apiCache.set(url,{t:Date.now(),data:d});
+      return d;
+    })
+    .finally(()=>{
+      // Снимаем только СВОЮ запись: после сброса здесь уже может лежать
+      // промис более нового запроса, и затирать его нельзя.
+      if(_apiInflight.get(url)===p) _apiInflight.delete(url);
+    });
+  _apiInflight.set(url,p);
+  return p;
+}
+
+/** Сбросить кэш по подстрокам пути. invalidateApi("/home","/planned") */
+function invalidateApi(...parts){
+  _apiGen++;
+  for(const key of Array.from(_apiCache.keys()))
+    if(parts.some(p=>key.includes(p))) _apiCache.delete(key);
+  for(const key of Array.from(_apiInflight.keys()))
+    if(parts.some(p=>key.includes(p))) _apiInflight.delete(key);
+}
+
+// Какие записи устаревают после какого события. Один словарь вместо россыпи
+// ручных сбросов по экранам — иначе про половину мест забудешь.
+const API_EVENTS = {
+  workout_finished: ["/home","/planned","/workouts","/progress","/achievements","/user/"],
+  workout_started:  ["/home","/planned"],
+  planned_changed:  ["/planned","/home"],
+  food_logged:      ["/home","/nutrition"],
+  sport_logged:     ["/home","/workouts","/progress"],
+  exercises_changed:["/custom-exercises","/exercises"],
+  profile_changed:  ["/user/","/home"],
+  prefs_changed:    ["/home","/alternatives","/user/"],
+  checkin_done:     ["/home","/progress","/user/"],
+};
+function apiEvent(name){
+  const parts=API_EVENTS[name];
+  if(parts) invalidateApi(...parts);
+}
+
+// Какой изменяющий запрос какое событие означает. Проверяется сверху вниз,
+// срабатывает первое совпадение.
+const _MUTATION_EVENTS = [
+  [/\/workout\/[^/]+\/(finish|close-active)/, "workout_finished"],
+  // Запись подхода — десятки раз за тренировку, и главный экран в это время
+  // всё равно не смотрят. Сбрасывать на каждый подход незачем.
+  [/\/workout\/[^/]+\/set/,  null],
+  [/\/workout\//,            "workout_started"],
+  [/\/planned\//,            "planned_changed"],
+  // Еда пишется через /nutrition/, а /food/ — только распознавание фото и
+  // пересчёт, они ничего не сохраняют. Без этого правила «Съедено» на главном
+  // не менялось до двух минут после записи обеда.
+  [/\/nutrition\//,          "food_logged"],
+  [/\/food\//,               "food_logged"],
+  [/\/sport\//,              "sport_logged"],
+  [/\/custom-exercises\//,   "exercises_changed"],
+  [/\/training-prefs\//,     "prefs_changed"],
+  [/\/checkin\//,            "checkin_done"],
+  [/\/measurements\//,       "checkin_done"],
+  [/\/consent\//,            "profile_changed"],
+  [/\/user\//,               "profile_changed"],
+];
+function _invalidateByMutation(url){
+  for(const [re,name] of _MUTATION_EVENTS){
+    // name===null — правило-исключение: совпало, но сбрасывать нечего
+    if(re.test(url)){ if(name) apiEvent(name); return; }
+  }
+}
 
 // Показывать баннер "Продолжить тренировку" можно только если тренировка РЕАЛЬНО была начата
 // (есть workoutId — вызов /api/workout/start на сервере уже произошёл). Простой факт наличия
@@ -2981,28 +3113,32 @@ function ConsentGateScreen({tgId,onDone}){
   </div>;
 }
 
-// Данные главного экрана переживают смену вкладки. MenuScreen перемонтируется при
-// каждом возврате в «Меню», и без кэша это давало пустой экран с загрузкой каждый раз.
-const _homeCache={};
+// Данные главного экрана переживают смену вкладки: MenuScreen перемонтируется при
+// каждом возврате в «Меню», и без этого был пустой экран с загрузкой каждый раз.
+// Берём их из общего кэша запросов, а не из отдельного объекта: своим кэшем
+// главный экран не видел сбросов по событиям и мог показывать данные до тренировки.
+function _cachedHome(tgId){
+  const hit=tgId?_apiCache.get(`${API}/home/${tgId}`):null;
+  return hit?hit.data:null;
+}
 
 function MenuScreen({user,onNav,activeWorkout=false}){
   const tgId=user?.telegram_id;
-  const [home,setHome]=useState(()=>(tgId&&_homeCache[tgId])||null);
+  const [home,setHome]=useState(()=>_cachedHome(tgId));
   const [failed,setFailed]=useState(false);
 
   useEffect(()=>{
     if(!tgId)return;
     setFailed(false);
-    fetch(`${API}/home/${tgId}`)
-      .then(r=>{if(!r.ok)throw new Error(r.status);return r.json();})
-      .then(d=>{_homeCache[tgId]=d;setHome(d);})
-      .catch(()=>{if(!_homeCache[tgId])setFailed(true);});
+    apiGet(`${API}/home/${tgId}`)
+      .then(d=>setHome(d))
+      .catch(()=>{if(!_cachedHome(tgId))setFailed(true);});
   },[tgId]);
 
   if(failed)return <div style={{padding:"16px 16px 100px"}}>
     <div style={{fontSize:14,color:C.muted,marginTop:40,textAlign:"center"}}>{t("home_load_error")}</div>
     <Btn full onClick={()=>{setFailed(false);setHome(null);
-      fetch(`${API}/home/${tgId}`).then(r=>r.json()).then(d=>setHome(d)).catch(()=>setFailed(true));}}
+      apiGet(`${API}/home/${tgId}`,{force:true}).then(d=>setHome(d)).catch(()=>setFailed(true));}}
       style={{marginTop:16}}>{t("retry")}</Btn>
   </div>;
   if(!home)return <Loader text={t("loading")||"ЗАГРУЗКА"}/>;
@@ -3086,8 +3222,8 @@ function MenuScreen({user,onNav,activeWorkout=false}){
       {card.state==="resume"&&<Btn full onClick={()=>{
         if(!window.confirm(t("home_close_confirm")))return;
         fetch(`${API}/workout/${tgId}/close-active`,{method:"POST"})
-          .then(()=>fetch(`${API}/home/${tgId}`).then(r=>r.json()))
-          .then(d=>{_homeCache[tgId]=d;setHome(d);})
+          .then(()=>apiGet(`${API}/home/${tgId}`,{force:true}))
+          .then(d=>setHome(d))
           .catch(()=>window.alert(t("home_load_error")));
       }} style={{marginTop:8}}>{t("home_close_workout")}</Btn>}
       <div style={{display:"flex",alignItems:"center",marginTop:12}}>
@@ -3204,8 +3340,7 @@ function AlternativesScreen({tgId,onNav,onBack}){
 
   useEffect(()=>{
     if(!tgId)return;
-    fetch(`${API}/home/${tgId}/alternatives`)
-      .then(r=>{if(!r.ok)throw new Error(r.status);return r.json();})
+    apiGet(`${API}/home/${tgId}/alternatives`)
       .then(d=>setData(d)).catch(()=>setFailed(true));
   },[tgId]);
 
@@ -3303,8 +3438,8 @@ function TrainingPrefsScreen({tgId,onBack}){
   const [saved,setSaved]=useState(false);
 
   useEffect(()=>{
-    fetch(`${API}/splits`).then(r=>r.json()).then(d=>setSplits(d.splits||[])).catch(()=>setSplits([]));
-    if(tgId)fetch(`${API}/home/${tgId}/alternatives`).then(r=>r.json())
+    apiGet(`${API}/splits`).then(d=>setSplits(d.splits||[])).catch(()=>setSplits([]));
+    if(tgId)apiGet(`${API}/home/${tgId}/alternatives`)
       .then(d=>setCur({split_type:d.split_type,target:d.week?.target||null})).catch(()=>setCur({split_type:"auto",target:null}));
   },[tgId]);
 
@@ -4070,13 +4205,13 @@ function WorkoutHistoryScreen({workouts,onNav,tgId,refreshToken=0}){
 
   useEffect(()=>{
     setPlanned(null);
-    if(tgId)fetch(`${API}/planned/${tgId}`).then(r=>r.json()).then(d=>setPlanned(d)).catch(()=>setPlanned({planned:[],archive:[]}));
+    if(tgId)apiGet(`${API}/planned/${tgId}`).then(d=>setPlanned(d)).catch(()=>setPlanned({planned:[],archive:[]}));
     else setPlanned({planned:[],archive:[]});
   },[refreshToken]);
 
   useEffect(()=>{
     if(activeTab==="planned"&&!planned){
-      if(tgId)fetch(`${API}/planned/${tgId}`).then(r=>r.json()).then(d=>setPlanned(d)).catch(()=>setPlanned({planned:[],archive:[]}));
+      if(tgId)apiGet(`${API}/planned/${tgId}`).then(d=>setPlanned(d)).catch(()=>setPlanned({planned:[],archive:[]}));
       else setPlanned({planned:[],archive:[]});
     }
     if(activeTab==="sport"){
@@ -4455,7 +4590,7 @@ function ActiveWorkoutScreen({tgId,exercises,muscleGroups,onBack,onFinish,onFini
   // Спорт режим
   const [sports,setSports]=useState([]);
   useEffect(()=>{
-    fetch(`${API}/sport-types`).then(r=>r.json()).then(d=>{
+    apiGet(`${API}/sport-types`).then(d=>{
       if(d.sport_types?.length)setSports(d.sport_types);
     }).catch(()=>{});
   },[]);
@@ -4463,7 +4598,7 @@ function ActiveWorkoutScreen({tgId,exercises,muscleGroups,onBack,onFinish,onFini
   const allEx=exercises||[];
   const [customExs,setCustomExs]=useState([]);
   useEffect(()=>{
-    if(tgId)fetch(`${API}/custom-exercises/${tgId}`).then(r=>r.json()).then(d=>setCustomExs((d.exercises||[]).map(e=>({...e,group_name:e.group_name||"Моё",group_emoji:e.group_emoji||"⭐"})))).catch(()=>{});
+    if(tgId)apiGet(`${API}/custom-exercises/${tgId}`).then(d=>setCustomExs((d.exercises||[]).map(e=>({...e,group_name:e.group_name||"Моё",group_emoji:e.group_emoji||"⭐"})))).catch(()=>{});
   },[]);
   const allExWithCustom=[...allEx,...customExs.filter(ce=>!allEx.find(e=>e.id===ce.id))];
 
@@ -5136,7 +5271,7 @@ function MyWorkoutsDetailScreen({tgId,onBack,onNav}){
   const [deleting,setDeleting]=useState(null);
   function load(){
     if(!tgId){setData({planned:[],archive:[]});return;}
-    fetch(`${API}/planned/${tgId}`).then(r=>r.json()).then(setData).catch(()=>setData({planned:[],archive:[]}));
+    apiGet(`${API}/planned/${tgId}`,{force:true}).then(setData).catch(()=>setData({planned:[],archive:[]}));
   }
   useEffect(()=>{load();},[]);
   async function del(id){setDeleting(id);try{await fetch(`${API}/planned/${tgId}/${id}`,{method:"DELETE"});load();}catch{}finally{setDeleting(null);};}
@@ -5608,7 +5743,7 @@ function sportLabel(code){
 }
 
 function ProgressScreen({stats,tgId,onNav}){
-  const [week,setWeek]=useState(()=>(tgId&&_homeCache[tgId]?.week)||null);
+  const [week,setWeek]=useState(()=>_cachedHome(tgId)?.week||null);
   const [muscleData,setMuscleData]=useState(null);
   const [activeGroup,setActiveGroup]=useState(null);
   const [days,setDays]=useState(90);
@@ -5618,8 +5753,7 @@ function ProgressScreen({stats,tgId,onNav}){
   // Детали недели: берём из кэша главного экрана, если он есть, иначе догружаем
   useEffect(()=>{
     if(!tgId||week)return;
-    fetch(`${API}/home/${tgId}`).then(r=>r.json())
-      .then(d=>{_homeCache[tgId]=d;setWeek(d.week);}).catch(()=>{});
+    apiGet(`${API}/home/${tgId}`).then(d=>setWeek(d.week)).catch(()=>{});
   },[tgId,week]);
 
   useEffect(()=>{
@@ -6015,6 +6149,7 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
   const [saving,setSaving]=useState(false);
   const [saved,setSaved]=useState(false);
   const [chatHistory,setChatHistory]=useState([]); // [{role,content,time}]
+  const [streamText,setStreamText]=useState("");   // ответ, который сейчас печатается
   // Выбор даты объявлен здесь, выше ask(): открывать его теперь может и сам ответ
   // тренера, когда человек попросил сохранить тренировку словами в чате.
   const [showDatePicker,setShowDatePicker]=useState(false);
@@ -6092,35 +6227,94 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
       const looksLikePlan=PLAN_WORDS.some(w=>ql.includes(w));
       const looksLikeFood=FOOD_WORDS.some(w=>ql.includes(w));
       const mode=looksLikeFood?"chat":((looksLikePlan||workoutPlan)?"plan":"chat");
-      const res=await fetch(`${API}/ai/ask`,{method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({question,tg_id:tgId,session_id:sessionId,mode})});
-      if(res.status===429){setAnswer(t("limit_exceeded"));return;}
-      // Согласие на передачу данных отозвано — объясняем причину, а не показываем код ошибки
-      if(res.status===451){setAiBlocked(true);return;}
-      if(!res.ok){
-        const err=await res.text().catch(()=>"");
-        setAnswer(`Ошибка сервера (${res.status})${err?" — "+err.slice(0,100):""}. Попробуй позже.`);
-        return;
+      const body=JSON.stringify({question,tg_id:tgId,session_id:sessionId,mode});
+
+      // Ответ целиком приходит за 13–18 секунд, и всё это время экран был пуст.
+      // Берём потоком: первые слова появляются примерно через полторы секунды.
+      // Если поток не завёлся и наружу ещё ничего не ушло — тихо откатываемся
+      // на обычный запрос, человек разницы не замечает.
+      let streamed="", gotAnything=false;
+      try{
+        const res=await fetch(`${API}/ai/ask-stream`,{method:"POST",
+          headers:{"Content-Type":"application/json"},body});
+        if(!res.ok||!res.body)throw new Error("stream unavailable");
+        const reader=res.body.getReader(), dec=new TextDecoder();
+        let buf="", lastPaint=0;
+        for(;;){
+          const {done,value}=await reader.read();
+          if(done)break;
+          buf+=dec.decode(value,{stream:true});
+          let nl;
+          while((nl=buf.indexOf("\n\n"))>=0){
+            const line=buf.slice(0,nl); buf=buf.slice(nl+2);
+            if(!line.startsWith("data:"))continue;
+            let ev; try{ev=JSON.parse(line.slice(5));}catch{continue;}
+            if(ev.type==="delta"){
+              streamed+=ev.text; gotAnything=true;
+              // Не перерисовываем на каждый токен — текст идёт мелкими кусками,
+              // а стейт обновляется чаще, чем экран успевает это показать.
+              const now=Date.now();
+              if(now-lastPaint>80){lastPaint=now;setStreamText(streamed);}
+            }else if(ev.type==="done"){
+              setStreamText("");
+              applyAnswer(ev);
+              return;
+            }else if(ev.type==="error"){
+              setStreamText("");
+              if(ev.status===429){setAnswer(t("limit_exceeded"));return;}
+              if(ev.status===451){setAiBlocked(true);return;}
+              throw new Error(`stream error ${ev.status}`);
+            }
+          }
+        }
+        // Поток кончился без события done — ответ недополучен
+        throw new Error("stream ended early");
+      }catch(streamErr){
+        setStreamText("");
+        if(gotAnything){
+          // Часть текста человек уже прочитал. Повторять запрос нельзя — он
+          // спишет лимит и выдаст второй ответ. Оставляем что пришло.
+          const aiAnswer=streamed||t("no_answer");
+          setAnswer(aiAnswer);
+          setChatHistory(prev=>[...prev,{role:"assistant",content:aiAnswer,
+            time:new Date().toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"})}]);
+          return;
+        }
+        // Ничего не отдали — спокойно повторяем обычным запросом
+        const res=await fetch(`${API}/ai/ask`,{method:"POST",
+          headers:{"Content-Type":"application/json"},body});
+        if(res.status===429){setAnswer(t("limit_exceeded"));return;}
+        if(res.status===451){setAiBlocked(true);return;}
+        if(!res.ok){
+          const err=await res.text().catch(()=>"");
+          setAnswer(`Ошибка сервера (${res.status})${err?" — "+err.slice(0,100):""}. Попробуй позже.`);
+          return;
+        }
+        applyAnswer(await res.json());
       }
-      const d=await res.json();
-      const aiAnswer=d.answer||t("no_answer");
-      setAnswer(aiAnswer);
-      if(d.workout_plan){
-        setWorkoutPlan(d.workout_plan);
-        try{localStorage.setItem("gymbot_ai_plan",JSON.stringify({sessionId,plan:d.workout_plan}));}catch{}
-      }
-      const aiMsg={role:"assistant",content:aiAnswer,time:new Date().toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"})};
-      setChatHistory(prev=>[...prev,aiMsg]);
-      // Попросил сохранить словами в чате — открываем выбор даты сами.
-      // Сохранять модель не умеет, раньше она просто отвечала «сохранил», и человек
-      // не находил тренировку в запланированных.
-      if(d.save_requested&&(d.workout_plan||workoutPlan))setShowDatePicker(true);
     }catch(e){
+      setStreamText("");
       const errMsg="Ошибка соединения — "+e.message;
       setAnswer(errMsg);
       setChatHistory(prev=>[...prev,{role:"assistant",content:errMsg,time:""}]);
     }
     finally{setLoading(false);}
+  }
+
+  /** Разбор итогового ответа — общий для потока и обычного запроса. */
+  function applyAnswer(d){
+    const aiAnswer=d.answer||t("no_answer");
+    setAnswer(aiAnswer);
+    if(d.workout_plan){
+      setWorkoutPlan(d.workout_plan);
+      try{localStorage.setItem("gymbot_ai_plan",JSON.stringify({sessionId,plan:d.workout_plan}));}catch{}
+    }
+    setChatHistory(prev=>[...prev,{role:"assistant",content:aiAnswer,
+      time:new Date().toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"})}]);
+    // Попросил сохранить словами в чате — открываем выбор даты сами.
+    // Сохранять модель не умеет, раньше она просто отвечала «сохранил», и человек
+    // не находил тренировку в запланированных.
+    if(d.save_requested&&(d.workout_plan||workoutPlan))setShowDatePicker(true);
   }
 
   function clearHistory(){
@@ -6221,7 +6415,16 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
             </div>
           </div>
         ))}
-        {loading&&<div style={{display:"flex",alignItems:"flex-start"}}>
+        {/* Ответ печатается на глазах. Пока не пришло ни слова — прежняя заглушка. */}
+        {loading&&streamText&&<div style={{display:"flex",alignItems:"flex-start"}}>
+          <div style={{maxWidth:"85%",padding:"10px 14px",borderRadius:12,background:C.card,border:`0.5px solid ${C.border}`}}>
+            <div style={{fontSize:10,color:C.accent,fontFamily:"monospace",marginBottom:4}}>{t("ai_coach_label")}</div>
+            <div style={{fontSize:13,color:C.text,lineHeight:1.6,whiteSpace:"pre-wrap"}}>
+              {streamText}<span style={{color:C.accent}}>▍</span>
+            </div>
+          </div>
+        </div>}
+        {loading&&!streamText&&<div style={{display:"flex",alignItems:"flex-start"}}>
           <div style={{padding:"10px 14px",borderRadius:12,background:C.card,border:`0.5px solid ${C.border}`}}>
             <div style={{color:C.accent,fontFamily:"monospace",fontSize:12,letterSpacing:2}}>{t("ai_thinking2")}</div>
           </div>
@@ -7011,7 +7214,7 @@ function SportLogScreen({tgId,onBack,initialSport=null}){
     {v:"padel",l:"🎾 Падел"},{v:"tennis",l:"🎾 Большой теннис"},{v:"yoga",l:"🧘 Йога"},
   ]);
   useEffect(()=>{
-    fetch(`${API}/sport-types`).then(r=>r.json()).then(d=>{
+    apiGet(`${API}/sport-types`).then(d=>{
       if(d.sport_types?.length)setSports(d.sport_types.map(s=>({v:s.code,l:s.name,l_en:s.name_en,l_uz:s.name_uz,l_kz:s.name_kz,met:s.met,track_distance:s.track_distance,track_duration:s.track_duration,track_intensity:s.track_intensity,track_sets:s.track_sets,track_score:s.track_score})));
     }).catch(()=>{});
   },[]);
@@ -7946,7 +8149,7 @@ export default function App(){
       document.head.appendChild(s);
     }
     loadUser();
-    fetch(`${API}/exercises`).then(r=>r.json()).then(d=>{setExercises(d.exercises||[]);setMuscleGroups(d.muscle_groups||[]);}).catch(()=>{setExercises([]);setMuscleGroups([]);});
+    apiGet(`${API}/exercises`).then(d=>{setExercises(d.exercises||[]);setMuscleGroups(d.muscle_groups||[]);}).catch(()=>{setExercises([]);setMuscleGroups([]);});
     if(!window.history.state?._g)window.history.replaceState({_g:true,tab:"menu",screen:null,params:{}},"");
     function onPop(e){const s=e.state;if(s&&s._g){setNav(s);if(s.tab==="menu"&&!s.screen)setMenuRefresh(r=>r+1);}else{const h={_g:true,tab:"menu",screen:null,params:{}};window.history.replaceState(h,"");setNav(h);}}
     window.addEventListener("popstate",onPop);
