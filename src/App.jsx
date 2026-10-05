@@ -41,7 +41,11 @@ const _apiInflight = new Map(); // url -> Promise, чтобы два экран�
 // длинный у справочников.
 const API_TTL = [
   [/\/sport-types$/,        60 * 60 * 1000],
-  [/\/exercises$/,          30 * 60 * 1000],
+  // Не просто $: у каталога появился параметр языка (?lang=uz), и с якорем на
+  // конец строки правило перестало бы совпадать — каталог вообще выпал бы из
+  // кэша и качался заново при каждом запуске. Слэш перед словом обязателен,
+  // иначе правило поймало бы /custom-exercises/.
+  [/\/exercises(\?|$)/,     30 * 60 * 1000],
   [/\/splits$/,             60 * 60 * 1000],
   [/\/custom-exercises\//,   5 * 60 * 1000],
   [/\/home\/\d+\/alternatives/, 3 * 60 * 1000],
@@ -109,7 +113,9 @@ const API_EVENTS = {
   planned_changed:  ["/planned","/home"],
   food_logged:      ["/home","/nutrition"],
   sport_logged:     ["/home","/workouts","/progress"],
-  exercises_changed:["/custom-exercises","/exercises"],
+  // Только свои упражнения: /api/exercises — общий каталог, своих там нет,
+  // и сбрасывать его означало лишь выбросить справочник на четырёх языках.
+  exercises_changed:["/custom-exercises"],
   profile_changed:  ["/user/","/home"],
   prefs_changed:    ["/home","/alternatives","/user/"],
   checkin_done:     ["/home","/progress","/user/"],
@@ -169,7 +175,44 @@ const C = {
 
 
 // ── i18n ─────────────────────────────────────────────────────────────────────
-const LANG_STORE = { current: "ru" };
+// Язык дублируется в localStorage, хотя источник правды — users.lang на сервере.
+// Причина: профиль приходит отдельным запросом, и до его ответа всё рисуется
+// по-русски. Для узбекского пользователя это заметная вспышка чужого языка при
+// каждом запуске. А ещё каталог упражнений запрашивается в том же useEffect,
+// что и профиль, и теперь просит у сервера конкретный язык — не зная языка,
+// он бы всегда просил русский. Сервер остаётся главным: когда профиль придёт,
+// он перезапишет и локальное значение, и язык каталога.
+const LANG_KEY = "gymbot_lang";
+const LANG_ALLOWED = ["ru", "en", "uz", "kz"];
+
+/** Любой код языка → один из четырёх наших, либо null. */
+function normLang(code) {
+  if (!code) return null;
+  let c = String(code).trim().toLowerCase().split(/[-_]/)[0];
+  if (c === "kk" || c === "kaz") c = "kz";   // в стандарте казахский — kk, у нас kz
+  return LANG_ALLOWED.includes(c) ? c : null;
+}
+
+// Язык из настроек самого Телеграма. Нужен ровно для одного случая: первый
+// запуск (или запрет на localStorage), когда своего сохранённого языка нет.
+// Угадать по телефону точнее, чем всегда брать русский: иначе узбекский
+// пользователь в приватном режиме качает каталог дважды при каждом запуске —
+// сперва русский, потом настоящий.
+function telegramLang() {
+  return normLang(tg?.initDataUnsafe?.user?.language_code);
+}
+function readStoredLang() {
+  let stored = null;
+  try { stored = localStorage.getItem(LANG_KEY); }
+  catch {}                      // приватный режим / запрет на хранилище
+  return normLang(stored) || telegramLang() || "ru";
+}
+function storeLang(code) {
+  const c = normLang(code);
+  if (!c) return;
+  try { localStorage.setItem(LANG_KEY, c); } catch {}
+}
+const LANG_STORE = { current: readStoredLang() };
 const T = {
   ru: {
     menu_nutrition:"Питание", menu_workout:"Тренировки", menu_progress:"Прогресс",
@@ -2522,8 +2565,7 @@ const T = {
 };
 function t(key) { return T[LANG_STORE.current]?.[key] || T.ru[key] || key; }
 
-// Локализованное поле из объекта API (name, description, technique)
-// Translate equipment string
+// Перевод названия оборудования («Штанга / EZ-гриф» и прочее)
 function tEquip(eq) {
   if (!eq) return "";
   const lang = LANG_STORE.current;
@@ -2588,6 +2630,11 @@ function tEquip(eq) {
   }
   return result;
 }
+// Локализованное поле объекта из API: берём name_uz, если есть, иначе name.
+// Названия приезжают сразу на всех языках и выбираются здесь. Описание и
+// техника — наоборот, приходят уже на нужном языке (см. /api/exercises),
+// и для них этот хелпер просто отдаёт obj[field]. Так и задумано: абзацы
+// на четырёх языках весят слишком много, чтобы возить их все.
 function tField(obj, field) {
   if (!obj) return "";
   const lang = LANG_STORE.current;
@@ -3995,7 +4042,7 @@ function AddCustomExerciseInline({tgId,muscleGroups,onAdded}){
           style={{background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"8px 10px",
             color:C.text,fontSize:12,outline:"none"}}>
           <option value="">{t("exercise_group")}</option>
-          {(muscleGroups||[]).map(g=><option key={g.id} value={g.id}>{g.emoji} {tGroup(g)||g.name}</option>)}
+          {(muscleGroups||[]).map(g=><option key={g.id} value={g.id}>{g.emoji} {tField(g,"name")}</option>)}
         </select>
         <select value={f.difficulty} onChange={e=>setF(p=>({...p,difficulty:e.target.value}))}
           style={{background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"8px 10px",
@@ -4970,7 +5017,7 @@ ${exList}
           <div key={g.id} onClick={()=>{setSelGroups(new Set([g.id]));setStep(STEP.SG);}}
             style={{background:C.card,border:`0.5px solid ${C.border}`,borderRadius:12,padding:"14px 6px",textAlign:"center",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:6}}>
             {g.icon_url?<img src={g.icon_url} alt="" style={{width:28,height:28,objectFit:"cover",borderRadius:6}}/>:<div style={{fontSize:24}}>{g.emoji}</div>}
-            <div style={{fontSize:9,fontFamily:"monospace",fontWeight:700,color:C.text,lineHeight:1.2}}>{(tGroup(g)||g.name).toUpperCase()}</div>
+            <div style={{fontSize:9,fontFamily:"monospace",fontWeight:700,color:C.text,lineHeight:1.2}}>{(tField(g,"name")).toUpperCase()}</div>
           </div>
         ))}
       </div>
@@ -5036,14 +5083,14 @@ ${exList}
               style={{position:"relative",background:sel?C.accent:C.card,border:`0.5px solid ${sel?C.accent:C.border}`,borderRadius:12,padding:"14px 6px",textAlign:"center",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:6}}>
               {sel&&<span style={{position:"absolute",top:6,right:6,width:16,height:16,borderRadius:4,background:C.bg,color:C.accent,fontSize:11,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center"}}>✓</span>}
               {g.icon_url?<img src={g.icon_url} alt="" style={{width:32,height:32,objectFit:"cover",borderRadius:6}}/>:<div style={{fontSize:26}}>{g.emoji}</div>}
-              <div style={{fontSize:10,fontFamily:"monospace",fontWeight:700,color:sel?C.bg:C.text,lineHeight:1.2}}>{(tGroup(g)||g.name).toUpperCase()}</div>
+              <div style={{fontSize:10,fontFamily:"monospace",fontWeight:700,color:sel?C.bg:C.text,lineHeight:1.2}}>{(tField(g,"name")).toUpperCase()}</div>
             </div>
           );
         })}
       </div>
       {selGroups.size>0&&(
         <div style={{marginBottom:12,fontFamily:"monospace",fontSize:11,color:C.accent}}>
-          ВЫБРАНО ГРУПП: {selGroups.size} · {(muscleGroups||[]).filter(g=>selGroups.has(g.id)).map(g=>g.emoji+(tGroup(g)||g.name)).join(", ")}
+          ВЫБРАНО ГРУПП: {selGroups.size} · {(muscleGroups||[]).filter(g=>selGroups.has(g.id)).map(g=>g.emoji+(tField(g,"name"))).join(", ")}
         </div>
       )}
       <Btn accent full onClick={()=>setStep(STEP.SE)}>
@@ -5660,7 +5707,7 @@ function PlanWorkoutScreen({tgId,exercises,muscleGroups,onBack}){
           return(
             <Card key={g.id} accent={sel} onClick={()=>setSelGroups(p=>{const n=new Set(p);if(n.has(g.id))n.delete(g.id);else n.add(g.id);return n;})}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
-                <div><span style={{fontSize:22,marginRight:12}}>{g.icon_url?<img src={g.icon_url} alt="" style={{width:26,height:26,objectFit:"cover",borderRadius:5,verticalAlign:"middle"}}/>:g.emoji}</span><span style={{fontSize:15,fontWeight:600,color:sel?C.accent:C.text}}>{tGroup(g)||g.name}</span></div>
+                <div><span style={{fontSize:22,marginRight:12}}>{g.icon_url?<img src={g.icon_url} alt="" style={{width:26,height:26,objectFit:"cover",borderRadius:5,verticalAlign:"middle"}}/>:g.emoji}</span><span style={{fontSize:15,fontWeight:600,color:sel?C.accent:C.text}}>{tField(g,"name")}</span></div>
                 <span style={{width:22,height:22,borderRadius:6,background:sel?C.accent:C.card,border:`0.5px solid ${sel?C.accent:C.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,color:sel?C.bg:C.muted,flexShrink:0}}>{sel?"✓":""}</span>
               </div>
             </Card>
@@ -5678,9 +5725,13 @@ function PlanWorkoutScreen({tgId,exercises,muscleGroups,onBack}){
       <BackBtn onBack={()=>setViewEx(null)}/>
       {viewEx.video_url?
         <video src={viewEx.video_url} style={{width:"100%",borderRadius:12,marginBottom:14,objectFit:"cover",maxHeight:220}} autoPlay loop muted playsInline onError={e=>e.target.style.display="none"}/>
-        :viewEx.photo_url&&<img src={viewEx.photo_url} alt={viewEx.name} style={{width:"100%",borderRadius:12,marginBottom:14,objectFit:"cover",maxHeight:220}} onError={e=>e.target.style.display="none"}/>}
-      <Kicker>{viewEx.group_emoji} {viewEx.group_name?.toUpperCase()}</Kicker>
-      <Hero style={{fontSize:20}}>{viewEx.name}</Hero>
+        :viewEx.photo_url&&<img src={viewEx.photo_url} alt={tField(viewEx,"name")} style={{width:"100%",borderRadius:12,marginBottom:14,objectFit:"cover",maxHeight:220}} onError={e=>e.target.style.display="none"}/>}
+      {/* Эта карточка (просмотр упражнения при сборе тренировки) была целиком
+          русской, хотя в списке рядом название уже переводилось. Описание
+          теперь приходит с сервера на нужном языке, и русское название над
+          переведённым описанием смотрелось бы особенно странно. */}
+      <Kicker>{viewEx.group_emoji} {tGroup(viewEx)?.toUpperCase()}</Kicker>
+      <Hero style={{fontSize:20}}>{tField(viewEx,"name")}</Hero>
       <div style={{height:12}}/>
       <div style={{display:"flex",gap:8,marginBottom:14}}>
         {[{l:t("sets_label"),v:viewEx.sets_recommended},{l:t("reps_label2"),v:viewEx.reps_recommended},{l:t("difficulty_label"),v:getDiff(viewEx.difficulty)||viewEx.difficulty}].map((s,i)=>(
@@ -5691,7 +5742,7 @@ function PlanWorkoutScreen({tgId,exercises,muscleGroups,onBack}){
         ))}
       </div>
       {viewEx.description&&<Card style={{marginBottom:10}}><Kicker>{t("description_label")}</Kicker><div style={{fontSize:14,color:C.text,lineHeight:1.6,marginTop:6}}>{viewEx.description}</div></Card>}
-      {viewEx.equipment&&<Card style={{marginBottom:14}}><Kicker>{t("equipment_label")}</Kicker><div style={{fontSize:14,color:C.text,marginTop:4}}>{viewEx.equipment}</div></Card>}
+      {viewEx.equipment&&<Card style={{marginBottom:14}}><Kicker>{t("equipment_label")}</Kicker><div style={{fontSize:14,color:C.text,marginTop:4}}>{tEquip(viewEx.equipment)}</div></Card>}
       <div style={{display:"flex",gap:10}}>
         <Btn full onClick={()=>setViewEx(null)} style={{flex:1}}>{t("back")}</Btn>
         <Btn accent full onClick={()=>{
@@ -6166,6 +6217,20 @@ function CatalogScreen({exercises,muscleGroups,onNav}){
     });
   },[activeGroup,search,exercises]);
 
+  // Открытая карточка держит сам объект упражнения, а описание и техника в нём
+  // приходят с сервера уже на одном языке. Если каталог приехал заново на
+  // другом языке (первый запуск: сперва ответ по сохранённому языку, потом по
+  // языку из профиля), список под карточкой обновится, а открытая карточка
+  // останется с описанием на прежнем языке. Поэтому подменяем её свежим
+  // объектом из нового массива.
+  useEffect(()=>{
+    if(!selected)return;
+    const fresh=(exercises||[]).find(e=>e.id===selected.id);
+    // Своих упражнений в общем каталоге нет — тогда fresh не найдётся и
+    // карточка остаётся как есть, это правильно.
+    if(fresh&&fresh!==selected)setSelected(fresh);
+  },[exercises,selected]);
+
   if(selected)return <div style={{padding:"16px 16px 100px"}}>
     <BackBtn onBack={()=>setSelected(null)}/>
     {selected.video_url?
@@ -6204,7 +6269,7 @@ function CatalogScreen({exercises,muscleGroups,onNav}){
     <input value={search} onChange={e=>setSearch(e.target.value)} placeholder={t("search_placeholder")} style={{width:"100%",background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 14px",color:C.text,fontSize:13,fontFamily:"monospace",letterSpacing:1,boxSizing:"border-box",marginBottom:12,outline:"none"}}/>
     <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:8,marginBottom:12}}>
       <button onClick={()=>setActiveGroup(null)} style={{flexShrink:0,padding:"6px 12px",borderRadius:20,background:!activeGroup?C.accent:C.card,color:!activeGroup?C.bg:C.muted,border:`0.5px solid ${!activeGroup?C.accent:C.border}`,fontSize:11,fontFamily:"monospace",cursor:"pointer",fontWeight:700}}>ВСЕ</button>
-      {muscleGroups?.map(g=><button key={g.id} onClick={()=>setActiveGroup(g.id===activeGroup?null:g.id)} style={{flexShrink:0,padding:"6px 12px",borderRadius:20,background:activeGroup===g.id?C.accent:C.card,color:activeGroup===g.id?C.bg:C.muted,border:`0.5px solid ${activeGroup===g.id?C.accent:C.border}`,fontSize:11,fontFamily:"monospace",cursor:"pointer",display:"inline-flex",alignItems:"center",gap:5}}>{g.icon_url?<img src={g.icon_url} alt="" style={{width:16,height:16,objectFit:"cover",borderRadius:3}}/>:g.emoji} {(tGroup(g)||g.name).toUpperCase()}</button>)}
+      {muscleGroups?.map(g=><button key={g.id} onClick={()=>setActiveGroup(g.id===activeGroup?null:g.id)} style={{flexShrink:0,padding:"6px 12px",borderRadius:20,background:activeGroup===g.id?C.accent:C.card,color:activeGroup===g.id?C.bg:C.muted,border:`0.5px solid ${activeGroup===g.id?C.accent:C.border}`,fontSize:11,fontFamily:"monospace",cursor:"pointer",display:"inline-flex",alignItems:"center",gap:5}}>{g.icon_url?<img src={g.icon_url} alt="" style={{width:16,height:16,objectFit:"cover",borderRadius:3}}/>:g.emoji} {(tField(g,"name")).toUpperCase()}</button>)}
     </div>
     <div style={{fontSize:10,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{filtered.length}  {t("exercises_label")}</div>
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
@@ -8025,8 +8090,10 @@ function CheckinScreen({onBack,tgId}){
 function LanguageScreen({tgId,user,onBack,onUserUpdated}){
   const [saving,setSaving]=useState(false);
   const langs=[{code:"ru",label:"🇷🇺 Русский"},{code:"en",label:"🇬🇧 English"},{code:"uz",label:"🇺🇿 O'zbek"},{code:"kz",label:"🇰🇿 Қазақша"}];
-  async function setLang(code){setSaving(code);try{await fetch(`${API}/user/${tgId}`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({lang:code})});LANG_STORE.current=code;onUserUpdated&&onUserUpdated(code);setTimeout(onBack,500);}catch{}finally{setSaving(false);};}
-  const cur=user?.lang||"ru";
+  async function setLang(code){setSaving(code);try{await fetch(`${API}/user/${tgId}`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({lang:code})});LANG_STORE.current=code;storeLang(code);onUserUpdated&&onUserUpdated(code);setTimeout(onBack,500);}catch{}finally{setSaving(false);};}
+  // Через normLang: если в users.lang лежит "kk" или "RU", галочка «текущий»
+  // иначе не встала бы ни на один пункт списка.
+  const cur=normLang(user?.lang)||"ru";
   return <div style={{padding:"16px 16px 100px"}}>
     <BackBtn onBack={onBack}/><Kicker>{t("settings_title")}</Kicker><Hero>{t("language_section")}</Hero><div style={{height:16}}/>
     <div style={{display:"flex",flexDirection:"column",gap:10}}>
@@ -8280,7 +8347,11 @@ export default function App(){
   const {tab,screen,params={}}=nav;
 
   const [user,setUser]=useState(null);
-  const [lang,setLang]=useState("ru"); // триггер перерисовки при смене языка
+  // Триггер перерисовки при смене языка. Начальное значение берём из того же
+  // хранилища, что и LANG_STORE, иначе они разойдутся на первом рендере и
+  // каталог будет запрошен не на том языке, на котором рисуется интерфейс.
+  // Функцией, а не вызовом: иначе localStorage читался бы на каждом рендере.
+  const [lang,setLang]=useState(readStoredLang);
   const [workouts,setWorkouts]=useState(null);
   const [stats,setStats]=useState(null);
   const [exercises,setExercises]=useState(null);
@@ -8303,7 +8374,11 @@ export default function App(){
           if(!r.ok) throw new Error(r.status);
           return r.json();
         })
-        .then(d=>{if(d){setUser(d);LANG_STORE.current=d.lang||"ru";setLang(d.lang||"ru");}})
+        // normLang, а не d.lang как есть: в users.lang мог попасть код в другом
+        // регистре или "kk" вместо "kz". Тогда интерфейс не нашёл бы такой ключ
+        // в T и рисовался бы по-русски, а каталог сервер отдал бы на казахском —
+        // вперемешку. Нормализуем в одном месте, у входа.
+        .then(d=>{if(d){setUser(d);const lc=normLang(d.lang)||"ru";LANG_STORE.current=lc;storeLang(lc);setLang(lc);}})
         .catch(()=>setUser({first_name:tg?.initDataUnsafe?.user?.first_name||"Атлет",ai_requests_today:0,_error:true}));
     } else {
       setUser({first_name:"Атлет",ai_requests_today:0});
@@ -8333,12 +8408,67 @@ export default function App(){
       document.head.appendChild(s);
     }
     loadUser();
-    apiGet(`${API}/exercises`).then(d=>{setExercises(d.exercises||[]);setMuscleGroups(d.muscle_groups||[]);}).catch(()=>{setExercises([]);setMuscleGroups([]);});
     if(!window.history.state?._g)window.history.replaceState({_g:true,tab:"menu",screen:null,params:{}},"");
     function onPop(e){const s=e.state;if(s&&s._g){setNav(s);if(s.tab==="menu"&&!s.screen)setMenuRefresh(r=>r+1);}else{const h={_g:true,tab:"menu",screen:null,params:{}};window.history.replaceState(h,"");setNav(h);}}
     window.addEventListener("popstate",onPop);
     return()=>window.removeEventListener("popstate",onPop);
   },[]);
+
+  // Каталог упражнений: описание и технику сервер отдаёт уже на нужном языке,
+  // поэтому язык входит в адрес запроса, а значит и в ключ кэша. Переключение
+  // туда и обратно бесплатно — вторая версия уже лежит в кэше. А вот первая
+  // смена языка это полноценный запрос, кэш тут не спасает.
+  //
+  // Эффект срабатывает дважды, если язык из localStorage не совпал с языком
+  // из профиля. И вот что важно: ответ «не на том» языке выбрасывать нельзя.
+  // От языка в нём зависят ровно два поля — описание и техника, а названия
+  // (они приезжают сразу на четырёх языках), фотографии, видео, сложность и
+  // группы мышц одинаковы для любого языка. Если такой ответ отбросить,
+  // каталог и выбор упражнений стоят пустыми — без лоадера, просто
+  // «0 упражнений» — пока не приедет второй запрос. Поэтому показываем что
+  // приехало, и заменяем, когда придёт нужный язык.
+  const haveCatalogLang = useRef(null);  // язык данных, которые уже на экране
+  const wantCatalogLang = useRef(null);  // язык, который нужен прямо сейчас
+  const [catalogRetry,setCatalogRetry]=useState(0);
+  const catalogTries = useRef({lang:null,n:0});  // счётчик попыток, свой на каждый язык
+  useEffect(()=>{
+    const want = lang || "ru";
+    wantCatalogLang.current = want;
+    const apply=(d,stale)=>{
+      setExercises(d.exercises||[]);setMuscleGroups(d.muscle_groups||[]);
+      // После заглушки оставляем метку пустой, чтобы правильный язык её сменил.
+      haveCatalogLang.current = stale ? null : want;
+    };
+    let timer=null;
+    apiGet(`${API}/exercises?lang=${encodeURIComponent(want)}`)
+      .then(d=>{
+        const stale = wantCatalogLang.current !== want;
+        // Нужный язык уже на экране — чужой ответ только испортит описания.
+        if(stale && haveCatalogLang.current) return;
+        apply(d, stale);
+      })
+      .catch(()=>{
+        // Пустой список ставим только если показывать всё равно нечего.
+        // Иначе упавший перезапрос при смене языка обнулил бы рабочий каталог.
+        setExercises(p=>p||[]);setMuscleGroups(p=>p||[]);
+        // А вот это обязательно. Эффект завязан только на язык, и если запрос
+        // нужного языка упал (вошёл в лифт в момент переключения), повторить
+        // его больше некому: язык уже не меняется, с экрана каталога и обратно
+        // запроса нет. Человек остался бы с русскими описаниями под узбекским
+        // интерфейсом до перезапуска приложения.
+        //
+        // Попыток три, и счётчик свой на каждый язык — иначе при недоступном
+        // сервере приложение дёргало бы каталог каждые четыре секунды до
+        // закрытия, а исчерпав общий лимит, не повторило бы запрос при
+        // следующей смене языка.
+        const tries = catalogTries.current.lang===want ? catalogTries.current.n : 0;
+        if(wantCatalogLang.current===want && haveCatalogLang.current!==want && tries<3){
+          catalogTries.current={lang:want,n:tries+1};
+          timer=setTimeout(()=>setCatalogRetry(n=>n+1), 4000);
+        }
+      });
+    return()=>{ if(timer) clearTimeout(timer); };
+  },[lang,catalogRetry]);
 
   useEffect(()=>{
     if(tab==="workout"&&!workouts){
