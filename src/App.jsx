@@ -125,7 +125,7 @@ const _MUTATION_EVENTS = [
   [/\/workout\/[^/]+\/(finish|close-active)/, "workout_finished"],
   // Запись подхода — десятки раз за тренировку, и главный экран в это время
   // всё равно не смотрят. Сбрасывать на каждый подход незачем.
-  [/\/workout\/[^/]+\/set/,  null],
+  [/\/workout\/[^/]+\/(set|state)/, null],
   [/\/workout\//,            "workout_started"],
   [/\/planned\//,            "planned_changed"],
   // Еда пишется через /nutrition/, а /food/ — только распознавание фото и
@@ -4600,7 +4600,83 @@ function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscle
   const [timerAuto,setTimerAuto]=useState(null); // секунды автозапуска отдыха после подхода
   const [timerEx,setTimerEx]=useState(null); // упражнение, для которого спрашиваем оценку усилия
 
+  // Восстановление тренировки с сервера.
+  //
+  // localStorage остаётся как быстрый кэш: он читается синхронно, поэтому экран
+  // не моргает. Но источник правды теперь сервер — иначе закрытое не вовремя
+  // приложение теряло тренировку целиком, а продолжить с другого устройства
+  // было нельзя в принципе.
+  //
+  // Подходы берём с сервера всегда: они пишутся отдельным запросом при каждом
+  // подходе и разойтись не могут, в отличие от локальной копии.
+  const [restored,setRestored]=useState(false);
+  // Своё упражнение приходит отдельным запросом; без отметки «загрузилось»
+  // нельзя отличить «ещё не пришли» от «их нет», и восстановление теряло бы их.
+  const [customLoaded,setCustomLoaded]=useState(false);
+  // Запланированная тренировка после восстановления: проп сюда уже не придёт,
+  // а без него план не закрывается по завершении.
+  const [restoredPlannedId,setRestoredPlannedId]=useState(null);
+  useEffect(()=>{
+    if(restored||!tgId)return;
+    // Явный старт новой тренировки — восстанавливать нечего
+    if(preselectedExIds?.length>0||preselectedGroupIds?.length>0||plannedWorkoutId){setRestored(true);return;}
+    if(!exercises?.length||!customLoaded)return;   // ждём каталог и свои упражнения
+    let alive=true;
+    fetch(`${API}/workout/${tgId}/active`)
+      .then(r=>r.ok?r.json():null)
+      .then(d=>{
+        if(!alive)return;
+        setRestored(true);
+        if(!d?.found)return;
+        // Локальное состояние свежее серверного — значит человек прямо сейчас
+        // тренируется на этом устройстве, перетирать нельзя.
+        const _now_sv=(()=>{try{const r=localStorage.getItem("gymbot_active_workout");return r?JSON.parse(r):null;}catch{return null;}})();
+        const localAt=_now_sv?.savedAt||0;
+        const srvAt=d.state_at?Date.parse(d.state_at+"Z"):0;
+        // Локальное состояние считается годным, только если в нём есть состав.
+        // Баннер «Продолжить» кладёт заглушку с пустым selExs и свежей отметкой
+        // времени — без этой проверки она всегда перебивала бы серверное.
+        const localUsable=(_now_sv?.selExs?.length||0)>0;
+        if(localUsable&&_now_sv?.workoutId===d.workout_id&&localAt>=srvAt)return;
+
+        const st=d.state||{};
+        // Ищем и в каталоге, и среди своих упражнений: у custom_exercises
+        // собственная последовательность id, и без этого своё упражнение
+        // молча выпадало из восстановленного состава, сдвигая curIdx.
+        const pool=[...exercises,...customExs.filter(c=>!exercises.find(e=>e.id===c.id))];
+        const exs=(st.exIds||[])
+          .map((id,i)=>{const e=pool.find(x=>x.id===id);return e?{...e,order:i+1}:null;})
+          .filter(Boolean);
+        if(exs.length)setSelExs(exs);
+        setWorkoutId(d.workout_id);
+        if(typeof st.curIdx==="number")setCurIdx(st.curIdx);
+        if(typeof st.step==="number")setStep(st.step);
+        if(st.warmupDone!==undefined)setWarmupDone(!!st.warmupDone);
+        if(st.exerciseTips)setExTips(st.exerciseTips);
+        if(st.plannedWorkoutId)setRestoredPlannedId(st.plannedWorkoutId);
+        setResumeBanner(true);
+        // startTime трогаем только если своего нет: иначе отсчёт пошёл бы от
+        // создания записи, и продолженная на следующий день тренировка дала бы
+        // девять часов и четыре тысячи килокалорий.
+        if(d.started_at&&!_now_sv?.startTime){
+          const t=Date.parse(d.started_at+"Z");
+          if(t)setStartTime(Date.now()-t>IDLE_RESET_MS?Date.now():t);
+        }
+
+        // Подходы — только серверные
+        const srv={};
+        (exs.length?exs:selExs).forEach(e=>{
+          const arr=d.sets?.[String(e.id)]||d.sets?.[e.name]||[];
+          srv[e.id]=arr.map(x=>({weight:x.weight||"",reps:x.reps||"",time:"",distance:""}));
+        });
+        setSets(srv);
+      })
+      .catch(()=>{if(alive)setRestored(true);});
+    return()=>{alive=false;};
+  },[tgId,exercises?.length,customLoaded,restored]);
+
   // Автосохранение состояния тренировки при любом изменении
+  const _stateTimer=useRef(null);
   useEffect(()=>{
     if(step===STEP.FN){
       // Тренировка завершена — очищаем
@@ -4616,17 +4692,40 @@ function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscle
         }));
       }catch{}
     }
-  },[step,curIdx,sets,workoutId,selExs.length,lastSetAt]);
+    // И на сервер — с задержкой, чтобы не слать запрос на каждое нажатие.
+    // Подходы сюда не кладём: они уже записаны отдельно и лежат в workout_sets.
+    // Пустой состав не отправляем: на сервере лежит единственная информация
+    // о том, из чего состоит тренировка, и затереть её пустотой нельзя.
+    if(workoutId&&tgId&&selExs.length>0){
+      clearTimeout(_stateTimer.current);
+      _stateTimer.current=setTimeout(()=>{
+        fetch(`${API}/workout/${workoutId}/state?tg_id=${tgId}`,{method:"PUT",
+          headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({state:{
+            exIds:selExs.map(e=>e.id),curIdx,step,
+            warmupDone,warmupId:warmup?.id||null,
+            plannedWorkoutId,exerciseTips:exTips,
+          }})}).catch(()=>{});
+      },1500);
+    }
+    return()=>clearTimeout(_stateTimer.current);
+    // Состав — по списку id, а не по длине: перестановка и замена упражнения
+    // длину не меняют, и без этого они не сохранялись вовсе.
+  },[step,curIdx,sets,workoutId,selExs.map(e=>e.id).join(","),lastSetAt,warmupDone,warmup?.id]);
 
   // Защита от повреждённого восстановленного состояния: если мы на экране логирования (LG),
   // но selExs пуст или curIdx указывает за пределы массива — вместо немого чёрного экрана
   // чистим localStorage и возвращаем пользователя назад
   useEffect(()=>{
+    // Ждём восстановления с сервера. Баннер «Продолжить тренировку» кладёт в
+    // localStorage заглушку с пустым составом, и без этой проверки защитник
+    // уводил человека назад за мгновение до того, как состав приезжал с сервера.
+    if(!restored)return;
     if(step===STEP.LG&&!selExs[curIdx]){
       try{localStorage.removeItem("gymbot_active_workout");}catch{}
       if(onBack)onBack();
     }
-  },[step,curIdx,selExs.length]);
+  },[step,curIdx,selExs.length,restored]);
   // Спорт режим
   const [sports,setSports]=useState([]);
   useEffect(()=>{
@@ -4638,7 +4737,11 @@ function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscle
   const allEx=exercises||[];
   const [customExs,setCustomExs]=useState([]);
   useEffect(()=>{
-    if(tgId)apiGet(`${API}/custom-exercises/${tgId}`).then(d=>setCustomExs((d.exercises||[]).map(e=>({...e,group_name:e.group_name||"Моё",group_emoji:e.group_emoji||"⭐"})))).catch(()=>{});
+    if(!tgId){setCustomLoaded(true);return;}
+    apiGet(`${API}/custom-exercises/${tgId}`)
+      .then(d=>setCustomExs((d.exercises||[]).map(e=>({...e,group_name:e.group_name||"Моё",group_emoji:e.group_emoji||"⭐"}))))
+      .catch(()=>{})
+      .finally(()=>setCustomLoaded(true));
   },[]);
   const allExWithCustom=[...allEx,...customExs.filter(ce=>!allEx.find(e=>e.id===ce.id))];
 
@@ -4699,7 +4802,9 @@ function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscle
       }
     }catch(e){console.error("[finish] workout finish error",e);}
     // Помечаем запланированную тренировку как выполненную
-    const pwId=plannedWorkoutId;
+    // После восстановления проп пуст — берём id плана из состояния,
+    // иначе запланированная тренировка остаётся незакрытой.
+    const pwId=plannedWorkoutId||restoredPlannedId;
     console.log("[finish] pwId=",pwId);
     if(pwId&&tgId){
       try{
