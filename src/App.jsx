@@ -226,6 +226,8 @@ const T = {
     warmup_title:"РАЗМИНКА", warmup_skip:"ПРОПУСТИТЬ", warmup_done:"✓ РАЗМИНКА ВЫПОЛНЕНА",
     warmup_hint:"Кардио для разминки — опционально", warmup_badge:"🏃 РАЗМИНКА",
     ready_wk_kicker:"ТРЕНИРОВКА СОБРАНА", ready_wk_hint:"Состав подобран по твоей истории", ready_wk_change:"Изменить состав",
+    rest_notify_title:"Сигнал об отдыхе", rest_notify_hint:"Бот пришлёт сообщение, когда отдых закончится. Телефон можно убрать — часы завибрируют.", rest_notify_on:"Включено", rest_notify_off:"Выключено",
+    rest_offer_kicker:"ПОДСКАЗКА", rest_offer_title:"Убрать телефон во время тренировки?", rest_offer_text:"Бот может сам сигналить об окончании отдыха. Тогда телефон не нужно держать в руке — часы или браслет завибрируют.", rest_offer_yes:"Включить", rest_offer_no:"Не нужно",
     order_title:"ПОРЯДОК", order_hint:"↑↓ — перестановка · ↔ — замена",
     muscles_title:"ГРУППЫ МЫШЦ", exercises_title:"УПРАЖНЕНИЯ", replace_title:"ЗАМЕНА", show_all_exercises:"ПОКАЗАТЬ ВСЕ УПРАЖНЕНИЯ",
     select_groups_hint:"Выбери одну или несколько групп → покажем упражнения",
@@ -811,6 +813,8 @@ const T = {
     warmup_title:"WARM UP", warmup_skip:"SKIP", warmup_done:"✓ WARM UP DONE",
     warmup_hint:"Cardio for warm-up — optional", warmup_badge:"🏃 WARM UP",
     ready_wk_kicker:"WORKOUT READY", ready_wk_hint:"Built from your training history", ready_wk_change:"Change exercises",
+    rest_notify_title:"Rest alert", rest_notify_hint:"The bot messages you when rest is over. Pocket your phone — your watch will buzz.", rest_notify_on:"On", rest_notify_off:"Off",
+    rest_offer_kicker:"TIP", rest_offer_title:"Put the phone away during training?", rest_offer_text:"The bot can signal the end of each rest. No need to hold the phone — your watch or band will buzz.", rest_offer_yes:"Turn on", rest_offer_no:"No thanks",
     order_title:"ORDER", order_hint:"↑↓ — reorder · ↔ — replace",
     muscles_title:"MUSCLE GROUPS", exercises_title:"EXERCISES", replace_title:"REPLACE", show_all_exercises:"SHOW ALL EXERCISES",
     select_groups_hint:"Select one or more groups → we'll show exercises",
@@ -1396,6 +1400,8 @@ const T = {
     warmup_title:"ISITISH", warmup_skip:"O'TKAZIB YUBORISH", warmup_done:"✓ ISITISH BAJARILDI",
     warmup_hint:"Isitish uchun kardio — ixtiyoriy", warmup_badge:"🏃 ISITISH",
     ready_wk_kicker:"MASHG'ULOT TAYYOR", ready_wk_hint:"Tarkib mashg'ulot tarixingiz asosida tanlandi", ready_wk_change:"Tarkibni o'zgartirish",
+    rest_notify_title:"Dam olish signali", rest_notify_hint:"Dam olish tugaganda bot xabar yuboradi. Telefonni cho'ntakka soling — soat tebranadi.", rest_notify_on:"Yoqilgan", rest_notify_off:"O'chirilgan",
+    rest_offer_kicker:"MASLAHAT", rest_offer_title:"Mashg'ulot paytida telefonni olib qo'yasizmi?", rest_offer_text:"Bot dam olish tugaganini o'zi bildiradi. Telefonni ushlab turish shart emas — soat yoki bilaguzuk tebranadi.", rest_offer_yes:"Yoqish", rest_offer_no:"Kerak emas",
     order_title:"TARTIB", order_hint:"↑↓ — qayta joylashtirish · ↔ — almashtirish",
     muscles_title:"MUSHAK GURUHLARI", exercises_title:"MASHQLAR", replace_title:"ALMASHTIRISH", show_all_exercises:"BARCHA MASHQLARNI KO'RSATISH",
     select_groups_hint:"Bir yoki bir nechta guruh tanlang → mashqlarni ko'rsatamiz",
@@ -1981,6 +1987,8 @@ const T = {
     warmup_title:"ЖЫЛЫТУ", warmup_skip:"ӨТКІЗІП ЖІБЕРу", warmup_done:"✓ ЖЫЛЫТУ ОРЫНДАЛДЫ",
     warmup_hint:"Жылыту үшін кардио — міндетті емес", warmup_badge:"🏃 ЖЫЛЫТУ",
     ready_wk_kicker:"ЖАТТЫҒУ ЖИНАЛДЫ", ready_wk_hint:"Құрамы жаттығу тарихыңыз бойынша таңдалды", ready_wk_change:"Құрамын өзгерту",
+    rest_notify_title:"Демалыс сигналы", rest_notify_hint:"Демалыс біткенде бот хабар жібереді. Телефонды қалтаға салыңыз — сағат дірілдейді.", rest_notify_on:"Қосулы", rest_notify_off:"Өшірулі",
+    rest_offer_kicker:"КЕҢЕС", rest_offer_title:"Жаттығу кезінде телефонды алып қоясыз ба?", rest_offer_text:"Бот демалыс аяқталғанын өзі білдіреді. Телефонды ұстап тұрудың қажеті жоқ — сағат немесе білезік дірілдейді.", rest_offer_yes:"Қосу", rest_offer_no:"Керек емес",
     order_title:"ТӘРТІП", order_hint:"↑↓ — қайта орналастыру · ↔ — ауыстыру",
     muscles_title:"БҰЛШЫҚЕТ ТОПТАРЫ", exercises_title:"ЖАТТЫҒУЛАР", replace_title:"АУЫСТЫРУ", show_all_exercises:"БАРЛЫҚ ЖАТТЫҒУЛАРДЫ КӨРСЕТУ",
     select_groups_hint:"Бір немесе бірнеше топ таңдаңыз → жаттығуларды көрсетеміз",
@@ -3731,6 +3739,34 @@ function ProfileScreen({user,tgId,onBack,onUserUpdated,onNav}){
       </div>
     </div>}
 
+    {/* Сигнал об отдыхе. Выключен по умолчанию — включает человек сам,
+        здесь или по предложению после первой тренировки. */}
+    {!editing&&<div style={{marginTop:20}}>
+      <Kicker>{t("rest_notify_title")}</Kicker>
+      <Card style={{marginTop:8}} pad="12px 14px" onClick={()=>{
+        if(!tgId)return;
+        const next=!user.rest_notify;
+        fetch(`${API}/user/${tgId}`,{method:"PUT",headers:{"Content-Type":"application/json"},
+          body:JSON.stringify({rest_notify:next})})
+          .then(()=>onUserUpdated&&onUserUpdated())
+          .catch(()=>{});
+      }}>
+        <div style={{display:"flex",alignItems:"center",gap:12}}>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontSize:14,color:C.text}}>
+              {user.rest_notify?t("rest_notify_on"):t("rest_notify_off")}
+            </div>
+            <div style={{fontSize:11,color:C.muted,marginTop:4,lineHeight:1.45}}>{t("rest_notify_hint")}</div>
+          </div>
+          <div style={{flexShrink:0,width:44,height:26,borderRadius:13,padding:2,
+            background:user.rest_notify?C.accent:"#3A3A3A",transition:"background .15s"}}>
+            <div style={{width:22,height:22,borderRadius:"50%",background:user.rest_notify?C.bg:"#8A8A8A",
+              transform:user.rest_notify?"translateX(18px)":"translateX(0)",transition:"transform .15s"}}/>
+          </div>
+        </div>
+      </Card>
+    </div>}
+
     {!editing&&<div style={{marginTop:20}}>
       <Kicker>{t("mydata_title")}</Kicker>
       <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:8}}>
@@ -4451,7 +4487,7 @@ function restSecFor(ex){
   return 90;                         // руки, пресс, ягодицы
 }
 
-function ActiveWorkoutScreen({tgId,exercises,muscleGroups,onBack,onFinish,onFinishNav=null,onNav=null,preselectedExIds=[],preselectedGroupIds=[],plannedWorkoutId=null,exerciseTips={}}){
+function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscleGroups,onBack,onFinish,onFinishNav=null,onNav=null,preselectedExIds=[],preselectedGroupIds=[],plannedWorkoutId=null,exerciseTips={}}){
   const STEP={MD:-1,SG:0,SE:1,WU:2,OR:3,LG:4,FN:5}; // MD=выбор режима
   // Если с момента последней записи подхода прошло больше 3 часов — тренировка считается
   // брошенной, и таймер обнуляется. Иначе в базу попадали сессии на 20+ часов: человек
@@ -4556,6 +4592,10 @@ function ActiveWorkoutScreen({tgId,exercises,muscleGroups,onBack,onFinish,onFini
   const [lgReplaceMode,setLgReplaceMode]=useState(false); // B-07: замена упражнения
   const [aiReview,setAiReview]=useState(null); // B-06: AI оценка (null=загрузка, ""=ошибка)
   const [streakInfo,setStreakInfo]=useState(null); // {streak_days, new_streak_rewards: [{days,name,emoji,pts,desc}]}
+  // Предложение включить сигнал об отдыхе. Показывается один раз, после первой
+  // тренировки, и только тем, кому ещё не предлагали. Включать молча нельзя:
+  // двадцать пять вибраций без спроса — и человек отключит бота совсем.
+  const [restOffer,setRestOffer]=useState(null); // null=не отвечал, "yes"/"no"=ответил
   const [showTimer,setShowTimer]=useState(false);
   const [timerAuto,setTimerAuto]=useState(null); // секунды автозапуска отдыха после подхода
   const [timerEx,setTimerEx]=useState(null); // упражнение, для которого спрашиваем оценку усилия
@@ -4629,12 +4669,16 @@ function ActiveWorkoutScreen({tgId,exercises,muscleGroups,onBack,onFinish,onFini
   async function doLog(){
     const ex=selExs[curIdx];if(!ex||!workoutId)return;
     const done=(sets[ex.id]||[]).length;
+    // Длительность отдыха считаем ДО отправки и передаём вместе с подходом:
+    // отсчёт ведёт сервер и сам пришлёт уведомление, когда время выйдет.
+    // Таймер в приложении остаётся как визуальный, но больше не единственный —
+    // раньше он просто вставал, стоило заблокировать телефон.
+    const rs=lastSets[ex.id]?.rest_sec||restSecFor(ex);
     await fetch(`${API}/workout/${workoutId}/set?tg_id=${tgId}`,{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({exercise_id:ex.id,exercise_name:ex.name,set_number:done+1,reps:parseInt(localSet.reps)||null,weight:parseFloat(localSet.weight)||null,duration_sec:parseInt(localSet.time)||null,distance_km:parseFloat(localSet.distance)||null})});
+      body:JSON.stringify({exercise_id:ex.id,exercise_name:ex.name,set_number:done+1,reps:parseInt(localSet.reps)||null,weight:parseFloat(localSet.weight)||null,duration_sec:parseInt(localSet.time)||null,distance_km:parseFloat(localSet.distance)||null,rest_sec:rs>0?rs:null})});
     setSets(p=>({...p,[ex.id]:[...(p[ex.id]||[]),{...localSet}]}));
     setLastSetAt(Date.now());
     setLocalSet({reps:"",weight:"",time:"",distance:""});
-    const rs=lastSets[ex.id]?.rest_sec||restSecFor(ex);
     if(rs>0){setTimerAuto(rs);setTimerEx(ex.name);setShowTimer(true);}
   }
   async function finish(){
@@ -4702,6 +4746,19 @@ ${exList}
     }catch{setAiReview("__error__");}
   }
 
+  async function answerRestOffer(enable){
+    setRestOffer(enable?"yes":"no");
+    if(!tgId)return;
+    try{
+      await fetch(`${API}/user/${tgId}`,{method:"PUT",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({rest_notify:enable,rest_notify_offered:true})});
+      // Перечитываем профиль: без этого родительский user остаётся со старыми
+      // флагами, предложение всплывало бы снова на следующей тренировке,
+      // а тумблер в профиле показывал бы «Выключено» при включённом сигнале.
+      if(onUserUpdated)onUserUpdated();
+    }catch{}
+  }
+
   if(step===STEP.FN)return(
     <div style={{padding:"16px 16px 100px"}}>
       <div style={{textAlign:"center",paddingTop:32,paddingBottom:24}}>
@@ -4710,6 +4767,23 @@ ${exList}
         <div style={{color:C.muted,fontSize:14,marginTop:8}}>{t("great_work")}</div>
         <div style={{marginTop:8,fontFamily:"monospace",color:C.accent,fontSize:20}}>{workoutDurationMin()} МИНУТ</div>
       </div>
+
+      {/* Спрашиваем один раз и только после настоящей тренировки: предлагать
+          то, чего человек ещё не пробовал, бессмысленно. */}
+      {user&&!user.rest_notify&&!user.rest_notify_offered&&restOffer===null&&
+       Object.values(sets).reduce((n,a)=>n+a.length,0)>0&&
+        <Card accent style={{marginBottom:16}}>
+          <Kicker>{t("rest_offer_kicker")}</Kicker>
+          <div style={{fontSize:16,fontWeight:600,color:C.text,marginTop:6}}>{t("rest_offer_title")}</div>
+          <div style={{fontSize:13,color:C.text,opacity:0.8,lineHeight:1.55,marginTop:8}}>{t("rest_offer_text")}</div>
+          <div style={{display:"flex",gap:8,marginTop:14}}>
+            <Btn accent full onClick={()=>answerRestOffer(true)}>{t("rest_offer_yes")}</Btn>
+            <Btn full onClick={()=>answerRestOffer(false)}>{t("rest_offer_no")}</Btn>
+          </div>
+        </Card>}
+      {restOffer==="yes"&&<Card style={{marginBottom:16}} pad="12px 16px">
+        <div style={{fontSize:13,color:C.accent}}>✓ {t("rest_notify_on")} — {t("rest_notify_title").toLowerCase()}</div>
+      </Card>}
 
       {streakInfo?.new_streak_rewards?.length>0&&streakInfo.new_streak_rewards.map((r,i)=>(
         <Card key={i} accent style={{marginBottom:16,textAlign:"center",background:"linear-gradient(135deg,rgba(200,255,0,0.12),rgba(200,255,0,0.03))"}}>
@@ -5257,7 +5331,12 @@ ${exList}
             method:"POST",headers:{"Content-Type":"application/json"},
             body:JSON.stringify({exercise_name:timerEx,rpe:v}),
           }).catch(()=>{});}:null}
-          onClose={()=>{setShowTimer(false);setTimerAuto(null);setTimerEx(null);}}/>}
+          onClose={()=>{
+            setShowTimer(false);setTimerAuto(null);setTimerEx(null);
+            // Отдых прерван вручную — снимаем его и на сервере, иначе уведомление
+            // придёт, когда человек уже делает следующий подход.
+            if(tgId)fetch(`${API}/workout/${tgId}/rest/cancel`,{method:"POST"}).catch(()=>{});
+          }}/>}
       </div>
     );
   }
@@ -8203,7 +8282,7 @@ export default function App(){
     if(screen==="more")return <MoreScreen user={user} onNav={handleNav} onBack={goBack}/>;
     if(screen==="alternatives")return <AlternativesScreen tgId={tgId} onNav={handleNav} onBack={goBack}/>;
     if(screen==="training_prefs")return <TrainingPrefsScreen tgId={tgId} onBack={goBack}/>;
-    if(screen==="active_workout")return <ActiveWorkoutScreen tgId={tgId} exercises={exercises} muscleGroups={muscleGroups} onBack={goBack} onFinish={()=>setWorkouts(null)} onFinishNav={()=>{setPlannedRefresh(r=>r+1);replace("workout",null,{});if(tgId)fetch(`${API}/workouts/${tgId}`).then(r=>r.json()).then(d=>setWorkouts(d.workouts||[])).catch(()=>setWorkouts([]));}} onNav={handleNav} preselectedExIds={p.preselectedExIds||[]} preselectedGroupIds={p.preselectedGroupIds||[]} plannedWorkoutId={p.plannedWorkoutId||null} exerciseTips={p.exerciseTips||{}}/>;
+    if(screen==="active_workout")return <ActiveWorkoutScreen tgId={tgId} user={user} onUserUpdated={loadUser} exercises={exercises} muscleGroups={muscleGroups} onBack={goBack} onFinish={()=>setWorkouts(null)} onFinishNav={()=>{setPlannedRefresh(r=>r+1);replace("workout",null,{});if(tgId)fetch(`${API}/workouts/${tgId}`).then(r=>r.json()).then(d=>setWorkouts(d.workouts||[])).catch(()=>setWorkouts([]));}} onNav={handleNav} preselectedExIds={p.preselectedExIds||[]} preselectedGroupIds={p.preselectedGroupIds||[]} plannedWorkoutId={p.plannedWorkoutId||null} exerciseTips={p.exerciseTips||{}}/>;
     if(screen==="workout_detail")return <WorkoutDetailScreen workoutId={p.workoutId} tgId={tgId} onBack={goBack}/>;
     if(screen==="my_workouts_detail")return <MyWorkoutsDetailScreen tgId={tgId} onBack={goBack} onNav={handleNav}/>;
     if(screen==="planned_detail")return <PlannedDetailScreen pwId={p.pwId} tgId={tgId} onBack={goBack} exercises={exercises} muscleGroups={muscleGroups} readOnly={p.readOnly||false} onNav={handleNav}/>;
