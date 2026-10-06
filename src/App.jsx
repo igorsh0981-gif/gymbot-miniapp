@@ -46,7 +46,9 @@ const API_TTL = [
   // кэша и качался заново при каждом запуске. Слэш перед словом обязателен,
   // иначе правило поймало бы /custom-exercises/.
   [/\/exercises(\?|$)/,     30 * 60 * 1000],
-  [/\/splits$/,             60 * 60 * 1000],
+  // Как и у каталога, не просто $: у справочника сплитов теперь есть параметр
+  // языка, и с якорем на конец строки правило бы не совпало.
+  [/\/splits(\?|$)/,        60 * 60 * 1000],
   [/\/custom-exercises\//,   5 * 60 * 1000],
   [/\/home\/\d+\/alternatives/, 3 * 60 * 1000],
   [/\/home\/\d+$/,           2 * 60 * 1000],
@@ -582,7 +584,7 @@ const T = {
     field_thigh:"Бедро",
     field_age:"Возраст",
     field_age_y:"Возраст (лет)",
-    field_weight_kg:"Вес (кг)",
+    field_weight_kg:"Вес (кг)",field_weight_g:"ВЕС (г)",
     field_height_cm:"Рост (см)",
     step_1_2:"ШАГ 1 / 2",
     step_2_2:"ШАГ 2 / 2",
@@ -800,6 +802,301 @@ const T = {
     no_sets_data:"нет данных",
     one_portion:"1 порция",
     portions_pack:"порций в упаковке",
+    // ── ЖДЁТ ПЕРЕВОДА (батч 2, translations_batch2.csv) ──────────────────
+    // Эти ключи намеренно есть ТОЛЬКО в русской секции: t() сам падает на
+    // русский, поэтому интерфейс работает как раньше, а проверка паритета
+    // по языкам показывает их как незакрытый долг и не даёт о них забыть.
+    ref_step1:"Поделись ссылкой с другом",
+    ref_step2:"Друг регистрируется в GymBot",
+    ref_step3:"Ты получаешь {n} баллов",
+    ref_step4:"Друг получает бонус при старте",
+    plan_time_taken:"На {dt} уже есть тренировка «{title}». Выбрать другое время?",
+    plan_show_ex:"ПОКАЗАТЬ УПРАЖНЕНИЯ ({n} групп) →",
+    plan_ex_groups:"УПРАЖНЕНИЯ ({n} групп) →",
+    err_save_failed:"Не удалось сохранить: {err}",
+    err_save_status:"Ошибка сохранения ({code})",
+    err_server_retry:"Ошибка сервера ({code}). Попробуй позже.",
+    sup_per_pack:"{n} порций в упаковке",
+    sup_tabs:"{a}мг ({b} таб по 100мг)",
+    prog_weight_range:"График веса: от {a} до {b}",
+    ai_plan_more:"+{n} ещё",
+    u_let:"лет",
+    u_dn:"дн",
+    u_t:"т",
+    u_km:"км",
+    u_povt:"повт",
+    // ── Добавлено 05.10.2026: тексты, которых не было в словаре вовсе.
+    // Раньше они стояли литералами прямо в разметке и показывались
+    // по-русски при любом языке приложения.
+    // Активная тренировка
+    aw_badminton:"🏸 Бадминтон",
+    aw_ballov_za_seriyu:"баллов за серию",
+    aw_basketbol:"🏀 Баскетбол",
+    aw_beg:"🏃 Бег",
+    aw_boks:"🥊 Бокс",
+    aw_bolshoy_tennis:"🎾 Большой теннис",
+    aw_dney:"дней",
+    aw_dnya:"дня",
+    aw_dobavit_uprazhnenie:"Добавить упражнение",
+    aw_futbol:"⚽ Футбол",
+    aw_gandbol:"🤾 Гандбол",
+    aw_gornye_lyzhi:"⛷ Горные лыжи",
+    aw_nastolnyy_tennis:"🏓 Настольный теннис",
+    aw_padel:"🎾 Падел",
+    aw_pilates:"🧘 Пилатес",
+    aw_plavanie:"🏊 Плавание",
+    aw_skalolazanie:"🧗 Скалолазание",
+    aw_sohranyaem:"⏳ СОХРАНЯЕМ...",
+    aw_velosport:"🚴 Велоспорт",
+    aw_voleybol:"🏐 Волейбол",
+    aw_vyberi_zamenu:"— выбери замену",
+    aw_vybrano:"ВЫБРАНО (",
+    aw_yoga:"🧘 Йога",
+    aw_zagruzka:"Загрузка...",
+    // Блок «плато» в прогрессе
+    plateau_analiz:"АНАЛИЗ",
+    // Гид по питанию
+    fg_belok:"БЕЛОК",
+    // Голосовая запись
+    voice_oshibka:"Ошибка",
+    // График недели: короткие названия спорта
+    sps_badm:"бадм.",
+    sps_basket:"баскет",
+    sps_beg:"бег",
+    sps_boks:"бокс",
+    sps_futbol:"футбол",
+    sps_gandbol:"гандбол",
+    sps_krossfit:"кроссфит",
+    sps_lyzhi:"лыжи",
+    sps_n_tennis:"н.теннис",
+    sps_padel:"падел",
+    sps_pilates:"пилатес",
+    sps_plav:"плав.",
+    sps_skalolaz:"скалолаз.",
+    sps_tennis:"теннис",
+    sps_velo:"вело",
+    sps_voley:"волей",
+    sps_yoga:"йога",
+    // График по группам мышц
+    mgc_obem:"объём",
+    // Достижения
+    ach_esche_ne_otkryto:"ЕЩЁ НЕ ОТКРЫТО (",
+    ach_otkryto:"ОТКРЫТО (",
+    // Единицы измерения
+    u_carb:"У",
+    u_fat:"Ж",
+    u_g:"г",u_s:"с",
+    u_prot:"Б",
+    // Журнал занятий спортом
+    splog_svoe:"Своё",
+    // Замеры тела
+    meas_sm:"см",
+    // Запланированная тренировка
+    pw_arhivnaya:"📋 АРХИВНАЯ",
+    pw_tolko_prosmotr:"ТОЛЬКО ПРОСМОТР",
+    pw_uprazhneniya:"УПРАЖНЕНИЯ (",
+    pw_vypolnena:"✓ ВЫПОЛНЕНА",
+    // Знакомство при первом входе
+    onb_analiziruet_trenirovki_vesa_:"Анализирует тренировки, веса, повторы — и советует, когда действительно пора прибавлять нагрузку",
+    onb_atlet:"Атлет",
+    onb_derzhit_motivaciyu:"Держит мотивацию",
+    onb_dobro_pozhalovat:"ДОБРО ПОЖАЛОВАТЬ",
+    onb_nachat:"НАЧАТЬ 🏋️",
+    onb_nachat_znakomstvo:"НАЧАТЬ ЗНАКОМСТВО →",
+    onb_otvechaet_kak_zhivoy_trener:"Отвечает как живой тренер",
+    onb_pitanie_po_foto:"Питание по фото",
+    onb_serii_dney_dostizheniya_ches:"Серии дней, достижения, честная обратная связь — без лишней сюсюканья",
+    onb_sfotografiroval_edu_poluchil:"Сфотографировал еду — получил КБЖУ. Без ручного ввода каждого приёма пищи",
+    onb_sprosi_chto_ugodno_pro:"Спроси что угодно про тренировку, восстановление, добавки — получишь конкретный ответ по твоим данным",
+    onb_tvoy_lichnyy_ai_trener:"Твой личный AI-тренер 🤖",
+    onb_vidit_ves_tvoy_progress:"Видит весь твой прогресс",
+    // История тренировок
+    wh_nizkaya:"Низкая",
+    wh_plan:"ПЛАН",
+    wh_srednyaya:"Средняя",
+    wh_vysokaya:"Высокая",
+    wh_zavershena:"✓ ЗАВЕРШЕНА",
+    // Карточка тренировки
+    wd_ph:"ПХ",
+    // Лидерборд
+    lb_ty:"(ты)",
+    // Мои добавки
+    usup_dobavit:"+ ДОБАВИТЬ",
+    usup_dobavit2:"✓ ДОБАВИТЬ",
+    // Питание
+    nut_belki:"Белки",
+    nut_cel:"цель",
+    nut_g:"(г)",
+    nut_isprav_nazvanie_sostav_kbzhu:"Исправь название/состав — КБЖУ пересчитается автоматически",
+    nut_limit_ai_zaprosov_na:"⚠️ Лимит AI запросов на сегодня исчерпан",
+    nut_ml:"мл",
+    nut_naprimer_chto_mne_ne:"Например: что мне не хватает в питании сегодня? или как лучше распределить белки?",
+    nut_naprimer_risovaya_kasha_s:"Например: Рисовая каша с молоком, 300г",
+    nut_oshibka:"ошибка",
+    nut_pereschitat_i_sohranit:"🔄 ПЕРЕСЧИТАТЬ И СОХРАНИТЬ",
+    nut_pitanie:"ПИТАНИЕ",
+    nut_zhiry:"Жиры",
+    // Поиск продукта
+    fs_na:"на",
+    fs_poisk:"ПОИСК",
+    fs_sportpit:"💊 Спортпит",
+    fs_vse:"Все",
+    // Правка занятия спортом
+    spedit_partnery_oschuscheniya:"Партнёры, ощущения...",
+    spedit_schet:"Счёт",
+    // Прогресс
+    prog_cht:"чт",
+    prog_pn:"пн",
+    prog_pt:"пт",
+    prog_sb:"сб",
+    prog_seriya:"СЕРИЯ",
+    prog_sr:"ср",
+    prog_trenirovok:"ТРЕНИРОВОК",
+    prog_vs:"вс",
+    prog_vt:"вт",
+    // Профиль
+    prof_bally:"Баллы",
+    prof_bro:"🤙 Бро",
+    prof_ekspert:"🎓 Эксперт",
+    prof_ekspert2:"Эксперт",
+    prof_nastavnik:"🧑‍🏫 Наставник",
+    prof_nastavnik2:"Наставник",
+    prof_profil_ne_nayden_snachala:"Профиль не найден. Сначала пройди регистрацию в боте @GYMASH_bot, затем вернись сюда.",
+    prof_status:"Статус",
+    prof_stil_ai:"Стиль AI",
+    prof_uroven:"Уровень",
+    // Профиль: аллергии
+    alg_glyuten:"🌾 Глютен",
+    alg_laktoza:"🥛 Лактоза",
+    alg_orehi:"🥜 Орехи",
+    alg_rybiy_zhir:"🐟 Рыбий жир",
+    alg_soya:"🫘 Соя",
+    alg_yayca:"🥚 Яйца",
+    // Профиль: ограничения по здоровью
+    med_bol_v_spine:"🔙 Боль в спине",
+    med_diabet:"💉 Диабет",
+    med_gipertoniya:"🩺 Гипертония",
+    med_gryzha:"⚠️ Грыжа",
+    med_plecho_rotator:"💪 Плечо/ротатор",
+    med_pochki:"🫘 Почки",
+    med_pozvonochnik:"🦴 Позвоночник",
+    med_serdce_sosudy:"❤️ Сердце/сосуды",
+    med_travma_kolena:"🦵 Травма колена",
+    // Профиль: уровень подготовки
+    lvl_novichok:"Новичок",
+    // Распознавание еды по фото
+    fv_blyudo:"Блюдо",
+    fv_gotovo:"✅ ГОТОВО",
+    fv_ispravit:"✏️ ИСПРАВИТЬ",
+    fv_naprimer_risovaya_kasha_s:"Например: Рисовая каша с молоком и мёдом, 300г",
+    fv_ne_udalos_pereschitat_poprob:"Не удалось пересчитать. Попробуй описать иначе.",
+    fv_neizvestnaya_oshibka:"неизвестная ошибка",
+    fv_nizkaya:"❓ Низкая",
+    fv_otmena:"Отмена",
+    fv_perekadrirovat:"🔄 Перекадрировать",
+    fv_pereschitat:"🔄 ПЕРЕСЧИТАТЬ",
+    fv_pereschityvaem:"ПЕРЕСЧИТЫВАЕМ...",
+    fv_povtorit_sohranenie:"🔄 ПОВТОРИТЬ СОХРАНЕНИЕ",
+    fv_povtoryaem:"ПОВТОРЯЕМ...",
+    fv_srednyaya:"⚠️ Средняя",
+    fv_vysokaya:"✅ Высокая",
+    // Рефералы
+    ref_kopirovat:"📋 КОПИРОВАТЬ",
+    ref_moi_referaly:"МОИ РЕФЕРАЛЫ (",
+    ref_skopirovano:"✓ СКОПИРОВАНО",
+    // Сбор тренировки
+    plan_dobavit_v_trenirovku:"+ ДОБАВИТЬ В ТРЕНИРОВКУ",
+    plan_ubrat_iz_trenirovki:"✓ УБРАТЬ ИЗ ТРЕНИРОВКИ",
+    plan_vybrano:"ВЫБРАНО",
+    plan_zaplanirovat:"📅 ЗАПЛАНИРОВАТЬ",
+    // Своё блюдо (форма)
+    fcat_frukty:"🍎 Фрукты",
+    fcat_hleb:"🍞 Хлеб",
+    fcat_krupy:"🌾 Крупы",
+    fcat_molochka:"🥛 Молочка",
+    fcat_myaso:"🥩 Мясо",
+    fcat_napitki:"🧃 Напитки",
+    fcat_ovoschi:"🥦 Овощи",
+    fcat_prochee:"🫙 Прочее",
+    fcat_ryba:"🐟 Рыба",
+    fcat_sneki:"🍫 Снеки",
+    // Своё упражнение
+    cex_moe:"Моё",
+    // Серии и баллы
+    gam_atlet:"🥈 Атлет",
+    gam_chek_in:"✓ Чек-ин",
+    gam_chempion:"🥇 Чемпион",
+    gam_legenda:"💎 Легенда",
+    gam_pitanie_vneseno:"Питание внесено",
+    gam_tennis:"🎾 Теннис",
+    gam_trenirovka_zavershena:"🏋️ Тренировка завершена",
+    gam_zanyatie_sportom:"Занятие спортом",
+    // Справочник добавок
+    sup_10g_den:"10г/день",
+    sup_15_30mg_den:"15–30мг/день",
+    sup_1_3g_epa_dha:"1–3г EPA+DHA/день",
+    sup_2000_5000_me_den:"2000–5000 МЕ/день",
+    sup_200_400mg:"200–400мг",
+    sup_20_40g_za_priem:"20–40г за приём",
+    sup_3_5g_den:"3–5г/день",
+    sup_3_6mg_kg_vesa:"3–6мг/кг веса",
+    sup_bez_zagruzki_rezultat_cherez:"Без загрузки. Результат через 2–4 недели. Запивай водой (250мл). Один из самых изученных препаратов.",
+    sup_immunitet_testosteron_kosti_:"Иммунитет, тестостерон, кости. Принимать с K2 (100–200мкг) для правильного усвоения кальция.",
+    sup_immunitet_testosteron_vossta:"Иммунитет, тестостерон, восстановление. Не принимать вместе с кальцием — конкурируют за усвоение.",
+    sup_kachestvo_sna_myshechnoe_vos:"Качество сна, мышечное восстановление, снижение стресса. Форма: глицинат или малат (не оксид — плохо усваивается).",
+    sup_posle_trenirovki_ili_v:"После тренировки или в любое время дня",
+    sup_povyshaet_vynoslivost_silu_i:"Повышает выносливость, силу и концентрацию. Не принимать после 15:00 — нарушает сон. Допуск развивается быстро.",
+    sup_prokonsultiruysya_s_vrachom_:"⚠️ Проконсультируйся с врачом — есть противопоказания",
+    sup_protivovospalitelnyy_effekt_:"Противовоспалительный эффект, суставы, сердце. Смотри на содержание EPA+DHA, не общий жир рыбы.",
+    sup_sustavy_i_svyazki_neobhodim:"Суставы и связки. Необходим витамин C (100мг) для синтеза коллагена. Эффект накопительный — 8–12 недель.",
+    sup_umerennyy_uroven_dokazatelno:"🟡 Умеренный уровень доказательности",
+    sup_vospolnenie_belka_syvorotoch:"Восполнение белка. Сывороточный — быстрый, казеин — медленный (на ночь).",
+    sup_vozmozhna_allergicheskaya_re:"🚫 Возможна аллергическая реакция",
+    sup_vysokiy_uroven_dokazatelnost:"🟢 Высокий уровень доказательности",
+    sup_your_weight:"(ТВОЙ ВЕС {w}КГ)",
+    // Цели
+    goals_celi:"ЦЕЛИ",
+    // Экран тренера (AI)
+    ai_ai_trenirovka:"AI тренировка",
+    ai_chto_est_do_i:"Что есть до и после тренировки",
+    ai_oshibka_soedineniya:"Ошибка соединения —",
+    ai_programma_dlya_pohudeniya_na:"Программа для похудения на месяц",
+    ai_sostav_plan_trenirovki_na:"Составь план тренировки на неделю под набор массы",
+    ai_sprosi_chto_ugodno:"СПРОСИ ЧТО УГОДНО...",
+    ai_trenirovka_na_plechi_i:"Тренировка на плечи и руки",
+    // ── Батч 2 и 3, переводы получены 06.10.2026 ───────────────────────
+    // Батч 2 — тексты из шаблонных строк, батч 3 — многострочные
+    // текстовые узлы JSX: ни те, ни другие построчный поиск не находит.
+    ui_1_porciya:"1 порция =",
+    ui_ai_zaprosov_v_den:"AI запросов в день:",
+    ui_ball:"балл.)",
+    ui_dobavit_svoe_uprazhnenie:"⭐ ДОБАВИТЬ СВОЁ УПРАЖНЕНИЕ",
+    ui_dobavit_svoy_produkt:"＋ ДОБАВИТЬ СВОЙ ПРОДУКТ",
+    ui_izmenenie_za_3_nedeli:"Изменение за 3 недели:",
+    ui_kg_za_period:"кг за период",
+    ui_limit_ai_zaprosov_na:"💬 Лимит AI запросов на сегодня исчерпан — оценка будет доступна завтра",
+    ui_napishi_pravilnoe_nazvanie_ili:"Напиши правильное название или состав блюда. КБЖУ пересчитается автоматически.",
+    ui_naydeno_v_kataloge:"⚠ Найдено в каталоге:",
+    ui_ne_prosto_spisok_uprazhneniy:"Не просто список упражнений — тренер, который реально знает твою историю и подстраивается под тебя.",
+    ui_ne_udalos_poluchit_ocenku:"Не удалось получить оценку AI — проверь соединение",
+    ui_peremeschay_i_uvelichivay_chto:"Перемещай и увеличивай, чтобы блюдо поместилось целиком",
+    ui_podhod:"ПОДХОД",
+    ui_poka_nikto_ne_v:"Пока никто не в рейтинге. Тренируйся и зарабатывай баллы!",
+    ui_polnaya_zapis_v_razdele:"↗ Полная запись в разделе Тренировки → ⚽ Спорт",
+    ui_poprobuy_otkryt_cherez_telegra:"Попробуй открыть через Telegram-бот.",
+    ui_poprobuy_smenit_uprazhnenie_il:"💡 Попробуй сменить упражнение или добавить дроп-сет — спроси тренера",
+    ui_posledniy_raz:"ПОСЛЕДНИЙ РАЗ (",
+    ui_primenenie_vitaminov_i_dobavok:"⚠️ Применение витаминов и добавок носит рекомендательный характер и не является медицинской рекомендацией. Перед применением проконсультируйтесь с врачом.",
+    ui_privet_treniruyus_v_gymbot:"Привет! Тренируюсь в GymBot — умный AI-тренер в Telegram. Присоединяйся по моей ссылке и получи бонусные баллы!",
+    ui_referalnaya_programma_vremenno:"Реферальная программа временно недоступна",
+    ui_seriya:"🔥 Серия:",
+    ui_sleduyuschiy:"Следующий:",
+    ui_taymer_avtomaticheski_zapuskae:"Таймер автоматически запускается после каждого подхода во время тренировки.",
+    ui_tochnost:"ТОЧНОСТЬ:",
+    ui_trenirovka_ne_naydena_ili:"Тренировка не найдена или нет доступа.",
+    ui_vybrano_grupp:"ВЫБРАНО ГРУПП:",
+    ui_zamenit:"ЗАМЕНИТЬ",
+    ui_zdes_mozhno_ispolzovat_otdelno:"Здесь можно использовать отдельно.",
   },
   en: {
     menu_nutrition:"Nutrition", menu_workout:"Workouts", menu_progress:"Progress",
@@ -1169,7 +1466,7 @@ const T = {
     field_thigh:"Thigh",
     field_age:"Age",
     field_age_y:"Age (years)",
-    field_weight_kg:"Weight (kg)",
+    field_weight_kg:"Weight (kg)",field_weight_g:"WEIGHT (g)",
     field_height_cm:"Height (cm)",
     step_1_2:"STEP 1 / 2",
     step_2_2:"STEP 2 / 2",
@@ -1387,6 +1684,297 @@ const T = {
     no_sets_data:"no data",
     one_portion:"1 serving",
     portions_pack:"servings per pack",
+    // ── Добавлено 05.10.2026: тексты, которых не было в словаре вовсе.
+    // Раньше они стояли литералами прямо в разметке и показывались
+    // по-русски при любом языке приложения.
+    // Активная тренировка
+    aw_badminton:"🏸 Badminton",
+    aw_ballov_za_seriyu:"points per streak",
+    aw_basketbol:"🏀 Basketball",
+    aw_beg:"🏃 Running",
+    aw_boks:"🥊 Boxing",
+    aw_bolshoy_tennis:"🎾 Tennis",
+    aw_dney:"days",
+    aw_dnya:"days",
+    aw_dobavit_uprazhnenie:"Add exercise",
+    aw_futbol:"⚽ Football",
+    aw_gandbol:"🤾 Handball",
+    aw_gornye_lyzhi:"⛷ Alpine skiing",
+    aw_nastolnyy_tennis:"🏓 Table tennis",
+    aw_padel:"🎾 Padel",
+    aw_pilates:"🧘 Pilates",
+    aw_plavanie:"🏊 Swimming",
+    aw_skalolazanie:"🧗 Climbing",
+    aw_sohranyaem:"⏳ SAVING...",
+    aw_velosport:"🚴 Cycling",
+    aw_voleybol:"🏐 Volleyball",
+    aw_vyberi_zamenu:"— choose replacement",
+    aw_vybrano:"SELECTED (",
+    aw_yoga:"🧘 Yoga",
+    aw_zagruzka:"Loading...",
+    // Блок «плато» в прогрессе
+    plateau_analiz:"ANALYSIS",
+    // Гид по питанию
+    fg_belok:"PROTEIN",
+    // Голосовая запись
+    voice_oshibka:"Error",
+    // График недели: короткие названия спорта
+    sps_badm:"badm.",
+    sps_basket:"basket",
+    sps_beg:"run",
+    sps_boks:"boxing",
+    sps_futbol:"football",
+    sps_gandbol:"handball",
+    sps_krossfit:"crossfit",
+    sps_lyzhi:"ski",
+    sps_n_tennis:"t.tennis",
+    sps_padel:"padel",
+    sps_pilates:"pilates",
+    sps_plav:"swim",
+    sps_skalolaz:"climb",
+    sps_tennis:"tennis",
+    sps_velo:"cycle",
+    sps_voley:"volley",
+    sps_yoga:"yoga",
+    // График по группам мышц
+    mgc_obem:"volume",
+    // Достижения
+    ach_esche_ne_otkryto:"NOT UNLOCKED (",
+    ach_otkryto:"UNLOCKED (",
+    // Единицы измерения
+    u_carb:"C",
+    u_fat:"F",
+    u_g:"g",u_s:"s",
+    u_prot:"P",
+    // Журнал занятий спортом
+    splog_svoe:"Custom",
+    // Замеры тела
+    meas_sm:"cm",
+    // Запланированная тренировка
+    pw_arhivnaya:"📋 ARCHIVED",
+    pw_tolko_prosmotr:"VIEW ONLY",
+    pw_uprazhneniya:"EXERCISES (",
+    pw_vypolnena:"✓ COMPLETED",
+    // Знакомство при первом входе
+    onb_analiziruet_trenirovki_vesa_:"Analyzes workouts, weights, and reps — and tells you when it’s really time to increase the load",
+    onb_atlet:"Athlete",
+    onb_derzhit_motivaciyu:"Keeps you motivated",
+    onb_dobro_pozhalovat:"WELCOME",
+    onb_nachat:"START 🏋️",
+    onb_nachat_znakomstvo:"GET STARTED →",
+    onb_otvechaet_kak_zhivoy_trener:"Answers like a real coach",
+    onb_pitanie_po_foto:"Nutrition from a photo",
+    onb_serii_dney_dostizheniya_ches:"Streaks, achievements, honest feedback — no unnecessary sugarcoating",
+    onb_sfotografiroval_edu_poluchil:"Snap your food — get calories and macros. No manual entry for every meal",
+    onb_sprosi_chto_ugodno_pro:"Ask anything about training, recovery, or supplements — get a specific answer based on your data",
+    onb_tvoy_lichnyy_ai_trener:"Your personal AI coach 🤖",
+    onb_vidit_ves_tvoy_progress:"Sees all your progress",
+    // История тренировок
+    wh_nizkaya:"Low",
+    wh_plan:"PLAN",
+    wh_srednyaya:"Medium",
+    wh_vysokaya:"High",
+    wh_zavershena:"✓ COMPLETED",
+    // Карточка тренировки
+    wd_ph:"SET",
+    // Лидерборд
+    lb_ty:"(you)",
+    // Мои добавки
+    usup_dobavit:"+ ADD",
+    usup_dobavit2:"✓ ADD",
+    // Питание
+    nut_belki:"Protein",
+    nut_cel:"target",
+    nut_g:"(g)",
+    nut_isprav_nazvanie_sostav_kbzhu:"Edit the name/ingredients — calories and macros will recalculate automatically",
+    nut_limit_ai_zaprosov_na:"⚠️ Today’s AI request limit reached",
+    nut_ml:"ml",
+    nut_naprimer_chto_mne_ne:"For example: what am I missing in my diet today? or how should I distribute protein?",
+    nut_naprimer_risovaya_kasha_s:"For example: Rice porridge with milk, 300g",
+    nut_oshibka:"error",
+    nut_pereschitat_i_sohranit:"🔄 RECALC & SAVE",
+    nut_pitanie:"NUTRITION",
+    nut_zhiry:"Fats",
+    // Поиск продукта
+    fs_na:"for",
+    fs_poisk:"SEARCH",
+    fs_sportpit:"💊 Sports supps",
+    fs_vse:"All",
+    // Правка занятия спортом
+    spedit_partnery_oschuscheniya:"Partners, how it felt...",
+    spedit_schet:"Score",
+    // Прогресс
+    prog_cht:"Thu",
+    prog_pn:"Mon",
+    prog_pt:"Fri",
+    prog_sb:"Sat",
+    prog_seriya:"STREAK",
+    prog_sr:"Wed",
+    prog_trenirovok:"WORKOUTS",
+    prog_vs:"Sun",
+    prog_vt:"Tue",
+    // Профиль
+    prof_bally:"Points",
+    prof_bro:"🤙 Bro",
+    prof_ekspert:"🎓 Expert",
+    prof_ekspert2:"Expert",
+    prof_nastavnik:"🧑‍🏫 Mentor",
+    prof_nastavnik2:"Mentor",
+    prof_profil_ne_nayden_snachala:"Profile not found. First register in @GYMASH_bot, then come back here.",
+    prof_status:"Status",
+    prof_stil_ai:"AI style",
+    prof_uroven:"Level",
+    // Профиль: аллергии
+    alg_glyuten:"🌾 Gluten",
+    alg_laktoza:"🥛 Lactose",
+    alg_orehi:"🥜 Nuts",
+    alg_rybiy_zhir:"🐟 Fish oil",
+    alg_soya:"🫘 Soy",
+    alg_yayca:"🥚 Eggs",
+    // Профиль: ограничения по здоровью
+    med_bol_v_spine:"🔙 Back pain",
+    med_diabet:"💉 Diabetes",
+    med_gipertoniya:"🩺 Hypertension",
+    med_gryzha:"⚠️ Hernia",
+    med_plecho_rotator:"💪 Shoulder/rotator",
+    med_pochki:"🫘 Kidneys",
+    med_pozvonochnik:"🦴 Spine",
+    med_serdce_sosudy:"❤️ Heart/vessels",
+    med_travma_kolena:"🦵 Knee injury",
+    // Профиль: уровень подготовки
+    lvl_novichok:"Beginner",
+    // Распознавание еды по фото
+    fv_blyudo:"Dish",
+    fv_gotovo:"✅ DONE",
+    fv_ispravit:"✏️ EDIT",
+    fv_naprimer_risovaya_kasha_s:"For example: Rice porridge with milk and honey, 300g",
+    fv_ne_udalos_pereschitat_poprob:"Couldn’t recalculate. Try describing it differently.",
+    fv_neizvestnaya_oshibka:"unknown error",
+    fv_nizkaya:"❓ Low",
+    fv_otmena:"Cancel",
+    fv_perekadrirovat:"🔄 Reframe",
+    fv_pereschitat:"🔄 RECALCULATE",
+    fv_pereschityvaem:"RECALCULATING...",
+    fv_povtorit_sohranenie:"🔄 RETRY SAVE",
+    fv_povtoryaem:"RETRYING...",
+    fv_srednyaya:"⚠️ Medium",
+    fv_vysokaya:"✅ High",
+    // Рефералы
+    ref_kopirovat:"📋 COPY",
+    ref_moi_referaly:"MY REFERRALS (",
+    ref_skopirovano:"✓ COPIED",
+    // Сбор тренировки
+    plan_dobavit_v_trenirovku:"+ ADD TO WORKOUT",
+    plan_ubrat_iz_trenirovki:"✓ REMOVE FROM WORKOUT",
+    plan_vybrano:"SELECTED",
+    plan_zaplanirovat:"📅 SCHEDULE",
+    // Своё блюдо (форма)
+    fcat_frukty:"🍎 Fruit",
+    fcat_hleb:"🍞 Bread",
+    fcat_krupy:"🌾 Grains",
+    fcat_molochka:"🥛 Dairy",
+    fcat_myaso:"🥩 Meat",
+    fcat_napitki:"🧃 Drinks",
+    fcat_ovoschi:"🥦 Vegetables",
+    fcat_prochee:"🫙 Other",
+    fcat_ryba:"🐟 Fish",
+    fcat_sneki:"🍫 Snacks",
+    // Своё упражнение
+    cex_moe:"Mine",
+    // Серии и баллы
+    gam_atlet:"🥈 Athlete",
+    gam_chek_in:"✓ Check-in",
+    gam_chempion:"🥇 Champion",
+    gam_legenda:"💎 Legend",
+    gam_pitanie_vneseno:"Nutrition logged",
+    gam_tennis:"🎾 Tennis",
+    gam_trenirovka_zavershena:"🏋️ Workout completed",
+    gam_zanyatie_sportom:"Sports activity",
+    // Справочник добавок
+    sup_10g_den:"10g/day",
+    sup_15_30mg_den:"15–30mg/day",
+    sup_1_3g_epa_dha:"1–3g EPA+DHA/day",
+    sup_2000_5000_me_den:"2000–5000 IU/day",
+    sup_200_400mg:"200–400mg",
+    sup_20_40g_za_priem:"20–40g per serving",
+    sup_3_5g_den:"3–5g/day",
+    sup_3_6mg_kg_vesa:"3–6mg/kg body weight",
+    sup_bez_zagruzki_rezultat_cherez:"No loading phase. Results in 2–4 weeks. Take with water (250ml). One of the most studied supplements.",
+    sup_immunitet_testosteron_kosti_:"Immunity, testosterone, bones. Take with K2 (100–200mcg) for proper calcium absorption.",
+    sup_immunitet_testosteron_vossta:"Immunity, testosterone, recovery. Do not take with calcium — they compete for absorption.",
+    sup_kachestvo_sna_myshechnoe_vos:"Sleep quality, muscle recovery, stress reduction. Form: glycinate or malate (not oxide — poorly absorbed).",
+    sup_posle_trenirovki_ili_v:"After training or any time of day",
+    sup_povyshaet_vynoslivost_silu_i:"Improves endurance, strength, and focus. Do not take after 15:00 — it disrupts sleep. Tolerance develops quickly.",
+    sup_prokonsultiruysya_s_vrachom_:"⚠️ Consult a doctor — there are contraindications",
+    sup_protivovospalitelnyy_effekt_:"Anti-inflammatory effect, joints, heart. Check EPA+DHA content, not total fish oil.",
+    sup_sustavy_i_svyazki_neobhodim:"Joints and ligaments. Vitamin C (100mg) is needed for collagen synthesis. Cumulative effect — 8–12 weeks.",
+    sup_umerennyy_uroven_dokazatelno:"🟡 Moderate evidence",
+    sup_vospolnenie_belka_syvorotoch:"Protein supplementation. Whey is fast, casein is slow (before bed).",
+    sup_vozmozhna_allergicheskaya_re:"🚫 Allergic reaction possible",
+    sup_vysokiy_uroven_dokazatelnost:"🟢 High evidence",
+    sup_your_weight:"(YOUR WEIGHT {w}KG)",
+    // Цели
+    goals_celi:"GOALS",
+    // Экран тренера (AI)
+    ai_ai_trenirovka:"AI workout",
+    ai_chto_est_do_i:"What to eat before and after training",
+    ai_oshibka_soedineniya:"Connection error —",
+    ai_programma_dlya_pohudeniya_na:"One-month weight-loss program",
+    ai_sostav_plan_trenirovki_na:"Create a one-week workout plan for muscle gain",
+    ai_sprosi_chto_ugodno:"ASK ANYTHING...",
+    ai_trenirovka_na_plechi_i:"Shoulder and arm workout",
+    ai_plan_more:"+{n} more",
+    err_save_failed:"Could not save: {err}",
+    err_save_status:"Save error ({code})",
+    err_server_retry:"Server error ({code}). Try again later.",
+    plan_ex_groups:"EXERCISES ({n} GROUPS) →",
+    plan_show_ex:"SHOW EXERCISES ({n} GROUPS) →",
+    plan_time_taken:"There is already a workout “{title}” at {dt}. Choose another time?",
+    prog_weight_range:"Weight chart: {a} to {b}",
+    ref_step1:"Share the link with a friend",
+    ref_step2:"Your friend signs up for GymBot",
+    ref_step3:"You get {n} points",
+    ref_step4:"Your friend gets a starting bonus",
+    sup_per_pack:"{n} servings per pack",
+    sup_tabs:"{a}mg ({b} tabs of 100mg)",
+    u_dn:"d",
+    u_km:"km",
+    u_let:"years",
+    u_povt:"reps",
+    u_t:"t",
+    // ── Батч 2 и 3, переводы получены 06.10.2026 ───────────────────────
+    // Батч 2 — тексты из шаблонных строк, батч 3 — многострочные
+    // текстовые узлы JSX: ни те, ни другие построчный поиск не находит.
+    ui_1_porciya:"1 serving =",
+    ui_ai_zaprosov_v_den:"AI requests per day:",
+    ui_ball:"pts.)",
+    ui_dobavit_svoe_uprazhnenie:"⭐ ADD CUSTOM EXERCISE",
+    ui_dobavit_svoy_produkt:"＋ ADD CUSTOM FOOD",
+    ui_izmenenie_za_3_nedeli:"Change over 3 weeks:",
+    ui_kg_za_period:"kg for period",
+    ui_limit_ai_zaprosov_na:"💬 Today’s AI request limit is reached — assessment will be available tomorrow",
+    ui_napishi_pravilnoe_nazvanie_ili:"Enter the correct dish name or ingredients. Calories and macros will recalculate automatically.",
+    ui_naydeno_v_kataloge:"⚠ Found in catalog:",
+    ui_ne_prosto_spisok_uprazhneniy:"Not just a list of exercises — a coach that actually knows your history and adapts to you.",
+    ui_ne_udalos_poluchit_ocenku:"Could not get the AI assessment — check your connection",
+    ui_peremeschay_i_uvelichivay_chto:"Move and zoom so the whole dish fits",
+    ui_podhod:"SET",
+    ui_poka_nikto_ne_v:"No one is in the ranking yet. Train and earn points!",
+    ui_polnaya_zapis_v_razdele:"↗ Full entry in Workouts → ⚽ Sports",
+    ui_poprobuy_otkryt_cherez_telegra:"Try opening it through the Telegram bot.",
+    ui_poprobuy_smenit_uprazhnenie_il:"💡 Try changing the exercise or adding a drop set — ask your coach",
+    ui_posledniy_raz:"LAST TIME (",
+    ui_primenenie_vitaminov_i_dobavok:"⚠️ Use of vitamins and supplements is for guidance only and is not medical advice. Consult a doctor before use.",
+    ui_privet_treniruyus_v_gymbot:"Hi! I train with GymBot — a smart AI coach in Telegram. Join through my link and get bonus points",
+    ui_referalnaya_programma_vremenno:"The referral program is temporarily unavailable",
+    ui_seriya:"🔥 Streak:",
+    ui_sleduyuschiy:"Next:",
+    ui_taymer_avtomaticheski_zapuskae:"The timer starts automatically after each set during a workout.",
+    ui_tochnost:"ACCURACY:",
+    ui_trenirovka_ne_naydena_ili:"Workout not found or access denied.",
+    ui_vybrano_grupp:"GROUPS SELECTED:",
+    ui_zamenit:"REPLACE",
+    ui_zdes_mozhno_ispolzovat_otdelno:"You can use it separately here.",
   },
   uz: {
     menu_nutrition:"Ovqatlanish", menu_workout:"Mashqlar", menu_progress:"Taraqqiyot",
@@ -1756,7 +2344,7 @@ const T = {
     field_thigh:"Son",
     field_age:"Yosh",
     field_age_y:"Yosh (yillar)",
-    field_weight_kg:"Og'irlik (kg)",
+    field_weight_kg:"Og'irlik (kg)",field_weight_g:"OG'IRLIK (g)",
     field_height_cm:"Bo'y (sm)",
     step_1_2:"QADAM 1 / 2",
     step_2_2:"QADAM 2 / 2",
@@ -1974,6 +2562,297 @@ const T = {
     no_sets_data:"ma'lumot yo'q",
     one_portion:"1 porsiya",
     portions_pack:"qadoqdagi porsiyalar",
+    // ── Добавлено 05.10.2026: тексты, которых не было в словаре вовсе.
+    // Раньше они стояли литералами прямо в разметке и показывались
+    // по-русски при любом языке приложения.
+    // Активная тренировка
+    aw_badminton:"🏸 Badminton",
+    aw_ballov_za_seriyu:"seriya uchun ball",
+    aw_basketbol:"🏀 Basketbol",
+    aw_beg:"🏃 Yugurish",
+    aw_boks:"🥊 Boks",
+    aw_bolshoy_tennis:"🎾 Tennis",
+    aw_dney:"kun",
+    aw_dnya:"kun",
+    aw_dobavit_uprazhnenie:"Mashq qo‘shish",
+    aw_futbol:"⚽ Futbol",
+    aw_gandbol:"🤾 Gandbol",
+    aw_gornye_lyzhi:"⛷ Tog‘ chang‘isi",
+    aw_nastolnyy_tennis:"🏓 Stol tennisi",
+    aw_padel:"🎾 Padel",
+    aw_pilates:"🧘 Pilates",
+    aw_plavanie:"🏊 Suzish",
+    aw_skalolazanie:"🧗 Qoyaga chiqish",
+    aw_sohranyaem:"⏳ SAQLANMOQDA...",
+    aw_velosport:"🚴 Velosport",
+    aw_voleybol:"🏐 Voleybol",
+    aw_vyberi_zamenu:"— o‘rnini tanla",
+    aw_vybrano:"TANLANDI (",
+    aw_yoga:"🧘 Yoga",
+    aw_zagruzka:"Yuklanmoqda...",
+    // Блок «плато» в прогрессе
+    plateau_analiz:"TAHLIL",
+    // Гид по питанию
+    fg_belok:"OQSIL",
+    // Голосовая запись
+    voice_oshibka:"Xato",
+    // График недели: короткие названия спорта
+    sps_badm:"badm.",
+    sps_basket:"basket",
+    sps_beg:"yugur.",
+    sps_boks:"boks",
+    sps_futbol:"futbol",
+    sps_gandbol:"gandbol",
+    sps_krossfit:"krossfit",
+    sps_lyzhi:"chang‘i",
+    sps_n_tennis:"st.tennis",
+    sps_padel:"padel",
+    sps_pilates:"pilates",
+    sps_plav:"suzish",
+    sps_skalolaz:"qoya",
+    sps_tennis:"tennis",
+    sps_velo:"velo",
+    sps_voley:"voley",
+    sps_yoga:"yoga",
+    // График по группам мышц
+    mgc_obem:"hajm",
+    // Достижения
+    ach_esche_ne_otkryto:"OCHILMAGAN (",
+    ach_otkryto:"OCHILGAN (",
+    // Единицы измерения
+    u_carb:"U",
+    u_fat:"Y",
+    u_g:"g",u_s:"s",
+    u_prot:"O",
+    // Журнал занятий спортом
+    splog_svoe:"O‘zimniki",
+    // Замеры тела
+    meas_sm:"sm",
+    // Запланированная тренировка
+    pw_arhivnaya:"📋 ARXIVDA",
+    pw_tolko_prosmotr:"FAQAT KO‘RISH",
+    pw_uprazhneniya:"MASHQLAR (",
+    pw_vypolnena:"✓ BAJARILDI",
+    // Знакомство при первом входе
+    onb_analiziruet_trenirovki_vesa_:"Treninglar, og‘irliklar va takrorlarni tahlil qiladi — yuklamani qachon oshirish kerakligini aytadi",
+    onb_atlet:"Atlet",
+    onb_derzhit_motivaciyu:"Motivatsiyani ushlab turadi",
+    onb_dobro_pozhalovat:"XUSH KELIBSIZ",
+    onb_nachat:"BOSHLASH 🏋️",
+    onb_nachat_znakomstvo:"TANISHISH →",
+    onb_otvechaet_kak_zhivoy_trener:"Haqiqiy murabbiydek javob beradi",
+    onb_pitanie_po_foto:"Surat orqali ovqatlanish",
+    onb_serii_dney_dostizheniya_ches:"Kunlik seriyalar, yutuqlar va halol fikr — ortiqcha erkalatishsiz",
+    onb_sfotografiroval_edu_poluchil:"Taomni suratga ol — kaloriya va BJU tayyor. Har bir ovqatni qo‘lda kiritish shart emas",
+    onb_sprosi_chto_ugodno_pro:"Trening, tiklanish yoki qo‘shimchalar haqida istagan narsangni so‘ra — ma’lumotlaring asosida aniq javob olasan",
+    onb_tvoy_lichnyy_ai_trener:"Shaxsiy AI murabbiying 🤖",
+    onb_vidit_ves_tvoy_progress:"Butun progressingni ko‘radi",
+    // История тренировок
+    wh_nizkaya:"Past",
+    wh_plan:"REJA",
+    wh_srednyaya:"O‘rtacha",
+    wh_vysokaya:"Yuqori",
+    wh_zavershena:"✓ YAKUNLANDI",
+    // Карточка тренировки
+    wd_ph:"SET",
+    // Лидерборд
+    lb_ty:"(sen)",
+    // Мои добавки
+    usup_dobavit:"+ QO‘SHISH",
+    usup_dobavit2:"✓ QO‘SHISH",
+    // Питание
+    nut_belki:"Oqsil",
+    nut_cel:"maqsad",
+    nut_g:"(g)",
+    nut_isprav_nazvanie_sostav_kbzhu:"Nomini/tarkibini tuzat — kaloriya va BJU avtomatik qayta hisoblanadi",
+    nut_limit_ai_zaprosov_na:"⚠️ Bugungi AI so‘rovlar limiti tugadi",
+    nut_ml:"ml",
+    nut_naprimer_chto_mne_ne:"Masalan: bugun ovqatlanishimda nima yetishmayapti? yoki oqsilni qanday taqsimlagan ma’qul?",
+    nut_naprimer_risovaya_kasha_s:"Masalan: Sutli guruch bo‘tqasi, 300g",
+    nut_oshibka:"xato",
+    nut_pereschitat_i_sohranit:"🔄 HISOBLA VA SAQLA",
+    nut_pitanie:"OVQATLANISH",
+    nut_zhiry:"Yog‘",
+    // Поиск продукта
+    fs_na:"uchun",
+    fs_poisk:"QIDIRISH",
+    fs_sportpit:"💊 Sport oziqa",
+    fs_vse:"Barchasi",
+    // Правка занятия спортом
+    spedit_partnery_oschuscheniya:"Sheriklar, hislar...",
+    spedit_schet:"Hisob",
+    // Прогресс
+    prog_cht:"pa",
+    prog_pn:"du",
+    prog_pt:"ju",
+    prog_sb:"sh",
+    prog_seriya:"SERIYA",
+    prog_sr:"ch",
+    prog_trenirovok:"TRENING",
+    prog_vs:"ya",
+    prog_vt:"se",
+    // Профиль
+    prof_bally:"Ballar",
+    prof_bro:"🤙 Bro",
+    prof_ekspert:"🎓 Ekspert",
+    prof_ekspert2:"Ekspert",
+    prof_nastavnik:"🧑‍🏫 Ustoz",
+    prof_nastavnik2:"Ustoz",
+    prof_profil_ne_nayden_snachala:"Profil topilmadi. Avval @GYMASH_bot’da ro‘yxatdan o‘t, keyin bu yerga qayt.",
+    prof_status:"Holat",
+    prof_stil_ai:"AI uslubi",
+    prof_uroven:"Daraja",
+    // Профиль: аллергии
+    alg_glyuten:"🌾 Glyuten",
+    alg_laktoza:"🥛 Laktoza",
+    alg_orehi:"🥜 Yong‘oq",
+    alg_rybiy_zhir:"🐟 Baliq yog‘i",
+    alg_soya:"🫘 Soya",
+    alg_yayca:"🥚 Tuxum",
+    // Профиль: ограничения по здоровью
+    med_bol_v_spine:"🔙 Bel og‘rig‘i",
+    med_diabet:"💉 Diabet",
+    med_gipertoniya:"🩺 Gipertoniya",
+    med_gryzha:"⚠️ Churra",
+    med_plecho_rotator:"💪 Yelka/rotator",
+    med_pochki:"🫘 Buyrak",
+    med_pozvonochnik:"🦴 Umurtqa",
+    med_serdce_sosudy:"❤️ Yurak/tomirlar",
+    med_travma_kolena:"🦵 Tizza jarohati",
+    // Профиль: уровень подготовки
+    lvl_novichok:"Boshlovchi",
+    // Распознавание еды по фото
+    fv_blyudo:"Taom",
+    fv_gotovo:"✅ TAYYOR",
+    fv_ispravit:"✏️ TUZATISH",
+    fv_naprimer_risovaya_kasha_s:"Masalan: Sut va asalli guruch bo‘tqasi, 300g",
+    fv_ne_udalos_pereschitat_poprob:"Qayta hisoblab bo‘lmadi. Boshqacha tasvirlab ko‘r.",
+    fv_neizvestnaya_oshibka:"noma’lum xato",
+    fv_nizkaya:"❓ Past",
+    fv_otmena:"Bekor qilish",
+    fv_perekadrirovat:"🔄 Qayta kadrla",
+    fv_pereschitat:"🔄 QAYTA HISOBLA",
+    fv_pereschityvaem:"HISOBLANMOQDA...",
+    fv_povtorit_sohranenie:"🔄 QAYTA SAQLASH",
+    fv_povtoryaem:"QAYTA URINISH...",
+    fv_srednyaya:"⚠️ O‘rtacha",
+    fv_vysokaya:"✅ Yuqori",
+    // Рефералы
+    ref_kopirovat:"📋 NUSXALASH",
+    ref_moi_referaly:"REFERALLARIM (",
+    ref_skopirovano:"✓ NUSXALANDI",
+    // Сбор тренировки
+    plan_dobavit_v_trenirovku:"+ TRENINGGA QO‘SH",
+    plan_ubrat_iz_trenirovki:"✓ TRENINGDAN OL",
+    plan_vybrano:"TANLANDI",
+    plan_zaplanirovat:"📅 REJALASH",
+    // Своё блюдо (форма)
+    fcat_frukty:"🍎 Mevalar",
+    fcat_hleb:"🍞 Non",
+    fcat_krupy:"🌾 Yormalar",
+    fcat_molochka:"🥛 Sutli",
+    fcat_myaso:"🥩 Go‘sht",
+    fcat_napitki:"🧃 Ichimliklar",
+    fcat_ovoschi:"🥦 Sabzavotlar",
+    fcat_prochee:"🫙 Boshqa",
+    fcat_ryba:"🐟 Baliq",
+    fcat_sneki:"🍫 Sneklar",
+    // Своё упражнение
+    cex_moe:"Meniki",
+    // Серии и баллы
+    gam_atlet:"🥈 Atlet",
+    gam_chek_in:"✓ Chek-in",
+    gam_chempion:"🥇 Chempion",
+    gam_legenda:"💎 Afsona",
+    gam_pitanie_vneseno:"Ovqatlanish kiritildi",
+    gam_tennis:"🎾 Tennis",
+    gam_trenirovka_zavershena:"🏋️ Trening yakunlandi",
+    gam_zanyatie_sportom:"Sport mashg‘uloti",
+    // Справочник добавок
+    sup_10g_den:"10g/kun",
+    sup_15_30mg_den:"15–30mg/kun",
+    sup_1_3g_epa_dha:"1–3g EPA+DHA/kun",
+    sup_2000_5000_me_den:"2000–5000 ME/kun",
+    sup_200_400mg:"200–400mg",
+    sup_20_40g_za_priem:"20–40g bir qabulda",
+    sup_3_5g_den:"3–5g/kun",
+    sup_3_6mg_kg_vesa:"3–6mg/kg vazn",
+    sup_bez_zagruzki_rezultat_cherez:"Yuklash bosqichisiz. Natija 2–4 haftada. Suv bilan ich (250ml). Eng ko‘p o‘rganilgan qo‘shimchalardan biri.",
+    sup_immunitet_testosteron_kosti_:"Immunitet, testosteron, suyaklar. Kalsiyning to‘g‘ri o‘zlashishi uchun K2 (100–200mkg) bilan qabul qiling.",
+    sup_immunitet_testosteron_vossta:"Immunitet, testosteron, tiklanish. Kalsiy bilan birga qabul qilmang — o‘zlashishda raqobatlashadi.",
+    sup_kachestvo_sna_myshechnoe_vos:"Uyqu sifati, mushak tiklanishi, stressni kamaytirish. Shakli: glitsinat yoki malat (oksid emas — yomon o‘zlashadi).",
+    sup_posle_trenirovki_ili_v:"Treningdan keyin yoki kunning istalgan vaqtida",
+    sup_povyshaet_vynoslivost_silu_i:"Chidamlilik, kuch va diqqatni oshiradi. 15:00 dan keyin qabul qilmang — uyquni buzadi. Tolerantlik tez rivojlanadi.",
+    sup_prokonsultiruysya_s_vrachom_:"⚠️ Shifokor bilan maslahatlashing — qarshi ko‘rsatmalar bor",
+    sup_protivovospalitelnyy_effekt_:"Yallig‘lanishga qarshi ta’sir, bo‘g‘imlar, yurak. Umumiy baliq yog‘iga emas, EPA+DHA miqdoriga qarang.",
+    sup_sustavy_i_svyazki_neobhodim:"Bo‘g‘imlar va paylar. Kollagen sintezi uchun C vitamini (100mg) kerak. Ta’siri yig‘ilib boradi — 8–12 hafta.",
+    sup_umerennyy_uroven_dokazatelno:"🟡 O‘rtacha dalil darajasi",
+    sup_vospolnenie_belka_syvorotoch:"Oqsilni to‘ldirish. Zardob oqsili — tez, kazein — sekin (uyqudan oldin).",
+    sup_vozmozhna_allergicheskaya_re:"🚫 Allergik reaksiya bo‘lishi mumkin",
+    sup_vysokiy_uroven_dokazatelnost:"🟢 Yuqori dalil darajasi",
+    sup_your_weight:"(VAZNING {w}KG)",
+    // Цели
+    goals_celi:"MAQSADLAR",
+    // Экран тренера (AI)
+    ai_ai_trenirovka:"AI trening",
+    ai_chto_est_do_i:"Treningdan oldin va keyin nima yeyish kerak",
+    ai_oshibka_soedineniya:"Ulanish xatosi —",
+    ai_programma_dlya_pohudeniya_na:"Bir oylik ozish dasturi",
+    ai_sostav_plan_trenirovki_na:"Massa yig‘ish uchun bir haftalik trening rejasini tuz",
+    ai_sprosi_chto_ugodno:"ISTAGANINGNI SO‘RA...",
+    ai_trenirovka_na_plechi_i:"Yelka va qo‘l uchun trening",
+    ai_plan_more:"+ yana {n}",
+    err_save_failed:"Saqlab bo‘lmadi: {err}",
+    err_save_status:"Saqlash xatosi ({code})",
+    err_server_retry:"Server xatosi ({code}). Keyinroq urinib ko‘r.",
+    plan_ex_groups:"MASHQLAR ({n} GURUH) →",
+    plan_show_ex:"MASHQLARNI KO‘RSATISH ({n} GURUH) →",
+    plan_time_taken:"{dt} vaqtiga «{title}» treningi allaqachon bor. Boshqa vaqt tanlaysanmi?",
+    prog_weight_range:"Vazn grafigi: {a} dan {b} gacha",
+    ref_step1:"Do‘sting bilan havolani ulash",
+    ref_step2:"Do‘sting GymBot’da ro‘yxatdan o‘tadi",
+    ref_step3:"Sen {n} ball olasan",
+    ref_step4:"Do‘sting boshlang‘ich bonus oladi",
+    sup_per_pack:"Qadoqda {n} porsiya",
+    sup_tabs:"{a}mg ({b} ta 100mg tabletka)",
+    u_dn:"kun",
+    u_km:"km",
+    u_let:"yosh",
+    u_povt:"takr",
+    u_t:"t",
+    // ── Батч 2 и 3, переводы получены 06.10.2026 ───────────────────────
+    // Батч 2 — тексты из шаблонных строк, батч 3 — многострочные
+    // текстовые узлы JSX: ни те, ни другие построчный поиск не находит.
+    ui_1_porciya:"1 porsiya =",
+    ui_ai_zaprosov_v_den:"Kunlik AI so‘rovlar:",
+    ui_ball:"ball.)",
+    ui_dobavit_svoe_uprazhnenie:"⭐ O‘Z MASHQINGNI QO‘SH",
+    ui_dobavit_svoy_produkt:"＋ O‘Z MAHSULOTINGNI QO‘SH",
+    ui_izmenenie_za_3_nedeli:"3 haftadagi o‘zgarish:",
+    ui_kg_za_period:"davrda kg",
+    ui_limit_ai_zaprosov_na:"💬 Bugungi AI so‘rovlar limiti tugadi — baholash ertaga mavjud bo‘ladi",
+    ui_napishi_pravilnoe_nazvanie_ili:"Taomning to‘g‘ri nomi yoki tarkibini yoz. Kaloriya va BJU avtomatik qayta hisoblanadi.",
+    ui_naydeno_v_kataloge:"⚠ Katalogdan topildi:",
+    ui_ne_prosto_spisok_uprazhneniy:"Shunchaki mashqlar ro‘yxati emas — tarixingni haqiqatan biladigan va senga moslashadigan murabbiy.",
+    ui_ne_udalos_poluchit_ocenku:"AI bahosini olib bo‘lmadi — ulanishni tekshir",
+    ui_peremeschay_i_uvelichivay_chto:"Taom to‘liq sig‘ishi uchun sur va kattalashtir",
+    ui_podhod:"YONDASHUV",
+    ui_poka_nikto_ne_v:"Reytingda hali hech kim yo‘q. Trening qil va ball to‘pla!",
+    ui_polnaya_zapis_v_razdele:"↗ To‘liq yozuv Treninglar → ⚽ Sport bo‘limida",
+    ui_poprobuy_otkryt_cherez_telegra:"Telegram-bot orqali ochib ko‘r.",
+    ui_poprobuy_smenit_uprazhnenie_il:"💡 Mashqni almashtirib yoki drop-set qo‘shib ko‘r — murabbiydan so‘ra",
+    ui_posledniy_raz:"OXIRGI MARTA (",
+    ui_primenenie_vitaminov_i_dobavok:"⚠️ Vitaminlar va qo‘shimchalardan foydalanish tavsiyaviy xarakterga ega va tibbiy tavsiya hisoblanmaydi. Qo‘llashdan oldin shifokor bilan maslahatlashing.",
+    ui_privet_treniruyus_v_gymbot:"Salom! Men GymBot — Telegram’dagi aqlli AI murabbiy bilan shug‘ullanaman. Havolam orqali qo‘shil va bonus ballar ol",
+    ui_referalnaya_programma_vremenno:"Referal dasturi vaqtincha mavjud emas",
+    ui_seriya:"🔥 Seriya:",
+    ui_sleduyuschiy:"Keyingi:",
+    ui_taymer_avtomaticheski_zapuskae:"Trening vaqtida har bir yondashuvdan keyin taymer avtomatik ishga tushadi.",
+    ui_tochnost:"ANIQLIK:",
+    ui_trenirovka_ne_naydena_ili:"Trening topilmadi yoki kirish huquqi yo‘q.",
+    ui_vybrano_grupp:"TANLANGAN GURUHLAR:",
+    ui_zamenit:"ALMASHTIRISH",
+    ui_zdes_mozhno_ispolzovat_otdelno:"Bu yerda alohida ishlatish mumkin.",
   },
   kz: {
     menu_nutrition:"Тамақтану", menu_workout:"Жаттығулар", menu_progress:"Прогресс",
@@ -2343,7 +3222,7 @@ const T = {
     field_thigh:"Сан",
     field_age:"Жас",
     field_age_y:"Жас (жылдар)",
-    field_weight_kg:"Салмақ (кг)",
+    field_weight_kg:"Салмақ (кг)",field_weight_g:"САЛМАҚ (г)",
     field_height_cm:"Бой (см)",
     step_1_2:"ҚАДАМ 1 / 2",
     step_2_2:"ҚАДАМ 2 / 2",
@@ -2561,6 +3440,297 @@ const T = {
     no_sets_data:"деректер жоқ",
     one_portion:"1 порция",
     portions_pack:"қаптағы порциялар",
+    // ── Добавлено 05.10.2026: тексты, которых не было в словаре вовсе.
+    // Раньше они стояли литералами прямо в разметке и показывались
+    // по-русски при любом языке приложения.
+    // Активная тренировка
+    aw_badminton:"🏸 Бадминтон",
+    aw_ballov_za_seriyu:"серия үшін ұпай",
+    aw_basketbol:"🏀 Баскетбол",
+    aw_beg:"🏃 Жүгіру",
+    aw_boks:"🥊 Бокс",
+    aw_bolshoy_tennis:"🎾 Теннис",
+    aw_dney:"күн",
+    aw_dnya:"күн",
+    aw_dobavit_uprazhnenie:"Жаттығу қосу",
+    aw_futbol:"⚽ Футбол",
+    aw_gandbol:"🤾 Гандбол",
+    aw_gornye_lyzhi:"⛷ Тау шаңғысы",
+    aw_nastolnyy_tennis:"🏓 Үстел теннисі",
+    aw_padel:"🎾 Падел",
+    aw_pilates:"🧘 Пилатес",
+    aw_plavanie:"🏊 Жүзу",
+    aw_skalolazanie:"🧗 Құзға өрмелеу",
+    aw_sohranyaem:"⏳ САҚТАЛУДА...",
+    aw_velosport:"🚴 Велоспорт",
+    aw_voleybol:"🏐 Волейбол",
+    aw_vyberi_zamenu:"— ауыстыруды таңда",
+    aw_vybrano:"ТАҢДАЛДЫ (",
+    aw_yoga:"🧘 Йога",
+    aw_zagruzka:"Жүктелуде...",
+    // Блок «плато» в прогрессе
+    plateau_analiz:"ТАЛДАУ",
+    // Гид по питанию
+    fg_belok:"АҚУЫЗ",
+    // Голосовая запись
+    voice_oshibka:"Қате",
+    // График недели: короткие названия спорта
+    sps_badm:"бадм.",
+    sps_basket:"баскет",
+    sps_beg:"жүгіру",
+    sps_boks:"бокс",
+    sps_futbol:"футбол",
+    sps_gandbol:"гандбол",
+    sps_krossfit:"кроссфит",
+    sps_lyzhi:"шаңғы",
+    sps_n_tennis:"ү.теннис",
+    sps_padel:"падел",
+    sps_pilates:"пилатес",
+    sps_plav:"жүзу",
+    sps_skalolaz:"өрмел.",
+    sps_tennis:"теннис",
+    sps_velo:"вело",
+    sps_voley:"волей",
+    sps_yoga:"йога",
+    // График по группам мышц
+    mgc_obem:"көлем",
+    // Достижения
+    ach_esche_ne_otkryto:"АШЫЛМАҒАН (",
+    ach_otkryto:"АШЫЛҒАН (",
+    // Единицы измерения
+    u_carb:"К",
+    u_fat:"М",
+    u_g:"г",u_s:"с",
+    u_prot:"А",
+    // Журнал занятий спортом
+    splog_svoe:"Өзімдік",
+    // Замеры тела
+    meas_sm:"см",
+    // Запланированная тренировка
+    pw_arhivnaya:"📋 МҰРАҒАТТА",
+    pw_tolko_prosmotr:"ТЕК КӨРУ",
+    pw_uprazhneniya:"ЖАТТЫҒУЛАР (",
+    pw_vypolnena:"✓ ОРЫНДАЛДЫ",
+    // Знакомство при первом входе
+    onb_analiziruet_trenirovki_vesa_:"Жаттығуларды, салмақтар мен қайталауларды талдайды — жүктемені қашан арттыру керегін айтады",
+    onb_atlet:"Атлет",
+    onb_derzhit_motivaciyu:"Мотивацияны сақтайды",
+    onb_dobro_pozhalovat:"ҚОШ КЕЛДІҢІЗ",
+    onb_nachat:"БАСТАУ 🏋️",
+    onb_nachat_znakomstvo:"ТАНЫСУ →",
+    onb_otvechaet_kak_zhivoy_trener:"Нағыз жаттықтырушыдай жауап береді",
+    onb_pitanie_po_foto:"Фото арқылы тамақтану",
+    onb_serii_dney_dostizheniya_ches:"Күндер сериясы, жетістіктер және шынайы кері байланыс — артық еркелетусіз",
+    onb_sfotografiroval_edu_poluchil:"Тағамды суретке түсір — калория мен БЖК дайын. Әр ас қабылдауды қолмен енгізудің қажеті жоқ",
+    onb_sprosi_chto_ugodno_pro:"Жаттығу, қалпына келу немесе қоспалар туралы кез келген сұрақ қой — деректеріңе негізделген нақты жауап аласың",
+    onb_tvoy_lichnyy_ai_trener:"Жеке AI жаттықтырушың 🤖",
+    onb_vidit_ves_tvoy_progress:"Бүкіл прогресіңді көреді",
+    // История тренировок
+    wh_nizkaya:"Төмен",
+    wh_plan:"ЖОСПАР",
+    wh_srednyaya:"Орташа",
+    wh_vysokaya:"Жоғары",
+    wh_zavershena:"✓ АЯҚТАЛДЫ",
+    // Карточка тренировки
+    wd_ph:"СЕТ",
+    // Лидерборд
+    lb_ty:"(сен)",
+    // Мои добавки
+    usup_dobavit:"+ ҚОСУ",
+    usup_dobavit2:"✓ ҚОСУ",
+    // Питание
+    nut_belki:"Ақуыз",
+    nut_cel:"мақсат",
+    nut_g:"(г)",
+    nut_isprav_nazvanie_sostav_kbzhu:"Атауын/құрамын түзет — калория мен БЖК автоматты түрде қайта есептеледі",
+    nut_limit_ai_zaprosov_na:"⚠️ Бүгінгі AI сұрауларының лимиті бітті",
+    nut_ml:"мл",
+    nut_naprimer_chto_mne_ne:"Мысалы: бүгін тамақтануымда не жетіспейді? немесе ақуызды қалай бөлген дұрыс?",
+    nut_naprimer_risovaya_kasha_s:"Мысалы: Сүтті күріш ботқасы, 300g",
+    nut_oshibka:"қате",
+    nut_pereschitat_i_sohranit:"🔄 ЕСЕПТЕП САҚТА",
+    nut_pitanie:"ТАМАҚТАНУ",
+    nut_zhiry:"Май",
+    // Поиск продукта
+    fs_na:"үшін",
+    fs_poisk:"ІЗДЕУ",
+    fs_sportpit:"💊 Спортқоспа",
+    fs_vse:"Барлығы",
+    // Правка занятия спортом
+    spedit_partnery_oschuscheniya:"Серіктестер, сезімдер...",
+    spedit_schet:"Есеп",
+    // Прогресс
+    prog_cht:"бс",
+    prog_pn:"дс",
+    prog_pt:"жм",
+    prog_sb:"сб",
+    prog_seriya:"СЕРИЯ",
+    prog_sr:"ср",
+    prog_trenirovok:"ЖАТТЫҒУ",
+    prog_vs:"жс",
+    prog_vt:"сс",
+    // Профиль
+    prof_bally:"Ұпай",
+    prof_bro:"🤙 Бро",
+    prof_ekspert:"🎓 Сарапшы",
+    prof_ekspert2:"Сарапшы",
+    prof_nastavnik:"🧑‍🏫 Тәлімгер",
+    prof_nastavnik2:"Тәлімгер",
+    prof_profil_ne_nayden_snachala:"Профиль табылмады. Алдымен @GYMASH_bot-та тіркеліп, кейін осында қайт.",
+    prof_status:"Мәртебе",
+    prof_stil_ai:"AI стилі",
+    prof_uroven:"Деңгей",
+    // Профиль: аллергии
+    alg_glyuten:"🌾 Глютен",
+    alg_laktoza:"🥛 Лактоза",
+    alg_orehi:"🥜 Жаңғақ",
+    alg_rybiy_zhir:"🐟 Балық майы",
+    alg_soya:"🫘 Соя",
+    alg_yayca:"🥚 Жұмыртқа",
+    // Профиль: ограничения по здоровью
+    med_bol_v_spine:"🔙 Арқа ауруы",
+    med_diabet:"💉 Диабет",
+    med_gipertoniya:"🩺 Гипертония",
+    med_gryzha:"⚠️ Жарық",
+    med_plecho_rotator:"💪 Иық/ротатор",
+    med_pochki:"🫘 Бүйрек",
+    med_pozvonochnik:"🦴 Омыртқа",
+    med_serdce_sosudy:"❤️ Жүрек/тамырлар",
+    med_travma_kolena:"🦵 Тізе жарақаты",
+    // Профиль: уровень подготовки
+    lvl_novichok:"Бастаушы",
+    // Распознавание еды по фото
+    fv_blyudo:"Тағам",
+    fv_gotovo:"✅ ДАЙЫН",
+    fv_ispravit:"✏️ ТҮЗЕТУ",
+    fv_naprimer_risovaya_kasha_s:"Мысалы: Сүт пен бал қосылған күріш ботқасы, 300g",
+    fv_ne_udalos_pereschitat_poprob:"Қайта есептеу мүмкін болмады. Басқаша сипаттап көр.",
+    fv_neizvestnaya_oshibka:"белгісіз қате",
+    fv_nizkaya:"❓ Төмен",
+    fv_otmena:"Болдырмау",
+    fv_perekadrirovat:"🔄 Қайта кадрлау",
+    fv_pereschitat:"🔄 ҚАЙТА ЕСЕПТЕ",
+    fv_pereschityvaem:"ЕСЕПТЕЛУДЕ...",
+    fv_povtorit_sohranenie:"🔄 ҚАЙТА САҚТАУ",
+    fv_povtoryaem:"ҚАЙТА ӘРЕКЕТ...",
+    fv_srednyaya:"⚠️ Орташа",
+    fv_vysokaya:"✅ Жоғары",
+    // Рефералы
+    ref_kopirovat:"📋 КӨШІРУ",
+    ref_moi_referaly:"РЕФЕРАЛДАРЫМ (",
+    ref_skopirovano:"✓ КӨШІРІЛДІ",
+    // Сбор тренировки
+    plan_dobavit_v_trenirovku:"+ ЖАТТЫҒУҒА ҚОС",
+    plan_ubrat_iz_trenirovki:"✓ ЖАТТЫҒУДАН АЛ",
+    plan_vybrano:"ТАҢДАЛДЫ",
+    plan_zaplanirovat:"📅 ЖОСПАРЛАУ",
+    // Своё блюдо (форма)
+    fcat_frukty:"🍎 Жемістер",
+    fcat_hleb:"🍞 Нан",
+    fcat_krupy:"🌾 Жармалар",
+    fcat_molochka:"🥛 Сүт өнімдері",
+    fcat_myaso:"🥩 Ет",
+    fcat_napitki:"🧃 Сусындар",
+    fcat_ovoschi:"🥦 Көкөністер",
+    fcat_prochee:"🫙 Басқа",
+    fcat_ryba:"🐟 Балық",
+    fcat_sneki:"🍫 Снэктер",
+    // Своё упражнение
+    cex_moe:"Менікі",
+    // Серии и баллы
+    gam_atlet:"🥈 Атлет",
+    gam_chek_in:"✓ Чек-ин",
+    gam_chempion:"🥇 Чемпион",
+    gam_legenda:"💎 Аңыз",
+    gam_pitanie_vneseno:"Тамақтану енгізілді",
+    gam_tennis:"🎾 Теннис",
+    gam_trenirovka_zavershena:"🏋️ Жаттығу аяқталды",
+    gam_zanyatie_sportom:"Спорттық жаттығу",
+    // Справочник добавок
+    sup_10g_den:"10г/күн",
+    sup_15_30mg_den:"15–30мг/күн",
+    sup_1_3g_epa_dha:"1–3г EPA+DHA/күн",
+    sup_2000_5000_me_den:"2000–5000 ХБ/күн",
+    sup_200_400mg:"200–400мг",
+    sup_20_40g_za_priem:"20–40г бір қабылдауда",
+    sup_3_5g_den:"3–5г/күн",
+    sup_3_6mg_kg_vesa:"3–6мг/кг салмақ",
+    sup_bez_zagruzki_rezultat_cherez:"Жүктеу кезеңінсіз. Нәтиже 2–4 аптада. Сумен іш (250ml). Ең көп зерттелген қоспалардың бірі.",
+    sup_immunitet_testosteron_kosti_:"Иммунитет, тестостерон, сүйектер. Кальций дұрыс сіңуі үшін K2 (100–200мкг) бірге қабылдаңыз.",
+    sup_immunitet_testosteron_vossta:"Иммунитет, тестостерон, қалпына келу. Кальциймен бірге қабылдамаңыз — сіңуі үшін бәсекелеседі.",
+    sup_kachestvo_sna_myshechnoe_vos:"Ұйқы сапасы, бұлшықеттің қалпына келуі, стрессті азайту. Түрі: глицинат немесе малат (оксид емес — нашар сіңеді).",
+    sup_posle_trenirovki_ili_v:"Жаттығудан кейін немесе күннің кез келген уақытында",
+    sup_povyshaet_vynoslivost_silu_i:"Төзімділікті, күшті және зейінді арттырады. 15:00-ден кейін қабылдамаңыз — ұйқыны бұзады. Төзімділік тез қалыптасады.",
+    sup_prokonsultiruysya_s_vrachom_:"⚠️ Дәрігермен кеңесіңіз — қарсы көрсетілімдер бар",
+    sup_protivovospalitelnyy_effekt_:"Қабынуға қарсы әсер, буындар, жүрек. Жалпы балық майына емес, EPA+DHA мөлшеріне қараңыз.",
+    sup_sustavy_i_svyazki_neobhodim:"Буындар мен байламдар. Коллаген синтезі үшін C дәрумені (100mg) қажет. Әсері жинақталады — 8–12 апта.",
+    sup_umerennyy_uroven_dokazatelno:"🟡 Дәлел деңгейі орташа",
+    sup_vospolnenie_belka_syvorotoch:"Ақуызды толықтыру. Сарысу ақуызы — жылдам, казеин — баяу (ұйқы алдында).",
+    sup_vozmozhna_allergicheskaya_re:"🚫 Аллергиялық реакция болуы мүмкін",
+    sup_vysokiy_uroven_dokazatelnost:"🟢 Дәлел деңгейі жоғары",
+    sup_your_weight:"(САЛМАҒЫҢ {w}КГ)",
+    // Цели
+    goals_celi:"МАҚСАТТАР",
+    // Экран тренера (AI)
+    ai_ai_trenirovka:"AI жаттығу",
+    ai_chto_est_do_i:"Жаттығуға дейін және кейін не жеу керек",
+    ai_oshibka_soedineniya:"Қосылым қатесі —",
+    ai_programma_dlya_pohudeniya_na:"Бір айлық арықтау бағдарламасы",
+    ai_sostav_plan_trenirovki_na:"Бұлшықет өсіруге бір апталық жаттығу жоспарын құр",
+    ai_sprosi_chto_ugodno:"КЕЗ КЕЛГЕНІН СҰРА...",
+    ai_trenirovka_na_plechi_i:"Иық пен қолға арналған жаттығу",
+    ai_plan_more:"+ тағы {n}",
+    err_save_failed:"Сақтау мүмкін болмады: {err}",
+    err_save_status:"Сақтау қатесі ({code})",
+    err_server_retry:"Сервер қатесі ({code}). Кейінірек қайталап көр.",
+    plan_ex_groups:"ЖАТТЫҒУЛАР ({n} ТОП) →",
+    plan_show_ex:"ЖАТТЫҒУЛАРДЫ КӨРСЕТУ ({n} ТОП) →",
+    plan_time_taken:"{dt} уақытына «{title}» жаттығуы бар. Басқа уақытты таңдайсың ба?",
+    prog_weight_range:"Салмақ графигі: {a}-ден {b}-ге дейін",
+    ref_step1:"Сілтемені досыңмен бөліс",
+    ref_step2:"Досың GymBot-та тіркеледі",
+    ref_step3:"Сен {n} ұпай аласың",
+    ref_step4:"Досың бастапқы бонус алады",
+    sup_per_pack:"Қаптамада {n} порция",
+    sup_tabs:"{a}мг ({b} дана 100мг таблетка)",
+    u_dn:"күн",
+    u_km:"км",
+    u_let:"жас",
+    u_povt:"рет",
+    u_t:"т",
+    // ── Батч 2 и 3, переводы получены 06.10.2026 ───────────────────────
+    // Батч 2 — тексты из шаблонных строк, батч 3 — многострочные
+    // текстовые узлы JSX: ни те, ни другие построчный поиск не находит.
+    ui_1_porciya:"1 порция =",
+    ui_ai_zaprosov_v_den:"Күніне AI сұраулары:",
+    ui_ball:"ұпай.)",
+    ui_dobavit_svoe_uprazhnenie:"⭐ ӨЗ ЖАТТЫҒУЫҢДЫ ҚОС",
+    ui_dobavit_svoy_produkt:"＋ ӨЗ ӨНІМІҢДІ ҚОС",
+    ui_izmenenie_za_3_nedeli:"3 аптадағы өзгеріс:",
+    ui_kg_za_period:"кезеңде кг",
+    ui_limit_ai_zaprosov_na:"💬 Бүгінгі AI сұрауларының лимиті бітті — бағалау ертең қолжетімді болады",
+    ui_napishi_pravilnoe_nazvanie_ili:"Тағамның дұрыс атауын немесе құрамын жаз. Калория мен БЖК автоматты түрде қайта есептеледі.",
+    ui_naydeno_v_kataloge:"⚠ Каталогтан табылды:",
+    ui_ne_prosto_spisok_uprazhneniy:"Жай ғана жаттығулар тізімі емес — тарихыңды шынымен білетін және саған бейімделетін жаттықтырушы.",
+    ui_ne_udalos_poluchit_ocenku:"AI бағасын алу мүмкін болмады — қосылымды тексер",
+    ui_peremeschay_i_uvelichivay_chto:"Тағам толық сыйуы үшін жылжытып, үлкейт",
+    ui_podhod:"ТӘСІЛ",
+    ui_poka_nikto_ne_v:"Рейтингте әзірге ешкім жоқ. Жаттығып, ұпай жина!",
+    ui_polnaya_zapis_v_razdele:"↗ Толық жазба Жаттығулар → ⚽ Спорт бөлімінде",
+    ui_poprobuy_otkryt_cherez_telegra:"Telegram-бот арқылы ашып көр.",
+    ui_poprobuy_smenit_uprazhnenie_il:"💡 Жаттығуды ауыстырып немесе дроп-сет қосып көр — жаттықтырушыдан сұра",
+    ui_posledniy_raz:"СОҢҒЫ РЕТ (",
+    ui_primenenie_vitaminov_i_dobavok:"⚠️ Дәрумендер мен қоспаларды қолдану ұсынымдық сипатта және медициналық кеңес болып табылмайды. Қолданар алдында дәрігермен кеңесіңіз.",
+    ui_privet_treniruyus_v_gymbot:"Сәлем! Мен GymBot — Telegram-дағы ақылды AI жаттықтырушымен жаттығамын. Менің сілтемем арқылы қосылып, бонустық ұпайлар ал",
+    ui_referalnaya_programma_vremenno:"Рефералдық бағдарлама уақытша қолжетімсіз",
+    ui_seriya:"🔥 Серия:",
+    ui_sleduyuschiy:"Келесі:",
+    ui_taymer_avtomaticheski_zapuskae:"Жаттығу кезінде әр тәсілден кейін таймер автоматты түрде іске қосылады.",
+    ui_tochnost:"ДӘЛДІК:",
+    ui_trenirovka_ne_naydena_ili:"Жаттығу табылмады немесе қолжетімділік жоқ.",
+    ui_vybrano_grupp:"ТАҢДАЛҒАН ТОПТАР:",
+    ui_zamenit:"АУЫСТЫРУ",
+    ui_zdes_mozhno_ispolzovat_otdelno:"Мұнда бөлек қолдануға болады.",
   },
 };
 function t(key) { return T[LANG_STORE.current]?.[key] || T.ru[key] || key; }
@@ -2635,6 +3805,18 @@ function tEquip(eq) {
 // техника — наоборот, приходят уже на нужном языке (см. /api/exercises),
 // и для них этот хелпер просто отдаёт obj[field]. Так и задумано: абзацы
 // на четырёх языках весят слишком много, чтобы возить их все.
+/** Локаль для toLocaleDateString и родственных.
+ *
+ *  Названия месяцев и дней недели браузер знает сам, переводить их не нужно —
+ *  нужно лишь передать язык вместо жёсткого "ru", как было во всех шестнадцати
+ *  местах. Казахский у браузера называется kk, а у нас в базе kz: без этой
+ *  подмены дата осталась бы на английском (запасной язык ICU).
+ */
+function dateLocale() {
+  const l = LANG_STORE.current;
+  return l === "kz" ? "kk" : (l || "ru");
+}
+
 function tField(obj, field) {
   if (!obj) return "";
   const lang = LANG_STORE.current;
@@ -2671,7 +3853,7 @@ function Card({children,accent,danger,onClick,style={},pad="14px 16px"}){
   const border = accent?C.accent:danger?C.danger:C.border;
   return <div onClick={onClick} style={{background:C.card,border:`0.5px solid ${border}`,borderRadius:12,padding:pad,cursor:onClick?"pointer":"default",...style}}>{children}</div>;
 }
-function Loader({text="ЗАГРУЗКА"}){
+function Loader({text=t("loading")}){
   return <div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"60vh"}}><div style={{textAlign:"center"}}><div style={{fontFamily:"monospace",fontSize:12,color:C.accent,letterSpacing:3}}>{text}</div><div style={{color:C.muted,fontSize:24,marginTop:8}}>◌</div></div></div>;
 }
 function BackBtn({onBack}){
@@ -2693,22 +3875,34 @@ function ProgressBar({pct,color=C.accent}){
   return <div style={{background:C.border,borderRadius:4,height:6}}><div style={{width:`${Math.min(100,pct)}%`,height:"100%",background:pct>100?C.danger:color,borderRadius:4,transition:"width 0.4s"}}/></div>;
 }
 
+// Эти списки вычисляются при загрузке модуля — РАНЬШЕ, чем станет известен язык
+// (он приходит из профиля отдельным запросом). Поэтому вызывать здесь t() нельзя:
+// подпись застыла бы на том языке, который был в момент загрузки, и не менялась
+// бы при переключении. Храним ключ, переводим в месте показа — так же, как это
+// уже сделано ниже у getGoalLabel и getDiff. Поле label остаётся русским
+// запасным вариантом на случай, если ключа в словаре почему-то нет.
 const MEDICAL_OPTIONS=[
-  {key:"knee_injury",label:"🦵 Травма колена"},{key:"back_pain",label:"🔙 Боль в спине"},
-  {key:"spine_issues",label:"🦴 Позвоночник"},{key:"shoulder_injury",label:"💪 Плечо/ротатор"},
-  {key:"heart_disease",label:"❤️ Сердце/сосуды"},{key:"hypertension",label:"🩺 Гипертония"},
-  {key:"hernia",label:"⚠️ Грыжа"},{key:"kidney_disease",label:"🫘 Почки"},{key:"diabetes",label:"💉 Диабет"},
+  {key:"knee_injury",tkey:"med_travma_kolena",label:"🦵 Травма колена"},{key:"back_pain",tkey:"med_bol_v_spine",label:"🔙 Боль в спине"},
+  {key:"spine_issues",tkey:"med_pozvonochnik",label:"🦴 Позвоночник"},{key:"shoulder_injury",tkey:"med_plecho_rotator",label:"💪 Плечо/ротатор"},
+  {key:"heart_disease",tkey:"med_serdce_sosudy",label:"❤️ Сердце/сосуды"},{key:"hypertension",tkey:"med_gipertoniya",label:"🩺 Гипертония"},
+  {key:"hernia",tkey:"med_gryzha",label:"⚠️ Грыжа"},{key:"kidney_disease",tkey:"med_pochki",label:"🫘 Почки"},{key:"diabetes",tkey:"med_diabet",label:"💉 Диабет"},
 ];
 const ALLERGY_OPTIONS=[
-  {key:"lactose",label:"🥛 Лактоза"},{key:"gluten",label:"🌾 Глютен"},
-  {key:"nuts",label:"🥜 Орехи"},{key:"soy",label:"🫘 Соя"},
-  {key:"fish_oil",label:"🐟 Рыбий жир"},{key:"eggs",label:"🥚 Яйца"},
+  {key:"lactose",tkey:"alg_laktoza",label:"🥛 Лактоза"},{key:"gluten",tkey:"alg_glyuten",label:"🌾 Глютен"},
+  {key:"nuts",tkey:"alg_orehi",label:"🥜 Орехи"},{key:"soy",tkey:"alg_soya",label:"🫘 Соя"},
+  {key:"fish_oil",tkey:"alg_rybiy_zhir",label:"🐟 Рыбий жир"},{key:"eggs",tkey:"alg_yayca",label:"🥚 Яйца"},
 ];
 const MEDICAL_LABELS=Object.fromEntries(MEDICAL_OPTIONS.map(o=>[o.key,o.label]));
 const ALLERGY_LABELS=Object.fromEntries(ALLERGY_OPTIONS.map(o=>[o.key,o.label]));
+const _TKEY_BY_OPT=Object.fromEntries([...MEDICAL_OPTIONS,...ALLERGY_OPTIONS].map(o=>[o.key,o.tkey]));
+/** Подпись ограничения или аллергии на языке приложения. Вызывать при рендере. */
+const getOptLabel=(key)=>{const k=_TKEY_BY_OPT[key];const v=k&&t(k);return (v&&v!==k)?v:(MEDICAL_LABELS[key]||ALLERGY_LABELS[key]||key);};
 const GOAL_LABELS={lose_weight:"Похудение",gain_muscle:"Набор массы",gain_strength:"Сила",improve_endurance:"Выносливость",stay_healthy:"Здоровье"};
 const getGoalLabel=(key)=>({lose_weight:t("goal_lose"),gain_muscle:t("goal_muscle"),gain_strength:t("goal_strength"),improve_endurance:t("goal_endurance"),stay_healthy:t("goal_health")})[key]||GOAL_LABELS[key]||key;
 const LEVEL_LABELS={beginner:"Новичок",intermediate:"Средний",advanced:"Продвинутый"};
+// lvl_novichok, а не level_beginner: в словаре тот ключ уже есть, но с русским
+// словом «Начинающий». Взять его означало бы молча поменять русский текст.
+const getLevelLabel=(key)=>({beginner:t("lvl_novichok"),intermediate:t("level_intermediate"),advanced:t("level_advanced")})[key]||LEVEL_LABELS[key]||key;
 const DIFF_COLOR={easy:C.success,medium:C.accent,hard:C.danger};
 const getDiff=(d)=>({easy:t("difficulty_easy"),medium:t("difficulty_medium"),hard:t("difficulty_hard")})[d]||d;
 const CARDIO_DISTANCE=["бег трусцой","интервальный бег","велосипед на улице","ходьба на беговой дорожке","бег на месте"];
@@ -2736,7 +3930,7 @@ function CheckboxGroup({options,selected,onChange}){
   const toggle=key=>onChange(selected.includes(key)?selected.filter(k=>k!==key):[...selected,key]);
   return <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
     {options.map(o=>{const a=selected.includes(o.key);return(
-      <button key={o.key} onClick={()=>toggle(o.key)} style={{padding:"7px 12px",borderRadius:20,fontSize:12,cursor:"pointer",background:a?C.accent:C.bg,border:`0.5px solid ${a?C.accent:C.border}`,color:a?C.bg:C.muted,fontWeight:a?700:400}}>{o.label}</button>
+      <button key={o.key} onClick={()=>toggle(o.key)} style={{padding:"7px 12px",borderRadius:20,fontSize:12,cursor:"pointer",background:a?C.accent:C.bg,border:`0.5px solid ${a?C.accent:C.border}`,color:a?C.bg:C.muted,fontWeight:a?700:400}}>{o.tkey?getOptLabel(o.key):o.label}</button>
     );})}
   </div>;
 }
@@ -2845,7 +4039,7 @@ function RestTimer({onClose,autoStart=null,onRpe=null}){
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
         <div>
           <div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:2}}>
-            {done?"✓ ОТДЫХ ЗАВЕРШЁН":left!=null?"ОТДЫХ":"ВЫБЕРИ ВРЕМЯ"}
+            {done?t("rest_done"):left!=null?t("rest_label"):t("choose_time")}
           </div>
           <div style={{fontSize:36,fontFamily:"monospace",fontWeight:700,color:done?C.success:C.accent,lineHeight:1}}>
             {fmt(left)}
@@ -2855,7 +4049,7 @@ function RestTimer({onClose,autoStart=null,onRpe=null}){
           {left!=null&&!done&&(
             <button onClick={running?pause:resume}
               style={{background:C.accent,border:"none",borderRadius:10,padding:"8px 16px",color:C.bg,fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"monospace"}}>
-              {running?"⏸ ПАУЗА":"▶ СТАРТ"}
+              {running?t("pause_btn"):t("start_btn2")}
             </button>
           )}
           <button onClick={()=>{reset();onClose();}}
@@ -2891,7 +4085,7 @@ function RestTimer({onClose,autoStart=null,onRpe=null}){
           {PRESETS.map(s=>(
             <button key={s} onClick={()=>start(s)}
               style={{flex:1,background:done&&total===s?C.success:C.card,border:`0.5px solid ${done&&total===s?C.success:C.border}`,borderRadius:8,padding:"8px 4px",color:done&&total===s?"#fff":C.muted,fontSize:12,fontFamily:"monospace",cursor:"pointer",fontWeight:done&&total===s?700:400}}>
-              {s}с
+              {s}{t("u_s")}
             </button>
           ))}
         </div>
@@ -2996,7 +4190,7 @@ function OnboardingScreen({tgId,tgUser,onComplete}){
     try{
       const body={
         telegram_id:tgId,
-        first_name:(name||"").trim()||tgUser?.first_name||"Атлет",
+        first_name:(name||"").trim()||tgUser?.first_name||"Атлет",   // данные в БД, не подпись: дефолты на сервере и в боте тоже русские
         username:tgUser?.username||null,
         desired_result:goal,
         lang:LANG_STORE.current||"ru",
@@ -3028,9 +4222,9 @@ function OnboardingScreen({tgId,tgUser,onComplete}){
   const goals=[
     {v:"lose_weight",icon:"⚖️",label:t("goal_lose")},
     {v:"gain_muscle",icon:"💪",label:t("goal_muscle")},
-    {v:"gain_strength",icon:"🏋️",label:"Сила"},
+    {v:"gain_strength",icon:"🏋️",label:t("goal_strength")},
     {v:"improve_endurance",icon:"🏃",label:t("goal_endurance")},
-    {v:"stay_healthy",icon:"❤️",label:"Здоровье"},
+    {v:"stay_healthy",icon:"❤️",label:t("goal_health")},
   ];
 
   return(
@@ -3040,17 +4234,17 @@ function OnboardingScreen({tgId,tgUser,onComplete}){
       </div>
       <div style={{flex:1,padding:"32px 20px 24px",display:"flex",flexDirection:"column"}}>
         {step===0&&<Fragment>
-          <div style={{fontFamily:"monospace",fontSize:10,color:C.muted,letterSpacing:2,marginBottom:16}}>ДОБРО ПОЖАЛОВАТЬ</div>
-          <Hero style={{marginBottom:8}}>Твой личный AI-тренер 🤖</Hero>
+          <div style={{fontFamily:"monospace",fontSize:10,color:C.muted,letterSpacing:2,marginBottom:16}}>{t("onb_dobro_pozhalovat")}</div>
+          <Hero style={{marginBottom:8}}>{t("onb_tvoy_lichnyy_ai_trener")}</Hero>
           <div style={{fontSize:14,color:C.muted,marginBottom:28,lineHeight:1.5}}>
-            Не просто список упражнений — тренер, который реально знает твою историю и подстраивается под тебя.
+            {t("ui_ne_prosto_spisok_uprazhneniy")}
           </div>
           <div style={{display:"flex",flexDirection:"column",gap:14,flex:1}}>
             {[
-              {icon:"📊",title:"Видит весь твой прогресс",desc:"Анализирует тренировки, веса, повторы — и советует, когда действительно пора прибавлять нагрузку"},
-              {icon:"🍽",title:"Питание по фото",desc:"Сфотографировал еду — получил КБЖУ. Без ручного ввода каждого приёма пищи"},
-              {icon:"💬",title:"Отвечает как живой тренер",desc:"Спроси что угодно про тренировку, восстановление, добавки — получишь конкретный ответ по твоим данным"},
-              {icon:"🔥",title:"Держит мотивацию",desc:"Серии дней, достижения, честная обратная связь — без лишней сюсюканья"},
+              {icon:"📊",title:t("onb_vidit_ves_tvoy_progress"),desc:t("onb_analiziruet_trenirovki_vesa_")},
+              {icon:"🍽",title:t("onb_pitanie_po_foto"),desc:t("onb_sfotografiroval_edu_poluchil")},
+              {icon:"💬",title:t("onb_otvechaet_kak_zhivoy_trener"),desc:t("onb_sprosi_chto_ugodno_pro")},
+              {icon:"🔥",title:t("onb_derzhit_motivaciyu"),desc:t("onb_serii_dney_dostizheniya_ches")},
             ].map((f,i)=>(
               <div key={i} style={{display:"flex",gap:14,alignItems:"flex-start"}}>
                 <div style={{fontSize:26,flexShrink:0}}>{f.icon}</div>
@@ -3070,13 +4264,13 @@ function OnboardingScreen({tgId,tgUser,onComplete}){
           </div>
           <div style={{fontSize:12,color:C.muted,marginTop:12,lineHeight:1.5}}>{t("consent_required_note")}</div>
           <Btn accent full disabled={!(consent.terms&&consent.basic)} onClick={()=>setStep(1)}
-            style={{marginTop:14,opacity:consent.terms&&consent.basic?1:0.45}}>НАЧАТЬ ЗНАКОМСТВО →</Btn>
+            style={{marginTop:14,opacity:consent.terms&&consent.basic?1:0.45}}>{t("onb_nachat_znakomstvo")}</Btn>
         </Fragment>}
         {step===1&&<Fragment>
           <div style={{fontFamily:"monospace",fontSize:10,color:C.muted,letterSpacing:2,marginBottom:16}}>{t("step_1_2")}</div>
           <Hero style={{marginBottom:8}}>{t("name_hint2")}</Hero>
           <div style={{fontSize:13,color:C.muted,marginBottom:28}}>{t("name_hint")}</div>
-          <input value={name} onChange={e=>setName(e.target.value)} placeholder={tgUser?.first_name||"Твоё имя"} maxLength={40} autoFocus
+          <input value={name} onChange={e=>setName(e.target.value)} placeholder={tgUser?.first_name||t("enter_name")} maxLength={40} autoFocus
             style={{width:"100%",background:C.card,border:`1px solid ${(name||"").trim()?C.accent:C.border}`,borderRadius:10,padding:"14px 16px",color:C.text,fontSize:18,outline:"none",fontFamily:"inherit",boxSizing:"border-box"}}/>
           {err&&<div style={{marginTop:12,padding:"10px 14px",background:"rgba(255,68,68,0.1)",border:`1px solid ${C.danger}`,borderRadius:8,color:C.danger,fontSize:13}}>{err}</div>}
           <div style={{flex:1}}/>
@@ -3101,7 +4295,7 @@ function OnboardingScreen({tgId,tgUser,onComplete}){
           {err&&<div style={{marginTop:12,padding:"10px 14px",background:"rgba(255,68,68,0.1)",border:`1px solid ${C.danger}`,borderRadius:8,color:C.danger,fontSize:13}}>{err}</div>}
           <div style={{display:"flex",gap:10,marginTop:24}}>
             <Btn onClick={()=>setStep(1)} style={{flex:1}}>{t("back")}</Btn>
-            <Btn accent disabled={saving} onClick={finish} style={{flex:2}}>{saving?"ВХОДИМ...":"НАЧАТЬ 🏋️"}</Btn>
+            <Btn accent disabled={saving} onClick={finish} style={{flex:2}}>{saving?t("going_in"):t("onb_nachat")}</Btn>
           </div>
         </Fragment>}
       </div>
@@ -3196,7 +4390,7 @@ function MenuScreen({user,onNav,activeWorkout=false}){
       apiGet(`${API}/home/${tgId}`,{force:true}).then(d=>setHome(d)).catch(()=>setFailed(true));}}
       style={{marginTop:16}}>{t("retry")}</Btn>
   </div>;
-  if(!home)return <Loader text={t("loading")||"ЗАГРУЗКА"}/>;
+  if(!home)return <Loader text={t("loading")}/>;
 
   const u=home.user||{};
   const week=home.week||{};
@@ -3248,7 +4442,7 @@ function MenuScreen({user,onNav,activeWorkout=false}){
       </div>
       <div style={{minWidth:0}}>
         <div style={{fontSize:15,color:C.text}}>
-          {greetText?`${greetText}, ${(u.first_name||"").split(" ")[0].toUpperCase()}`:(u.first_name||"Атлет")}
+          {greetText?`${greetText}, ${(u.first_name||"").split(" ")[0].toUpperCase()}`:(u.first_name||t("onb_atlet"))}
         </div>
         <div style={{fontSize:12,color:C.muted}}>
           {u.goal?getGoalLabel(u.goal):""}
@@ -3366,7 +4560,7 @@ function MoreScreen({user,onNav,onBack}){
         {(user?.first_name||"?").trim().charAt(0).toUpperCase()}
       </div>
       <div>
-        <div style={{fontSize:17,fontWeight:600,color:C.text}}>{user?.first_name||"Атлет"}</div>
+        <div style={{fontSize:17,fontWeight:600,color:C.text}}>{user?.first_name||t("onb_atlet")}</div>
         <div style={{fontSize:13,color:C.muted}}>{t("more_edit_profile")}</div>
       </div>
       <span style={{marginLeft:"auto",color:C.muted,fontSize:20}}>›</span>
@@ -3403,7 +4597,7 @@ function AlternativesScreen({tgId,onNav,onBack}){
     <BackBtn onBack={onBack}/>
     <div style={{fontSize:14,color:C.muted,marginTop:20}}>{t("home_load_error")}</div>
   </div>;
-  if(!data)return <Loader text={t("loading")||"ЗАГРУЗКА"}/>;
+  if(!data)return <Loader text={t("loading")}/>;
 
   const restLabel=(r)=>r===null||r===undefined?t("alt_never"):`${t("alt_rest")} ${r} ${t("alt_days")}`;
 
@@ -3493,12 +4687,12 @@ function TrainingPrefsScreen({tgId,onBack}){
   const [saved,setSaved]=useState(false);
 
   useEffect(()=>{
-    apiGet(`${API}/splits`).then(d=>setSplits(d.splits||[])).catch(()=>setSplits([]));
+    apiGet(`${API}/splits?lang=${encodeURIComponent(LANG_STORE.current||"ru")}`).then(d=>setSplits(d.splits||[])).catch(()=>setSplits([]));
     if(tgId)apiGet(`${API}/home/${tgId}/alternatives`)
       .then(d=>setCur({split_type:d.split_type,target:d.week?.target||null})).catch(()=>setCur({split_type:"auto",target:null}));
   },[tgId]);
 
-  if(!cur)return <Loader text={t("loading")||"ЗАГРУЗКА"}/>;
+  if(!cur)return <Loader text={t("loading")}/>;
 
   function save(patch){
     const next={...cur,...patch};
@@ -3545,9 +4739,9 @@ function TrainingPrefsScreen({tgId,onBack}){
 
 function UserSupplementsBlock({tgId}){
   const COMMON=[
-    "Протеин","Креатин моногидрат","Омега-3","Витамин D3","Магний",
-    "BCAA","Цинк","Витамин C","Мультивитамины","Глютамин",
-    "Коллаген","Мелатонин","Кофеин","Бета-аланин","Предтреник",
+    t("supp_protein"),t("supp_creatine"),t("supp_omega"),t("supp_vitd"),t("supp_magnesium"),
+    "BCAA",t("supp_zinc"),t("supp_vitc"),t("supp_multi"),t("supp_glutamine"),
+    t("supp_collagen"),t("supp_melatonin"),t("supp_caffeine"),t("supp_beta"),t("supp_preworkout"),
   ];
   const [supps,setSupps]=useState(null);
   const [adding,setAdding]=useState(false);
@@ -3583,10 +4777,10 @@ function UserSupplementsBlock({tgId}){
       <button onClick={()=>setAdding(!adding)}
         style={{background:"none",border:`0.5px solid ${C.accent}`,borderRadius:6,padding:"3px 10px",
           color:C.accent,fontSize:11,cursor:"pointer",fontFamily:"monospace"}}>
-        {adding?"✕":"+ ДОБАВИТЬ"}
+        {adding?"✕":t("usup_dobavit")}
       </button>
     </div>
-    {supps===null?<Loader text="ЗАГРУЗКА"/>:supps.length===0&&!adding?
+    {supps===null?<Loader text={t("loading")}/>:supps.length===0&&!adding?
       <div style={{color:C.muted,fontSize:12,fontFamily:"monospace",padding:"8px 0"}}>{t("not_specified2")}</div>:
       <div style={{display:"flex",flexWrap:"wrap",gap:6,marginBottom:adding?12:0}}>
         {supps.map(s=><div key={s.id} style={{display:"flex",alignItems:"center",gap:6,
@@ -3623,7 +4817,7 @@ function UserSupplementsBlock({tgId}){
             padding:"8px 10px",color:C.text,fontSize:12,outline:"none"}}/>
       </div>
       <Btn accent full onClick={()=>form.name.trim()&&add(form.name.trim(),form.dose,form.timing)} disabled={!form.name.trim()||saving}>
-        {saving?"СОХРАНЯЮ...":"✓ ДОБАВИТЬ"}
+        {saving?t("saving2"):t("usup_dobavit2")}
       </Btn>
     </Card>}
   </div>;
@@ -3635,7 +4829,7 @@ function ProfileScreen({user,tgId,onBack,onUserUpdated,onNav}){
   const [saved,setSaved]=useState(false);
   const [form,setForm]=useState({age:"",weight:"",height:"",gender:"male",fitness_level:"beginner",desired_result:"stay_healthy",ai_tone:"",medical_conditions:[],allergies:[]});
 
-  if(!user)return <div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader text="ПРОФИЛЬ"/></div>;
+  if(!user)return <div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader text={t("section_profile")}/></div>;
 
   function startEdit(){
     setForm({age:user.age||"",weight:user.weight||"",height:user.height||"",gender:user.gender||"male",fitness_level:user.fitness_level||"beginner",desired_result:user.desired_result||"stay_healthy",
@@ -3654,20 +4848,23 @@ function ProfileScreen({user,tgId,onBack,onUserUpdated,onNav}){
         allergies:form.allergies.length?form.allergies:["none"]};
       const res=await fetch(`${API}/user/${tgId}`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify(body)});
       if(res.ok){setSaved(true);setEditing(false);onUserUpdated();setTimeout(()=>setSaved(false),3000);}
-      else if(res.status===404){alert("Профиль не найден. Сначала пройди регистрацию в боте @GYMASH_bot, затем вернись сюда.");}
-      else{alert(`Ошибка сохранения (${res.status}).`);}
+      else if(res.status===404){alert(t("prof_profil_ne_nayden_snachala"));}
+      else{alert(t("err_save_status").replace("{code}",res.status));}
     }catch(e){alert(t("error_conn"));}finally{setSaving(false);}
   }
 
-  const medNames=(user.medical_conditions||[]).filter(c=>c!=="none").map(c=>MEDICAL_LABELS[c]||c);
-  const algNames=(user.allergies||[]).filter(a=>a!=="none").map(a=>ALLERGY_LABELS[a]||a);
+  const medNames=(user.medical_conditions||[]).filter(c=>c!=="none").map(c=>getOptLabel(c));
+  const algNames=(user.allergies||[]).filter(a=>a!=="none").map(a=>getOptLabel(a));
   const aiLimit=user.ai_daily_limit||5;
-  const rows=[{l:"Возраст",v:user.age?`${user.age} лет`:"—"},{l:"Вес",v:user.weight?`${user.weight} кг`:"—"},{l:"Рост",v:user.height?`${user.height} см`:"—"},{l:"ИМТ",v:user.bmi||"—"},{l:"Уровень",v:LEVEL_LABELS[user.fitness_level]||"—"},{l:"Цель",v:GOAL_LABELS[user.desired_result]||"—"},{l:"Язык",v:(user.lang||"ru").toUpperCase()},{l:"Стиль AI",v:{"bro":"🤙 Бро","mentor":"🧑‍🏫 Наставник","expert":"🎓 Эксперт"}[user.ai_tone]||"🎓 Эксперт"},{l:t("ai_today")||"AI сегодня",v:`${user.ai_requests_today||0}/${aiLimit}`},{l:"Статус",v:user.rank_name||"🥉"},{l:"Баллы",v:`${user.total_points||0} pts`}];
+  // Таблица профиля была целиком русской: и подписи строк, и единицы, и стиль AI.
+  // Уровень и цель берём через функции, а не через карты LEVEL_LABELS/GOAL_LABELS:
+  // карты вычисляются при загрузке модуля и языка ещё не знают.
+  const rows=[{l:t("field_age"),v:user.age?`${user.age} ${t("u_let")}`:"—"},{l:t("home_weight"),v:user.weight?`${user.weight} ${t("home_kg")}`:"—"},{l:t("height_label"),v:user.height?`${user.height} ${t("meas_sm")}`:"—"},{l:t("bmi_label"),v:user.bmi||"—"},{l:t("prof_uroven"),v:getLevelLabel(user.fitness_level)||"—"},{l:t("goal_target"),v:getGoalLabel(user.desired_result)||"—"},{l:t("menu_language"),v:(user.lang||"ru").toUpperCase()},{l:t("prof_stil_ai"),v:{"bro":t("prof_bro"),"mentor":t("prof_nastavnik"),"expert":t("prof_ekspert")}[user.ai_tone]||t("prof_ekspert")},{l:t("ai_today"),v:`${user.ai_requests_today||0}/${aiLimit}`},{l:t("prof_status"),v:user.rank_name||"🥉"},{l:t("prof_bally"),v:`${user.total_points||0} pts`}];
 
   return <div style={{padding:"16px 16px 100px"}}>
     <BackBtn onBack={onBack}/>
     <Kicker>{t("my_profile")}</Kicker>
-    <Hero>{user.first_name||"Атлет"}</Hero>
+    <Hero>{user.first_name||t("onb_atlet")}</Hero>
     {user.username&&<div style={{color:C.muted,fontSize:13,marginTop:4,fontFamily:"monospace"}}>@{user.username}</div>}
     <div style={{height:16}}/>
     {saved&&<div style={{background:"#00CC6622",border:`0.5px solid ${C.success}`,borderRadius:10,padding:"10px 14px",marginBottom:12,fontFamily:"monospace",fontSize:12,color:C.success}}>{t("status_saved")}</div>}
@@ -3690,20 +4887,20 @@ function ProfileScreen({user,tgId,onBack,onUserUpdated,onNav}){
       <Btn accent full onClick={startEdit}>{t("edit_profile_btn2")}</Btn>
     </>:<>
       <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:16}}>
-        {[{label:"Возраст (лет)",key:"age",placeholder:"45"},{label:"Вес (кг)",key:"weight",placeholder:"86"},{label:"Рост (см)",key:"height",placeholder:"186"}].map(f=><Card key={f.key}>
+        {[{label:t("field_age_y"),key:"age",placeholder:"45"},{label:t("field_weight_kg"),key:"weight",placeholder:"86"},{label:t("field_height_cm"),key:"height",placeholder:"186"}].map(f=><Card key={f.key}>
           <div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{f.label.toUpperCase()}</div>
           <input type="number" value={form[f.key]} onChange={e=>setForm(p=>({...p,[f.key]:e.target.value}))} placeholder={f.placeholder} style={{background:"none",border:"none",color:C.accent,fontSize:22,fontFamily:"monospace",fontWeight:700,width:"100%",outline:"none"}}/>
         </Card>)}
-        <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>ПОЛ</div><Sel value={form.gender} onChange={v=>setForm(p=>({...p,gender:v}))} options={[{value:"male",label:t("gender_male")},{value:"female",label:t("gender_female")}]}/></Card>
-        <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("level_section")}</div><Sel value={form.fitness_level} onChange={v=>setForm(p=>({...p,fitness_level:v}))} options={[{value:"beginner",label:"Новичок"},{value:"intermediate",label:t("level_intermediate")},{value:"advanced",label:t("level_advanced")}]}/></Card>
-        <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("goal_section")}</div><Sel value={form.desired_result} onChange={v=>setForm(p=>({...p,desired_result:v}))} options={[{value:"lose_weight",label:t("goal_lose")},{value:"gain_muscle",label:t("goal_muscle")},{value:"gain_strength",label:"Сила"},{value:"improve_endurance",label:t("goal_endurance")},{value:"stay_healthy",label:"Здоровье"}]}/></Card>
+        <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("gender_label")}</div><Sel value={form.gender} onChange={v=>setForm(p=>({...p,gender:v}))} options={[{value:"male",label:t("gender_male")},{value:"female",label:t("gender_female")}]}/></Card>
+        <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("level_section")}</div><Sel value={form.fitness_level} onChange={v=>setForm(p=>({...p,fitness_level:v}))} options={[{value:"beginner",label:t("lvl_novichok")},{value:"intermediate",label:t("level_intermediate")},{value:"advanced",label:t("level_advanced")}]}/></Card>
+        <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("goal_section")}</div><Sel value={form.desired_result} onChange={v=>setForm(p=>({...p,desired_result:v}))} options={[{value:"lose_weight",label:t("goal_lose")},{value:"gain_muscle",label:t("goal_muscle")},{value:"gain_strength",label:t("goal_strength")},{value:"improve_endurance",label:t("goal_endurance")},{value:"stay_healthy",label:t("goal_health")}]}/></Card>
         <Card style={{marginBottom:12}}>
           <Kicker style={{marginBottom:10}}>{t("ai_style_label")}</Kicker>
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
               {[
-                {v:"bro",    icon:"🤙", label:"Фитнес-бро",  desc:"Молодёжный, сленг, мотивация"},
-                {v:"mentor", icon:"🧑‍🏫", label:"Наставник",   desc:"Умеренный, поддержка, советы"},
-                {v:"expert", icon:"🎓", label:"Эксперт",     desc:"Профессиональный, термины"},
+                {v:"bro",    icon:"🤙", label:t("ai_bro_name"),  desc:t("ai_bro_desc")},
+                {v:"mentor", icon:"🧑‍🏫", label:t("prof_nastavnik2"),   desc:t("ai_mentor_desc")},
+                {v:"expert", icon:"🎓", label:t("prof_ekspert2"),     desc:t("ai_expert_desc")},
               ].map(t=>{
                 const isSelected = form.ai_tone===t.v || (!form.ai_tone && t.v==="expert");
                 return(
@@ -3735,7 +4932,7 @@ function ProfileScreen({user,tgId,onBack,onUserUpdated,onNav}){
       </div>
       <div style={{display:"flex",gap:10}}>
         <Btn full onClick={()=>setEditing(false)} style={{flex:1}}>{t("cancel_btn2")}</Btn>
-        <Btn accent full onClick={handleSave} disabled={saving} style={{flex:2}}>{saving?"СОХРАНЯЕМ...":t("save_profile")}</Btn>
+        <Btn accent full onClick={handleSave} disabled={saving} style={{flex:2}}>{saving?t("saving"):t("save_profile")}</Btn>
       </div>
     </>}
 
@@ -3896,7 +5093,7 @@ function SportEditModal({session,tgId,onClose,onSaved,onDeleted}){
           sport_type:session.sport_type,
           duration_min:parseInt(duration)||session.duration_min,
           intensity,
-          notes:notes.trim()||score.trim()?`${score?'Счёт: '+score+'. ':''}${notes}`.trim():null,
+          notes:notes.trim()||score.trim()?`${score?t("spedit_schet")+': '+score+'. ':''}${notes}`.trim():null,
           session_date:session.session_date,
         }),
       });
@@ -3959,7 +5156,7 @@ function SportEditModal({session,tgId,onClose,onSaved,onDeleted}){
         <div style={{marginBottom:12}}>
           <Kicker>{t("score_opt")}</Kicker>
           <input value={score} onChange={e=>setScore(e.target.value)}
-            placeholder="Например: 3:2 или 21:18"
+            placeholder={t("score_example")}
             style={{width:"100%",background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,
               padding:"8px 12px",color:C.text,fontSize:13,outline:"none",
               boxSizing:"border-box",marginTop:6}}/>
@@ -3968,7 +5165,7 @@ function SportEditModal({session,tgId,onClose,onSaved,onDeleted}){
         <div style={{marginBottom:16}}>
           <Kicker>{t("notes_section")}</Kicker>
           <textarea value={notes} onChange={e=>setNotes(e.target.value)}
-            placeholder="Партнёры, ощущения..."
+            placeholder={t("spedit_partnery_oschuscheniya")}
             style={{width:"100%",background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,
               padding:"8px 12px",color:C.text,fontSize:13,outline:"none",resize:"none",
               minHeight:50,fontFamily:"inherit",boxSizing:"border-box",marginTop:6}}/>
@@ -3976,7 +5173,7 @@ function SportEditModal({session,tgId,onClose,onSaved,onDeleted}){
 
         <div style={{display:"flex",gap:8}}>
           <Btn full onClick={del} disabled={saving} style={{flex:1,color:C.danger,border:`0.5px solid ${C.danger}`}}>{t("delete_btn")}</Btn>
-          <Btn accent full onClick={save} disabled={saving} style={{flex:2}}>{saving?"СОХРАНЯЕМ...":t("save_profile")}</Btn>
+          <Btn accent full onClick={save} disabled={saving} style={{flex:2}}>{saving?t("saving"):t("save_profile")}</Btn>
         </div>
       </div>
     </div>
@@ -3991,7 +5188,7 @@ function AddCustomExerciseInline({tgId,muscleGroups,onAdded}){
   const [f,setF]=useState({name:"",muscle_group_id:"",sets_recommended:"3",reps_recommended:"12",equipment:"",difficulty:"medium"});
 
   async function save(){
-    if(!f.name.trim()){setErr("Укажите название");return;}
+    if(!f.name.trim()){setErr(t("specify_name"));return;}
     setSaving(true);setErr("");
     try{
       const res=await fetch(`${API}/custom-exercises/${tgId}`,{
@@ -4012,7 +5209,7 @@ function AddCustomExerciseInline({tgId,muscleGroups,onAdded}){
         id:d.id,name:f.name.trim(),muscle_group_id:f.muscle_group_id?parseInt(f.muscle_group_id):null,
         sets_recommended:parseInt(f.sets_recommended)||3,reps_recommended:parseInt(f.reps_recommended)||12,
         equipment:f.equipment||null,difficulty:f.difficulty,is_custom:true,photo_url:null,
-        group_name:mg?.name||"Моё",group_emoji:mg?.emoji||"⭐",
+        group_name:mg?.name||t("cex_moe"),group_emoji:mg?.emoji||"⭐",
       });
       setOpen(false);
       setF({name:"",muscle_group_id:"",sets_recommended:"3",reps_recommended:"12",equipment:"",difficulty:"medium"});
@@ -4025,7 +5222,7 @@ function AddCustomExerciseInline({tgId,muscleGroups,onAdded}){
       style={{width:"100%",marginTop:8,marginBottom:4,background:"none",
         border:`0.5px dashed ${C.border}`,borderRadius:10,padding:"10px 16px",
         color:C.muted,fontSize:12,cursor:"pointer",fontFamily:"monospace",letterSpacing:1}}>
-      ⭐ ДОБАВИТЬ СВОЁ УПРАЖНЕНИЕ
+      {t("ui_dobavit_svoe_uprazhnenie")}
     </button>
   );
 
@@ -4052,11 +5249,11 @@ function AddCustomExerciseInline({tgId,muscleGroups,onAdded}){
           <option value="hard">{t("difficulty_hard")}</option>
         </select>
         <input type="number" value={f.sets_recommended} onChange={e=>setF(p=>({...p,sets_recommended:e.target.value}))}
-          placeholder="Подходов"
+          placeholder={t("sets_num")}
           style={{background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,
             padding:"8px 10px",color:C.text,fontSize:12,outline:"none",textAlign:"center"}}/>
         <input type="number" value={f.reps_recommended} onChange={e=>setF(p=>({...p,reps_recommended:e.target.value}))}
-          placeholder="Повторений"
+          placeholder={t("reps_num")}
           style={{background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,
             padding:"8px 10px",color:C.text,fontSize:12,outline:"none",textAlign:"center"}}/>
       </div>
@@ -4064,7 +5261,7 @@ function AddCustomExerciseInline({tgId,muscleGroups,onAdded}){
       <div style={{display:"flex",gap:8}}>
         <Btn full onClick={()=>setOpen(false)} style={{flex:1}}>{t("cancel_btn2")}</Btn>
         <Btn accent full onClick={save} disabled={saving||!f.name.trim()} style={{flex:2}}>
-          {saving?"СОХРАНЯЕМ...":"ДОБАВИТЬ"}
+          {saving?t("saving"):t("add")}
         </Btn>
       </div>
     </Card>
@@ -4088,7 +5285,7 @@ function AddExerciseDuringWorkout({allExercises,muscleGroups,tgId,onAdd}){
       style={{width:"100%",marginTop:4,background:"none",border:`0.5px dashed ${C.border}`,
         borderRadius:8,padding:"8px",color:C.muted,fontSize:11,cursor:"pointer",
         fontFamily:"monospace",letterSpacing:1}}>
-      + ДОБАВИТЬ УПРАЖНЕНИЕ
+      {t("add_exercise")}
     </button>
   );
 
@@ -4108,7 +5305,7 @@ function AddExerciseDuringWorkout({allExercises,muscleGroups,tgId,onAdd}){
         <button onClick={()=>setGroupId(null)}
           style={{flexShrink:0,padding:"4px 10px",borderRadius:12,fontSize:10,cursor:"pointer",
             background:!groupId?C.accent:C.card,border:`0.5px solid ${!groupId?C.accent:C.border}`,
-            color:!groupId?C.bg:C.muted,fontFamily:"monospace"}}>ВСЕ</button>
+            color:!groupId?C.bg:C.muted,fontFamily:"monospace"}}>{t("all_btn")}</button>
         {(muscleGroups||[]).map(g=>(
           <button key={g.id} onClick={()=>setGroupId(groupId===g.id?null:g.id)}
             style={{flexShrink:0,padding:"4px 10px",borderRadius:12,fontSize:10,cursor:"pointer",
@@ -4159,7 +5356,7 @@ function PlateauBlock({tgId}){
         <span style={{color:C.accent,fontSize:14}}>{open?"∧":"∨"}</span>
       </button>
       {open&&<div style={{marginTop:12,paddingTop:12,borderTop:`0.5px solid ${C.border}`}}>
-        {!data?<Loader text="АНАЛИЗ"/>:
+        {!data?<Loader text={t("plateau_analiz")}/>:
          !data.has_plateau?(
            <div style={{color:C.success,fontFamily:"monospace",fontSize:12,textAlign:"center",padding:"8px 0"}}>
              ✅ {t("plateau_none")}
@@ -4171,7 +5368,7 @@ function PlateauBlock({tgId}){
                  ⚠️ {t("plateau_weight")}
                </div>
                <div style={{fontSize:11,color:C.muted}}>
-                 Изменение за 3 недели: {data.weight_change > 0 ? "+" : ""}{data.weight_change} кг
+                 {t("ui_izmenenie_za_3_nedeli")} {data.weight_change > 0 ? "+" : ""}{data.weight_change} {t("home_kg")}
                </div>
              </div>}
              {data.stagnant_exercises?.length>0&&<div>
@@ -4182,12 +5379,12 @@ function PlateauBlock({tgId}){
                  <div key={i} style={{padding:"6px 0",borderBottom:`0.5px solid ${C.border}`,fontSize:12}}>
                    <div style={{color:C.text}}>{tField(ex,"name")}</div>
                    <div style={{color:C.muted,fontSize:11}}>
-                     {ex.min_weight}–{ex.max_weight} кг · {ex.sessions} тренировок
+                     {ex.min_weight}–{ex.max_weight} {t("home_kg")} · {ex.sessions} {t("prog_trenirovok").toLowerCase()}
                    </div>
                  </div>
                ))}
                <div style={{marginTop:10,fontSize:11,color:C.muted}}>
-                 💡 Попробуй сменить упражнение или добавить дроп-сет — спроси тренера
+                 {t("ui_poprobuy_smenit_uprazhnenie_il")}
                </div>
              </div>}
            </div>
@@ -4200,10 +5397,10 @@ function PlateauBlock({tgId}){
 
 function AddCustomProductForm({onAdded}){
   const CATS=[
-    {v:"meat",l:"🥩 Мясо"},{v:"fish",l:"🐟 Рыба"},{v:"dairy",l:"🥛 Молочка"},
-    {v:"eggs",l:"🥚 Яйца"},{v:"grains",l:"🌾 Крупы"},{v:"bread",l:"🍞 Хлеб"},
-    {v:"vegetables",l:"🥦 Овощи"},{v:"fruits",l:"🍎 Фрукты"},{v:"nuts",l:"🥜 Орехи"},
-    {v:"drinks",l:"🧃 Напитки"},{v:"snacks",l:"🍫 Снеки"},{v:"other",l:"🫙 Прочее"},
+    {v:"meat",l:t("fcat_myaso")},{v:"fish",l:t("fcat_ryba")},{v:"dairy",l:t("fcat_molochka")},
+    {v:"eggs",l:t("alg_yayca")},{v:"grains",l:t("fcat_krupy")},{v:"bread",l:t("fcat_hleb")},
+    {v:"vegetables",l:t("fcat_ovoschi")},{v:"fruits",l:t("fcat_frukty")},{v:"nuts",l:t("alg_orehi")},
+    {v:"drinks",l:t("fcat_napitki")},{v:"snacks",l:t("fcat_sneki")},{v:"other",l:t("fcat_prochee")},
   ];
   const [open,setOpen]=useState(false);
   const [saving,setSaving]=useState(false);
@@ -4211,7 +5408,7 @@ function AddCustomProductForm({onAdded}){
   const [f,setF]=useState({name:"",calories:"",protein:"",fat:"",carbs:"",fiber:"",category:"meat"});
 
   async function save(){
-    if(!f.name.trim()||!f.calories){setErr("Укажите название и калории");return;}
+    if(!f.name.trim()||!f.calories){setErr(t("specify_name_cal"));return;}
     setSaving(true);setErr("");
     try{
       const res=await fetch(`${API}/food/products`,{
@@ -4243,7 +5440,7 @@ function AddCustomProductForm({onAdded}){
       style={{width:"100%",marginTop:8,background:"none",border:`0.5px dashed ${C.border}`,
         borderRadius:10,padding:"12px 16px",color:C.muted,fontSize:13,cursor:"pointer",
         fontFamily:"monospace",letterSpacing:1}}>
-      ＋ ДОБАВИТЬ СВОЙ ПРОДУКТ
+      {t("ui_dobavit_svoy_produkt")}
     </button>
   );
 
@@ -4256,7 +5453,7 @@ function AddCustomProductForm({onAdded}){
           padding:"10px 12px",color:C.text,fontSize:13,outline:"none",
           marginBottom:8,boxSizing:"border-box"}}/>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:8}}>
-        {[{k:"calories",p:"Ккал *"},{k:"protein",p:"Белки г"},{k:"fat",p:"Жиры г"},{k:"carbs",p:"Углев г"}].map(x=>(
+        {[{k:"calories",p:t("calories_req")},{k:"protein",p:t("protein_g")},{k:"fat",p:t("fat_g")},{k:"carbs",p:t("carb_g")}].map(x=>(
           <input key={x.k} type="number" value={f[x.k]} onChange={e=>setF(p=>({...p,[x.k]:e.target.value}))}
             placeholder={x.p}
             style={{background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,
@@ -4268,7 +5465,7 @@ function AddCustomProductForm({onAdded}){
       <div style={{display:"flex",gap:8,marginTop:10}}>
         <Btn full onClick={()=>setOpen(false)} style={{flex:1}}>{t("cancel_btn2")}</Btn>
         <Btn accent full onClick={save} disabled={saving||!f.name.trim()||!f.calories} style={{flex:2}}>
-          {saving?"СОХРАНЯЕМ...":"ДОБАВИТЬ"}
+          {saving?t("saving"):t("add")}
         </Btn>
       </div>
     </Card>
@@ -4316,13 +5513,13 @@ function WorkoutHistoryScreen({workouts,onNav,tgId,refreshToken=0}){
     catch{}finally{setDeleting(null);}
   }
 
-  const fmtDt=iso=>{if(!iso)return"—";const d=new Date(new Date(iso).getTime()+5*3600000);return d.toLocaleString("ru",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});};
-  const fmtDate=iso=>{if(!iso)return"—";const d=new Date(iso+"T12:00:00");return d.toLocaleDateString("ru",{day:"numeric",month:"short"});};
+  const fmtDt=iso=>{if(!iso)return"—";const d=new Date(new Date(iso).getTime()+5*3600000);return d.toLocaleString(dateLocale(),{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});};
+  const fmtDate=iso=>{if(!iso)return"—";const d=new Date(iso+"T12:00:00");return d.toLocaleDateString(dateLocale(),{day:"numeric",month:"short"});};
   const statusColor={scheduled:C.accent,reminded:C.warn,completed:C.success,missed:C.danger};
-  const intensityLabel={low:"Низкая",medium:"Средняя",high:"Высокая"};
+  const intensityLabel={low:t("wh_nizkaya"),medium:t("wh_srednyaya"),high:t("wh_vysokaya")};
   const intensityColor={low:C.success,medium:C.accent,high:C.danger};
 
-  if(!workouts)return <div style={{padding:"16px 16px 100px"}}><Loader text="ТРЕНИРОВКИ"/></div>;
+  if(!workouts)return <div style={{padding:"16px 16px 100px"}}><Loader text={t("workout_title")}/></div>;
 
   return <div style={{padding:"16px 16px 100px"}}>
     <Hero>{t("workouts_title")}</Hero>
@@ -4353,14 +5550,14 @@ function WorkoutHistoryScreen({workouts,onNav,tgId,refreshToken=0}){
           {workouts.map(w=><Card key={w.id} onClick={()=>onNav("workout_detail",{workoutId:w.id})}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
               <div>
-                <Kicker>{new Date(w.date||w.started_at).toLocaleDateString("ru",{day:"numeric",month:"short"})}</Kicker>
-                <div style={{fontWeight:600,fontSize:15,color:C.text}}>{w.workout_type==="completed"?"Тренировка":w.workout_type||"Тренировка"}</div>
+                <Kicker>{new Date(w.date||w.started_at).toLocaleDateString(dateLocale(),{day:"numeric",month:"short"})}</Kicker>
+                <div style={{fontWeight:600,fontSize:15,color:C.text}}>{w.workout_type==="completed"?t("workout_type"):w.workout_type||t("workout_type")}</div>
               </div>
               <div style={{textAlign:"right"}}><Mono>{w.sets_count||0}</Mono><span style={{fontSize:11,color:C.muted}}> {t("sets_short2")}</span></div>
             </div>
             <div style={{borderTop:`0.5px solid ${C.border}`,marginTop:10,paddingTop:10,display:"flex",gap:20}}>
-              <div><div style={{fontSize:10,color:C.muted,fontFamily:"monospace"}}>{t("tonnage_section")}</div><Mono>{Math.round((w.total_volume||0)/1000*10)/10}</Mono><span style={{fontSize:11,color:C.muted}}> т</span></div>
-              <div><div style={{fontSize:10,color:C.muted,fontFamily:"monospace"}}>{t("status_section")}</div><span style={{fontSize:12,fontFamily:"monospace",color:w.status==="finished"?C.success:C.muted}}>{w.status==="finished"?"✓ ЗАВЕРШЕНА":w.status||"—"}</span></div>
+              <div><div style={{fontSize:10,color:C.muted,fontFamily:"monospace"}}>{t("tonnage_section")}</div><Mono>{Math.round((w.total_volume||0)/1000*10)/10}</Mono><span style={{fontSize:11,color:C.muted}}> {t("u_t")}</span></div>
+              <div><div style={{fontSize:10,color:C.muted,fontFamily:"monospace"}}>{t("status_section")}</div><span style={{fontSize:12,fontFamily:"monospace",color:w.status==="finished"?C.success:C.muted}}>{w.status==="finished"?t("wh_zavershena"):w.status||"—"}</span></div>
             </div>
             <div style={{marginTop:8,fontSize:11,color:C.accent,fontFamily:"monospace"}}>{t("open_plan")}</div>
           </Card>)}
@@ -4370,7 +5567,7 @@ function WorkoutHistoryScreen({workouts,onNav,tgId,refreshToken=0}){
     {activeTab==="sport"&&(
       <Fragment>
         <Btn accent full onClick={()=>onNav("sport_log",{})} style={{marginBottom:12}}>{t("record_sport")}</Btn>
-        {!sportSessions?<Loader text="СПОРТ"/>:
+        {!sportSessions?<Loader text={t("sport_cat")}/>:
          sportSessions.length===0?<Card><div style={{textAlign:"center",padding:"20px 0",color:C.muted}}>{t("no_sport_yet")}</div></Card>:
          <div style={{display:"flex",flexDirection:"column",gap:8}}>
            {(()=>{const today=new Date().toISOString().split("T")[0];
@@ -4393,9 +5590,9 @@ function WorkoutHistoryScreen({workouts,onNav,tgId,refreshToken=0}){
                   </div>
                 </div>
                 <div style={{borderTop:`0.5px solid ${C.border}`,marginTop:8,paddingTop:8,display:"flex",gap:16,flexWrap:"wrap"}}>
-                  <div><div style={{fontSize:9,color:C.muted,fontFamily:"monospace"}}>{t("time_label2")}</div><Mono size={13}>{s.duration_min} мин</Mono></div>
+                  <div><div style={{fontSize:9,color:C.muted,fontFamily:"monospace"}}>{t("time_label2")}</div><Mono size={13}>{s.duration_min} {t("home_min")}</Mono></div>
                   <div><div style={{fontSize:9,color:C.muted,fontFamily:"monospace"}}>{t("sport_intensity")}</div><span style={{fontSize:12,fontFamily:"monospace",color:intensityColor[s.intensity]||C.muted}}>{intensityLabel[s.intensity]||s.intensity}</span></div>
-                  {s.calories_burned>0&&<div><div style={{fontSize:9,color:C.muted,fontFamily:"monospace"}}>{t("calories_section")}</div><Mono size={13}>{s.calories_burned} ккал</Mono></div>}
+                  {s.calories_burned>0&&<div><div style={{fontSize:9,color:C.muted,fontFamily:"monospace"}}>{t("calories_section")}</div><Mono size={13}>{s.calories_burned} {t("kcal_unit")}</Mono></div>}
                   {s.score&&<div><div style={{fontSize:9,color:C.muted,fontFamily:"monospace"}}>{t("score_section")}</div><Mono size={13}>{s.score}</Mono></div>}
                 </div>
                 {s.notes&&<div style={{fontSize:12,color:C.muted,marginTop:6}}>{s.notes}</div>}
@@ -4407,7 +5604,7 @@ function WorkoutHistoryScreen({workouts,onNav,tgId,refreshToken=0}){
                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                    <div><div style={{fontWeight:600,fontSize:13,color:C.muted}}>{s.sport_label}</div>
                      <div style={{fontSize:11,color:C.muted,fontFamily:"monospace"}}>{fmtDate(s.session_date)}</div></div>
-                   <Mono size={12} color={C.muted}>{s.duration_min} мин</Mono>
+                   <Mono size={12} color={C.muted}>{s.duration_min} {t("home_min")}</Mono>
                  </div></Card>))}
              </>}
              </>);})()} 
@@ -4424,7 +5621,7 @@ function WorkoutHistoryScreen({workouts,onNav,tgId,refreshToken=0}){
     )}
 
     {activeTab==="planned"&&(
-      !planned?<Loader text="ПЛАН"/>:<>
+      !planned?<Loader text={t("wh_plan")}/>:<>
         {(planned.planned||[]).filter(pw=>pw.status==="scheduled"||pw.status==="reminded").length===0&&<Card style={{marginBottom:12}}><div style={{textAlign:"center",padding:"12px 0",color:C.muted,fontSize:14}}>{t("no_planned")}</div></Card>}
         {(planned.planned||[]).filter(pw=>pw.status==="scheduled"||pw.status==="reminded").map(pw=><Card key={pw.id} style={{marginBottom:8}} onClick={()=>onNav("planned_detail",{pwId:pw.id})}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
@@ -4465,7 +5662,7 @@ function WorkoutDetailScreen({workoutId,tgId,onBack}){
       .catch(()=>setData({exercises:[],status:"error",_nodata:true}));
   },[workoutId]);
 
-  if(!data)return <div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader text="ЗАГРУЗКА"/></div>;
+  if(!data)return <div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader text={t("loading")}/></div>;
   if(data._nodata)return(
   <div style={{padding:"16px 16px 100px"}}>
     <BackBtn onBack={onBack}/>
@@ -4474,8 +5671,8 @@ function WorkoutDetailScreen({workoutId,tgId,onBack}){
     <div style={{height:16}}/>
     <Card danger>
       <div style={{fontSize:13,color:C.danger,fontFamily:"monospace",lineHeight:1.6}}>
-        Тренировка не найдена или нет доступа.<br/>
-        Попробуй открыть через Telegram-бот.
+        {t("ui_trenirovka_ne_naydena_ili")}<br/>
+        {t("ui_poprobuy_otkryt_cherez_telegra")}
       </div>
     </Card>
     <Btn full onClick={onBack} style={{marginTop:16}}>{t("back")}</Btn>
@@ -4485,7 +5682,7 @@ function WorkoutDetailScreen({workoutId,tgId,onBack}){
   // Тренировка в процессе (active) — показываем что есть
   const isActive = data.status === "active";
   const totalSets=data.exercises?.reduce((s,e)=>s+e.sets.length,0)||0;
-  const dateStr=data.date?new Date(data.date).toLocaleDateString("ru",{day:"numeric",month:"long",year:"numeric"}):"—";
+  const dateStr=data.date?new Date(data.date).toLocaleDateString(dateLocale(),{day:"numeric",month:"long",year:"numeric"}):"—";
 
   return <div style={{padding:"16px 16px 100px"}}>
     <BackBtn onBack={onBack}/>
@@ -4494,7 +5691,7 @@ function WorkoutDetailScreen({workoutId,tgId,onBack}){
     <div style={{height:12}}/>
     {isActive&&<div style={{background:"#FFB80022",border:`0.5px solid ${C.warn}`,borderRadius:10,padding:"10px 14px",marginBottom:12,fontSize:12,color:C.warn,fontFamily:"monospace"}}>{t("workout_still_active")}</div>}
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:16}}>
-      {[{l:t("sets_label"),v:totalSets},{l:t("tonnage_label2"),v:`${Math.round((data.total_volume||0)/1000*10)/10} т`},{l:"СТАТУС",v:data.status==="finished"?"✓":data.status||"—"}].map((s,i)=><Card key={i} style={{textAlign:"center"}}><div style={{fontSize:9,color:C.muted,fontFamily:"monospace",marginBottom:4}}>{s.l}</div><Mono size={14}>{s.v}</Mono></Card>)}
+      {[{l:t("sets_label"),v:totalSets},{l:t("tonnage_label2"),v:`${Math.round((data.total_volume||0)/1000*10)/10} ${t("u_t")}`},{l:t("status_label"),v:data.status==="finished"?"✓":data.status||"—"}].map((s,i)=><Card key={i} style={{textAlign:"center"}}><div style={{fontSize:9,color:C.muted,fontFamily:"monospace",marginBottom:4}}>{s.l}</div><Mono size={14}>{s.v}</Mono></Card>)}
     </div>
 
     {data.exercises?.length===0&&<Card><div style={{textAlign:"center",padding:"16px 0",color:C.muted}}>{t("no_sets")}</div></Card>}
@@ -4502,14 +5699,14 @@ function WorkoutDetailScreen({workoutId,tgId,onBack}){
     {data.exercises?.map((ex,i)=><Card key={i} style={{marginBottom:10}}>
       <div style={{fontWeight:700,fontSize:15,color:C.text,marginBottom:10}}>{i+1}. {tField(ex,"name")}</div>
       <div style={{display:"grid",gridTemplateColumns:"auto 1fr 1fr 1fr",gap:"4px 12px",alignItems:"center"}}>
-        <div style={{fontSize:10,color:C.muted,fontFamily:"monospace"}}>ПХ</div>
-        <div style={{fontSize:10,color:C.muted,fontFamily:"monospace"}}>ВЕС</div>
+        <div style={{fontSize:10,color:C.muted,fontFamily:"monospace"}}>{t("wd_ph")}</div>
+        <div style={{fontSize:10,color:C.muted,fontFamily:"monospace"}}>{t("weight_label2")}</div>
         <div style={{fontSize:10,color:C.muted,fontFamily:"monospace"}}>{t("reps_short2")}</div>
         <div style={{fontSize:10,color:C.muted,fontFamily:"monospace"}}>RPE</div>
         {ex.sets.map((s,si)=>(
           <Fragment key={`set-${si}`}>
             <Mono size={13}>{s.set_number}</Mono>
-            <Mono size={13}>{s.weight!=null?`${s.weight} кг`:"—"}</Mono>
+            <Mono size={13}>{s.weight!=null?`${s.weight} ${t("home_kg")}`:"—"}</Mono>
             <Mono size={13}>{s.reps!=null?`${s.reps}`:"—"}</Mono>
             <Mono size={13} color={C.muted}>{s.rpe||"—"}</Mono>
           </Fragment>
@@ -4786,7 +5983,7 @@ function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscle
   useEffect(()=>{
     if(!tgId){setCustomLoaded(true);return;}
     apiGet(`${API}/custom-exercises/${tgId}`)
-      .then(d=>setCustomExs((d.exercises||[]).map(e=>({...e,group_name:e.group_name||"Моё",group_emoji:e.group_emoji||"⭐"}))))
+      .then(d=>setCustomExs((d.exercises||[]).map(e=>({...e,group_name:e.group_name||t("cex_moe"),group_emoji:e.group_emoji||"⭐"}))))
       .catch(()=>{})
       .finally(()=>setCustomLoaded(true));
   },[]);
@@ -4814,7 +6011,7 @@ function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscle
       const r=await fetch(`${API}/workout/start/${tgId}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({exercise_ids:selExs.map(e=>e.id)})});
       const d=await r.json();setWorkoutId(d.workout_id);
       const init={};selExs.forEach(e=>{init[e.id]=[];});setSets(init);setStep(STEP.LG);
-    }catch{alert("Ошибка запуска");}
+    }catch{alert(t("error_launch"));}
   }
   async function doLog(){
     const ex=selExs[curIdx];if(!ex||!workoutId)return;
@@ -4917,7 +6114,7 @@ ${exList}
         <div style={{fontSize:60}}>🏆</div>
         <Hero style={{textAlign:"center",marginTop:16}}>{t("workout_done")}</Hero>
         <div style={{color:C.muted,fontSize:14,marginTop:8}}>{t("great_work")}</div>
-        <div style={{marginTop:8,fontFamily:"monospace",color:C.accent,fontSize:20}}>{workoutDurationMin()} МИНУТ</div>
+        <div style={{marginTop:8,fontFamily:"monospace",color:C.accent,fontSize:20}}>{workoutDurationMin()} {t("minutes_label")}</div>
       </div>
 
       {/* Спрашиваем один раз и только после настоящей тренировки: предлагать
@@ -4942,12 +6139,12 @@ ${exList}
           <div style={{fontSize:36,marginBottom:4}}>{r.emoji}</div>
           <div style={{fontSize:16,fontWeight:700,color:C.text,marginBottom:4}}>{r.name}!</div>
           <div style={{fontSize:12,color:C.muted,marginBottom:4}}>{r.desc}</div>
-          <div style={{fontSize:13,color:C.accent,fontFamily:"monospace"}}>+{r.pts} баллов за серию</div>
+          <div style={{fontSize:13,color:C.accent,fontFamily:"monospace"}}>+{r.pts} {t("aw_ballov_za_seriyu")}</div>
         </Card>
       ))}
       {streakInfo&&!(streakInfo.new_streak_rewards?.length>0)&&streakInfo.streak_days>1&&(
         <div style={{textAlign:"center",marginBottom:16,fontFamily:"monospace",fontSize:13,color:C.muted}}>
-          🔥 Серия: {streakInfo.streak_days} {streakInfo.streak_days<5?"дня":"дней"} подряд
+          {t("ui_seriya")} {streakInfo.streak_days} {streakInfo.streak_days<5?t("aw_dnya"):t("aw_dney")} {t("streak_podryad").toLowerCase()}
         </div>
       )}
 
@@ -4956,7 +6153,7 @@ ${exList}
         {[
           {l:t("exercises_label"),v:selExs.length},
           {l:t("sets_label"),v:Object.values(sets).reduce((s,a)=>s+a.length,0)},
-          {l:"МИНУТ",v:workoutDurationMin()},
+          {l:t("minutes_label"),v:workoutDurationMin()},
         ].map((s,i)=><Card key={i} style={{textAlign:"center"}}><div style={{fontSize:9,color:C.muted,fontFamily:"monospace",marginBottom:4}}>{s.l}</div><Mono size={18}>{s.v}</Mono></Card>)}
       </div>
 
@@ -4977,13 +6174,13 @@ ${exList}
       ):aiReview==="__limit__"?(
         <Card style={{marginBottom:16}}>
           <div style={{fontSize:13,color:C.muted,textAlign:"center",padding:"8px 0"}}>
-            💬 Лимит AI запросов на сегодня исчерпан — оценка будет доступна завтра
+            {t("ui_limit_ai_zaprosov_na")}
           </div>
         </Card>
       ):aiReview==="__error__"?(
         <Card style={{marginBottom:16}}>
           <div style={{fontSize:13,color:C.muted,textAlign:"center",padding:"8px 0"}}>
-            Не удалось получить оценку AI — проверь соединение
+            {t("ui_ne_udalos_poluchit_ocenku")}
           </div>
         </Card>
       ):null}
@@ -5043,15 +6240,15 @@ ${exList}
         <div style={{fontSize:13,color:C.muted,marginBottom:16}}>{t("sport_section_desc")}</div>
         <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
           {(sports.length?sports:[
-            {code:"football",name:"⚽ Футбол"},{code:"volleyball",name:"🏐 Волейбол"},
-            {code:"basketball",name:"🏀 Баскетбол"},{code:"handball",name:"🤾 Гандбол"},
-            {code:"table_tennis",name:"🏓 Настольный теннис"},{code:"padel",name:"🎾 Падел"},
-            {code:"tennis",name:"🎾 Большой теннис"},{code:"badminton",name:"🏸 Бадминтон"},
-            {code:"boxing",name:"🥊 Бокс"},{code:"mma",name:"🥋 MMA"},
-            {code:"swimming",name:"🏊 Плавание"},{code:"cycling",name:"🚴 Велоспорт"},
-            {code:"running",name:"🏃 Бег"},{code:"crossfit",name:"🏋️ CrossFit"},
-            {code:"yoga",name:"🧘 Йога"},{code:"pilates",name:"🧘 Пилатес"},
-            {code:"skiing",name:"⛷ Горные лыжи"},{code:"climbing",name:"🧗 Скалолазание"},
+            {code:"football",name:t("aw_futbol")},{code:"volleyball",name:t("aw_voleybol")},
+            {code:"basketball",name:t("aw_basketbol")},{code:"handball",name:t("aw_gandbol")},
+            {code:"table_tennis",name:t("aw_nastolnyy_tennis")},{code:"padel",name:t("aw_padel")},
+            {code:"tennis",name:t("aw_bolshoy_tennis")},{code:"badminton",name:t("aw_badminton")},
+            {code:"boxing",name:t("aw_boks")},{code:"mma",name:"🥋 MMA"},
+            {code:"swimming",name:t("aw_plavanie")},{code:"cycling",name:t("aw_velosport")},
+            {code:"running",name:t("aw_beg")},{code:"crossfit",name:"🏋️ CrossFit"},
+            {code:"yoga",name:t("aw_yoga")},{code:"pilates",name:t("aw_pilates")},
+            {code:"skiing",name:t("aw_gornye_lyzhi")},{code:"climbing",name:t("aw_skalolazanie")},
           ]).map(s=>(
             <button key={s.code||s.v} onClick={()=>{
               if(onNav){onNav("sport_log",{initial_sport:s.code||s.v});}else{onBack();}
@@ -5063,7 +6260,7 @@ ${exList}
           ))}
         </div>
         <div style={{marginTop:12,fontSize:11,color:C.muted,fontFamily:"monospace"}}>
-          ↗ Полная запись в разделе Тренировки → ⚽ Спорт
+          {t("ui_polnaya_zapis_v_razdele")}
         </div>
       </Card>
       )}
@@ -5090,11 +6287,11 @@ ${exList}
       </div>
       {selGroups.size>0&&(
         <div style={{marginBottom:12,fontFamily:"monospace",fontSize:11,color:C.accent}}>
-          ВЫБРАНО ГРУПП: {selGroups.size} · {(muscleGroups||[]).filter(g=>selGroups.has(g.id)).map(g=>g.emoji+(tField(g,"name"))).join(", ")}
+          {t("ui_vybrano_grupp")} {selGroups.size} · {(muscleGroups||[]).filter(g=>selGroups.has(g.id)).map(g=>g.emoji+(tField(g,"name"))).join(", ")}
         </div>
       )}
       <Btn accent full onClick={()=>setStep(STEP.SE)}>
-        {selGroups.size===0?"ПОКАЗАТЬ ВСЕ УПРАЖНЕНИЯ →":`ПОКАЗАТЬ УПРАЖНЕНИЯ (${selGroups.size} групп) →`}
+        {selGroups.size===0?t("show_exercises"):t("plan_show_ex").replace("{n}",selGroups.size)}
       </Btn>
     </div>
   );
@@ -5114,7 +6311,7 @@ ${exList}
         <input value={exSearch} onChange={e=>setExSearch(e.target.value)} placeholder={t("search_placeholder")} style={{width:"100%",background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 14px",color:C.text,fontSize:13,fontFamily:"monospace",outline:"none",boxSizing:"border-box",marginTop:12,marginBottom:12}}/>
         {selExs.length>0&&(
           <div style={{marginBottom:12}}>
-            <Kicker>ВЫБРАНО ({selExs.length})</Kicker>
+            <Kicker>{t("aw_vybrano")}{selExs.length})</Kicker>
             <div style={{display:"flex",flexWrap:"wrap",gap:6}}>
               {selExs.map((e,i)=><Tag key={e.id} color={C.accent}>{i+1}. {e.name.split(" ").slice(0,2).join(" ")}</Tag>)}
             </div>
@@ -5128,15 +6325,15 @@ ${exList}
           })}
         </div>
         <AddCustomExerciseInline tgId={tgId} muscleGroups={muscleGroups} onAdded={ex=>{
-          setCustomExs(p=>[...p,{...ex,group_name:ex.group_name||"Моё",group_emoji:ex.group_emoji||"⭐"}]);
-          setSelExs(p=>[...p,{...ex,order:p.length+1,group_name:ex.group_name||"Моё",group_emoji:ex.group_emoji||"⭐"}]);
+          setCustomExs(p=>[...p,{...ex,group_name:ex.group_name||t("cex_moe"),group_emoji:ex.group_emoji||"⭐"}]);
+          setSelExs(p=>[...p,{...ex,order:p.length+1,group_name:ex.group_name||t("cex_moe"),group_emoji:ex.group_emoji||"⭐"}]);
         }}/>
         {selExs.length>0&&(
           <div style={{position:"sticky",bottom:80,marginTop:12}}>
             <Btn accent full onClick={()=>{
               const allCardio=selExs.every(e=>e.muscle_group_id===9||cardioType(e)!==null);
               setStep(allCardio?STEP.OR:STEP.WU);
-            }}>ДАЛЕЕ → {selExs.every(e=>e.muscle_group_id===9||cardioType(e)!==null)?t("order_title"):"РАЗМИНКА"} ({selExs.length})</Btn>
+            }}>{t("next_btn2")} {selExs.every(e=>e.muscle_group_id===9||cardioType(e)!==null)?t("order_title"):t("warmup_title")} ({selExs.length})</Btn>
           </div>
         )}
       </div>
@@ -5249,7 +6446,7 @@ ${exList}
     if(!ex){
       return(
         <div style={{padding:"16px 16px 100px",textAlign:"center"}}>
-          <div style={{fontSize:13,color:C.muted,marginTop:40}}>{t("loading")||"Загрузка..."}</div>
+          <div style={{fontSize:13,color:C.muted,marginTop:40}}>{t("loading")}</div>
         </div>
       );
     }
@@ -5270,7 +6467,7 @@ ${exList}
             {ex.group_icon_url?<img src={ex.group_icon_url} alt="" style={{width:16,height:16,objectFit:"cover",borderRadius:3,verticalAlign:"middle",marginRight:4}}/>:ex.group_emoji+" "}{ex.group_name?.toUpperCase()}
           </div>
           <button onClick={finish} style={{background:"none",border:`0.5px solid ${C.danger}`,borderRadius:8,padding:"5px 10px",color:C.danger,fontSize:11,fontFamily:"monospace",cursor:"pointer"}}>
-            ЗАВЕРШИТЬ
+            {t("finish_workout")}
           </button>
         </div>
 
@@ -5281,7 +6478,7 @@ ${exList}
               <Kicker>{t("replace_exercise2")}</Kicker>
               <button onClick={()=>setLgReplaceMode(false)} style={{background:"none",border:`0.5px solid ${C.border}`,borderRadius:8,padding:"4px 10px",color:C.muted,fontSize:12,cursor:"pointer"}}>{t("cancel_btn2")}</button>
             </div>
-            <div style={{fontSize:12,color:C.muted,marginBottom:10}}>{ex.group_icon_url?<img src={ex.group_icon_url} alt="" style={{width:14,height:14,objectFit:"cover",borderRadius:3,verticalAlign:"middle",marginRight:3}}/>:ex.group_emoji+" "}{tGroup(ex)} — выбери замену:</div>
+            <div style={{fontSize:12,color:C.muted,marginBottom:10}}>{ex.group_icon_url?<img src={ex.group_icon_url} alt="" style={{width:14,height:14,objectFit:"cover",borderRadius:3,verticalAlign:"middle",marginRight:3}}/>:ex.group_emoji+" "}{tGroup(ex)} — {t("aw_vyberi_zamenu")}:</div>
             {(exercises||[]).filter(e=>e.muscle_group_id===ex.muscle_group_id&&e.id!==ex.id).slice(0,15).map(alt=>(
               <ExCard key={alt.id} ex={alt} badge={getDiff(alt.difficulty)}
                 onClick={()=>{
@@ -5298,7 +6495,7 @@ ${exList}
                     }}
                     style={{flexShrink:0,background:C.accent,border:"none",borderRadius:8,
                       padding:"6px 10px",color:C.bg,fontSize:11,fontWeight:700,cursor:"pointer"}}>
-                    ЗАМЕНИТЬ
+                    {t("ui_zamenit")}
                   </button>
                 }
               />
@@ -5311,8 +6508,8 @@ ${exList}
               <button onClick={()=>setLgReplaceMode(true)} style={{background:"rgba(200,255,0,0.15)",border:`0.5px solid ${C.accent}`,borderRadius:8,padding:"6px 12px",color:C.accent,fontSize:12,fontWeight:600,cursor:"pointer",flexShrink:0,marginLeft:8,fontFamily:"monospace"}}>{t("do_replace2")}</button>
             </div>
             <div style={{fontSize:12,color:C.muted,fontFamily:"monospace",marginBottom:12}}>
-              ПОДХОД {setNum} / {totalSets}
-              {doneSets.length>0&&<span style={{color:C.success,marginLeft:8}}>✓ {doneSets.length} выполнено</span>}
+              {t("ui_podhod")} {setNum} / {totalSets}
+              {doneSets.length>0&&<span style={{color:C.success,marginLeft:8}}>✓ {doneSets.length} {t("reps_done")}</span>}
             </div>
           </>
         )}
@@ -5337,7 +6534,7 @@ ${exList}
                   <div style={{fontSize:11,color:C.muted,marginTop:4,fontFamily:"monospace"}}>
                     <button onClick={()=>setLocalSet(p=>({...p,weight:String(suggestWeight)}))}
                       style={{background:"none",border:"none",color:C.muted,cursor:"pointer",fontSize:11,fontFamily:"monospace",textDecoration:"underline"}}>
-                      → {suggestWeight} кг
+                      → {suggestWeight} {t("home_kg")}
                     </button>
                   </div>
                 )}
@@ -5397,9 +6594,9 @@ ${exList}
           <div style={{display:"flex",gap:8,marginBottom:12,flexWrap:"wrap"}}>
             {doneSets.map((s,i)=>(
               <div key={i} style={{background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"6px 10px",textAlign:"center",minWidth:60}}>
-                <div style={{fontSize:9,color:C.muted,fontFamily:"monospace"}}>ПХ {i+1}</div>
+                <div style={{fontSize:9,color:C.muted,fontFamily:"monospace"}}>{t("wd_ph")} {i+1}</div>
                 <div style={{fontSize:12,color:C.success,fontFamily:"monospace",fontWeight:700,marginTop:2}}>
-                  {cType==="distance"?`${s.distance}км`:cType==="time"?`${s.time}с`:`${s.weight}×${s.reps}`}
+                  {cType==="distance"?`${s.distance}${t("u_km")}`:cType==="time"?`${s.time}${t("u_s")}`:`${s.weight}×${s.reps}`}
                 </div>
               </div>
             ))}
@@ -5418,7 +6615,7 @@ ${exList}
         }}
           disabled={logBusy}
           style={{width:"100%",background:logBusy?"#8FB300":C.accent,border:"none",borderRadius:12,padding:"16px",color:C.bg,fontWeight:700,fontSize:16,cursor:logBusy?"not-allowed":"pointer",marginBottom:10,letterSpacing:0.5,opacity:logBusy?0.8:1,transition:"all 0.15s"}}>
-          {logBusy?"⏳ СОХРАНЯЕМ...":"✓ ПОДХОД ВЫПОЛНЕН"}
+          {logBusy?t("aw_sohranyaem"):t("set_done")}
         </button>
 
         {/* Навигация между упражнениями */}
@@ -5467,10 +6664,10 @@ ${exList}
               <div style={{fontSize:18}}>📊</div>
               <div style={{flex:1}}>
                 <div style={{fontSize:11,color:C.muted,marginBottom:4,fontFamily:"monospace"}}>
-                  ПОСЛЕДНИЙ РАЗ ({lastSets[ex.id].date})
+                  {t("ui_posledniy_raz")}{lastSets[ex.id].date})
                 </div>
                 <div style={{fontSize:13,color:C.text}}>
-                  {lastSets[ex.id].sets.map((s,i)=>(s.weight>0?`${s.weight}кг×${s.reps}`:`${s.reps}повт`)).join(", ")}
+                  {lastSets[ex.id].sets.map((s,i)=>(s.weight>0?`${s.weight}${t("home_kg")}×${s.reps}`:`${s.reps}${t("u_povt")}`)).join(", ")}
                 </div>
               </div>
             </div>
@@ -5506,7 +6703,7 @@ function MyWorkoutsDetailScreen({tgId,onBack,onNav}){
   }
   useEffect(()=>{load();},[]);
   async function del(id){setDeleting(id);try{await fetch(`${API}/planned/${tgId}/${id}`,{method:"DELETE"});load();}catch{}finally{setDeleting(null);};}
-  const fmtDt=iso=>{if(!iso)return"—";const d=new Date(new Date(iso).getTime()+5*3600000);return d.toLocaleString("ru",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});};
+  const fmtDt=iso=>{if(!iso)return"—";const d=new Date(new Date(iso).getTime()+5*3600000);return d.toLocaleString(dateLocale(),{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});};
   const statusColor={scheduled:C.accent,reminded:C.warn,completed:C.success,missed:C.danger};
   if(!data)return <div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader/></div>;
   return <div style={{padding:"16px 16px 100px"}}>
@@ -5560,7 +6757,7 @@ function PlannedDetailScreen({pwId,tgId,onBack,exercises=[],muscleGroups=[],read
           setForm({title:d.title||"",date:dt.toISOString().split("T")[0],time:dt.toTimeString().slice(0,5)});
         }
       })
-      .catch(()=>setData({exercises:[],title:"Не удалось загрузить",status:"error"}));
+      .catch(()=>setData({exercises:[],title:t("failed_load"),status:"error"}));
   },[pwId]);
 
   async function save(){
@@ -5574,12 +6771,12 @@ function PlannedDetailScreen({pwId,tgId,onBack,exercises=[],muscleGroups=[],read
   }
 
   if(!data)return <div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader/></div>;
-  const dt=data.planned_datetime?new Date(new Date(data.planned_datetime).getTime()+5*3600000).toLocaleString("ru",{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}):"—";
+  const dt=data.planned_datetime?new Date(new Date(data.planned_datetime).getTime()+5*3600000).toLocaleString(dateLocale(),{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}):"—";
 
   return <div style={{padding:"16px 16px 100px"}}>
     <BackBtn onBack={onBack}/><Kicker>{t("scheduled_workout")}</Kicker>
     {!editing?<>
-      <Hero>{data.title||"Тренировка"}</Hero>
+      <Hero>{data.title||t("workout_type")}</Hero>
       <div style={{fontSize:13,color:C.accent,fontFamily:"monospace",marginTop:6,marginBottom:16}}>📅 {dt}</div>
       {!readOnly&&data?.status==="scheduled"&&<>
         <Btn accent full onClick={()=>onNav&&onNav("active_workout",{
@@ -5589,9 +6786,9 @@ function PlannedDetailScreen({pwId,tgId,onBack,exercises=[],muscleGroups=[],read
         })} style={{marginBottom:10}}>{t("start_workout")}</Btn>
         <Btn full onClick={()=>{setEditing(true);setEditExIds(data.exercises?.map(e=>e.id)||[]);setExSearch("");}} style={{marginBottom:16}}>{t("edit_date_plan")}</Btn>
       </>}
-      {(readOnly||data?.status==="completed"||data?.status==="missed")&&<Card style={{marginBottom:12,background:data?.status==="completed"?"#00CC6611":"#FF444411",border:`0.5px solid ${data?.status==="completed"?C.success:C.danger}`}}><div style={{fontSize:13,color:data?.status==="completed"?C.success:C.danger,fontFamily:"monospace"}}>{data?.status==="completed"?"✓ ВЫПОЛНЕНА":"📋 АРХИВНАЯ · "+(data.status||"missed").toUpperCase()+" · ТОЛЬКО ПРОСМОТР"}</div></Card>}
+      {(readOnly||data?.status==="completed"||data?.status==="missed")&&<Card style={{marginBottom:12,background:data?.status==="completed"?"#00CC6611":"#FF444411",border:`0.5px solid ${data?.status==="completed"?C.success:C.danger}`}}><div style={{fontSize:13,color:data?.status==="completed"?C.success:C.danger,fontFamily:"monospace"}}>{data?.status==="completed"?t("pw_vypolnena"):t("pw_arhivnaya")+" · "+(data.status||"missed").toUpperCase()+" · "+t("pw_tolko_prosmotr")}</div></Card>}
       {data.exercises?.length===0?<Card><div style={{textAlign:"center",padding:"16px 0",color:C.muted}}>{readOnly?t("exercises_none_planned"):t("exercises_none")}</div></Card>:
-      <><Kicker>УПРАЖНЕНИЯ ({data.exercises?.length})</Kicker>
+      <><Kicker>{t("pw_uprazhneniya")}{data.exercises?.length})</Kicker>
       {data.exercises?.map(ex=><Card key={ex.id} style={{marginBottom:8}}>
         <div style={{display:"flex",gap:12,alignItems:"flex-start"}}>
           <Mono color={C.accent} size={20}>{ex.order}</Mono>
@@ -5678,10 +6875,10 @@ function PlanWorkoutScreen({tgId,exercises,muscleGroups,onBack}){
         return Math.abs(planDt-pwDt)<60*60*1000; // ±1 час
       });
       if(conflict){
-        const ok=window.confirm(`На ${planDt.toLocaleString("ru",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})} уже есть тренировка "${conflict.title}". Выбрать другое время?`);
+        const ok=window.confirm(t("plan_time_taken").replace("{dt}",planDt.toLocaleString(dateLocale(),{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})).replace("{title}",conflict.title));
         if(ok){setSaving(false);return;}
       }
-      const title=form.title||selExs.slice(0,2).map(e=>e.name.split(" ")[0]).join("+")||"Тренировка";
+      const title=form.title||selExs.slice(0,2).map(e=>e.name.split(" ")[0]).join("+")||t("workout_type");
       const res=await fetch(`${API}/planned/${tgId}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({title,planned_datetime:`${form.date}T${form.time}:00`,exercise_ids:selExs.map(e=>e.id)})});
       if(res.ok)setSaved(true);
     }catch{}finally{setSaving(false);}
@@ -5714,8 +6911,8 @@ function PlanWorkoutScreen({tgId,exercises,muscleGroups,onBack}){
           );
         })}
       </div>
-      {selGroups.size>0&&<div style={{marginBottom:10,fontSize:11,color:C.accent,fontFamily:"monospace"}}>ВЫБРАНО: {(muscleGroups||[]).filter(g=>selGroups.has(g.id)).map(g=>g.emoji+g.name).join(", ")}</div>}
-      <Btn accent full onClick={()=>setStep(1)}>{selGroups.size===0?"ВСЕ УПРАЖНЕНИЯ →":`УПРАЖНЕНИЯ (${selGroups.size} групп) →`}</Btn>
+      {selGroups.size>0&&<div style={{marginBottom:10,fontSize:11,color:C.accent,fontFamily:"monospace"}}>{t("plan_vybrano")}: {(muscleGroups||[]).filter(g=>selGroups.has(g.id)).map(g=>g.emoji+tField(g,"name")).join(", ")}</div>}
+      <Btn accent full onClick={()=>setStep(1)}>{selGroups.size===0?t("all_exercises"):t("plan_ex_groups").replace("{n}",selGroups.size)}</Btn>
     </div>
   );
 
@@ -5749,7 +6946,7 @@ function PlanWorkoutScreen({tgId,exercises,muscleGroups,onBack}){
           setSelExs(prev=>prev.find(e=>e.id===viewEx.id)?prev.filter(e=>e.id!==viewEx.id):[...prev,viewEx]);
           setViewEx(null);
         }} style={{flex:2}}>
-          {selExs.find(e=>e.id===viewEx.id)?"✓ УБРАТЬ ИЗ ТРЕНИРОВКИ":"+ ДОБАВИТЬ В ТРЕНИРОВКУ"}
+          {selExs.find(e=>e.id===viewEx.id)?t("plan_ubrat_iz_trenirovki"):t("plan_dobavit_v_trenirovku")}
         </Btn>
       </div>
     </div>
@@ -5758,7 +6955,7 @@ function PlanWorkoutScreen({tgId,exercises,muscleGroups,onBack}){
   if(step===1)return <div style={{padding:"16px 16px 100px"}}>
     <BackBtn onBack={()=>setStep(0)}/><Kicker>{t("plan_s2")}</Kicker><Hero>{t("exercises_section")}</Hero>
     <input value={search} onChange={e=>setSearch(e.target.value)} placeholder={t("search_placeholder")} style={{width:"100%",background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 14px",color:C.text,fontSize:13,fontFamily:"monospace",outline:"none",boxSizing:"border-box",marginTop:12,marginBottom:12}}/>
-    {selExs.length>0&&<div style={{marginBottom:12}}><Kicker>ВЫБРАНО ({selExs.length})</Kicker><div style={{display:"flex",flexWrap:"wrap",gap:6}}>{selExs.map((e,i)=><Tag key={e.id} color={C.accent}>{i+1}. {e.name.split(" ").slice(0,2).join(" ")}</Tag>)}</div></div>}
+    {selExs.length>0&&<div style={{marginBottom:12}}><Kicker>{t("aw_vybrano")}{selExs.length})</Kicker><div style={{display:"flex",flexWrap:"wrap",gap:6}}>{selExs.map((e,i)=><Tag key={e.id} color={C.accent}>{i+1}. {e.name.split(" ").slice(0,2).join(" ")}</Tag>)}</div></div>}
     {filtered.slice(0,50).map(ex=>{const sel=selExs.find(e=>e.id===ex.id);return<ExCard key={ex.id} ex={ex} badge={getDiff(ex.difficulty)}
       onClick={()=>setViewEx(ex)}
       action={<button onClick={e=>{e.stopPropagation();toggle(ex);}} style={{flexShrink:0,width:32,height:32,borderRadius:8,background:sel?C.accent:C.card,border:`0.5px solid ${sel?C.accent:C.border}`,color:sel?C.bg:C.muted,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>{sel?`${selExs.indexOf(sel)+1}`:"+"}</button>}/>;
@@ -5770,12 +6967,12 @@ function PlanWorkoutScreen({tgId,exercises,muscleGroups,onBack}){
     <BackBtn onBack={()=>setStep(1)}/><Kicker>{t("plan_s3")}</Kicker><Hero>{t("time_label2")}</Hero>
     <div style={{height:16}}/>
     <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:16}}>
-      <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("name_opt_section")}</div><input value={form.title} onChange={e=>setForm(p=>({...p,title:e.target.value}))} placeholder={selExs.slice(0,2).map(e=>e.name.split(" ")[0]).join("+")||"Моя тренировка"} style={{background:"none",border:"none",color:C.text,fontSize:16,width:"100%",outline:"none"}}/></Card>
+      <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("name_opt_section")}</div><input value={form.title} onChange={e=>setForm(p=>({...p,title:e.target.value}))} placeholder={selExs.slice(0,2).map(e=>e.name.split(" ")[0]).join("+")||t("my_workout_name")} style={{background:"none",border:"none",color:C.text,fontSize:16,width:"100%",outline:"none"}}/></Card>
       <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("sport_date")}</div><div style={{display:"flex",alignItems:"center",gap:8}}><input id="plan-date-input" type="date" value={form.date} min={new Date().toISOString().split("T")[0]} onChange={e=>setForm(p=>({...p,date:e.target.value}))} style={{colorScheme:"dark",background:"none",border:"none",color:C.accent,fontSize:20,fontFamily:"monospace",fontWeight:700,outline:"none",flex:1,WebkitAppearance:"none",appearance:"none"}}/><span style={{fontSize:22,flexShrink:0}}>📅</span></div></Card>
       <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("time_label2")}</div><div style={{display:"flex",alignItems:"center",gap:8}}><input id="plan-time-input" type="time" value={form.time} onChange={e=>setForm(p=>({...p,time:e.target.value}))} style={{colorScheme:"dark",background:"none",border:"none",color:C.accent,fontSize:20,fontFamily:"monospace",fontWeight:700,outline:"none",flex:1,WebkitAppearance:"none",appearance:"none"}}/><span style={{fontSize:22,flexShrink:0}}>⏰</span></div></Card>
     </div>
-    <div style={{marginBottom:16}}><Kicker>УПРАЖНЕНИЯ ({selExs.length})</Kicker>{selExs.map((e,i)=><div key={e.id} style={{padding:"6px 0",borderBottom:`0.5px solid ${C.border}`,display:"flex",gap:10}}><Mono color={C.accent} size={13}>{i+1}</Mono><span style={{fontSize:13,color:C.text}}>{tField(e,"name")}</span></div>)}</div>
-    <Btn accent full onClick={save} disabled={saving||!form.date}>{saving?"СОХРАНЯЕМ...":"📅 ЗАПЛАНИРОВАТЬ"}</Btn>
+    <div style={{marginBottom:16}}><Kicker>{t("pw_uprazhneniya")}{selExs.length})</Kicker>{selExs.map((e,i)=><div key={e.id} style={{padding:"6px 0",borderBottom:`0.5px solid ${C.border}`,display:"flex",gap:10}}><Mono color={C.accent} size={13}>{i+1}</Mono><span style={{fontSize:13,color:C.text}}>{tField(e,"name")}</span></div>)}</div>
+    <Btn accent full onClick={save} disabled={saving||!form.date}>{saving?t("saving"):t("plan_zaplanirovat")}</Btn>
     <div style={{fontSize:11,color:C.muted,fontFamily:"monospace",textAlign:"center",marginTop:8}}>{t("bot_1h_full")}</div>
   </div>;
 }
@@ -5790,8 +6987,8 @@ function StandaloneTimer({onBack}){
       <div style={{height:16}}/>
       <Card>
         <div style={{fontSize:13,color:C.muted,lineHeight:1.6,marginBottom:12}}>
-          Таймер автоматически запускается после каждого подхода во время тренировки.<br/>
-          Здесь можно использовать отдельно.
+          {t("ui_taymer_avtomaticheski_zapuskae")}<br/>
+          {t("ui_zdes_mozhno_ispolzovat_otdelno")}
         </div>
       </Card>
       <div style={{marginTop:16,position:"relative"}}>
@@ -5815,7 +7012,7 @@ function WeightChart({logs}){
     const sorted = [...logs].sort((a,b)=>new Date(a.logged_at)-new Date(b.logged_at)).slice(-30);
     const labels = sorted.map(w=>{
       const d=new Date(w.logged_at);
-      return d.toLocaleDateString("ru",{day:"numeric",month:"short"});
+      return d.toLocaleDateString(dateLocale(),{day:"numeric",month:"short"});
     });
     const data = sorted.map(w=>parseFloat(w.weight)||0);
     const minW = Math.min(...data)-1;
@@ -5826,7 +7023,7 @@ function WeightChart({logs}){
       data:{
         labels,
         datasets:[{
-          label:"Вес (кг)",
+          label:t("field_weight_kg"),
           data,
           borderColor:"#C8FF00",
           backgroundColor:"rgba(200,255,0,0.08)",
@@ -5858,7 +7055,7 @@ function WeightChart({logs}){
           },
           y:{
             min:minW,max:maxW,
-            ticks:{color:"#888888",font:{size:10},callback:v=>`${v} кг`},
+            ticks:{color:"#888888",font:{size:10},callback:v=>`${v} ${t("home_kg")}`},
             grid:{color:"rgba(255,255,255,0.05)"},
           }
         }
@@ -5887,14 +7084,14 @@ function WeightChart({logs}){
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
         <Kicker>{t("weight_dynamics")}</Kicker>
         <div style={{textAlign:"right"}}>
-          <Mono size={16}>{last} кг</Mono>
+          <Mono size={16}>{last} {t("home_kg")}</Mono>
           {delta!==0&&<div style={{fontSize:11,fontFamily:"monospace",color:delta<0?C.success:C.danger,marginTop:2}}>
-            {delta>0?"+":""}{delta} кг за период
+            {delta>0?"+":""}{delta} {t("ui_kg_za_period")}
           </div>}
         </div>
       </div>
       <div style={{position:"relative",height:160}}>
-        <canvas ref={canvasRef} role="img" aria-label={`График веса: от ${first} до ${last} кг`}/>
+        <canvas ref={canvasRef} role="img" aria-label={t("prog_weight_range").replace("{a}",first).replace("{b}",`${last} ${t("home_kg")}`)}/>
       </div>
     </Card>
   );
@@ -5913,7 +7110,7 @@ function MuscleGroupChart({data,groupName,emoji}){
       </div>
       <div style={{display:"flex",gap:16,padding:"8px 0"}}>
         <div><div style={{fontSize:9,color:C.muted,fontFamily:"monospace"}}>{t("date_label")}</div><Mono size={13}>{String(d.date).slice(0,10).slice(5)}</Mono></div>
-        <div><div style={{fontSize:9,color:C.muted,fontFamily:"monospace"}}>{t("max_w")}</div><Mono size={13}>{d.max_weight}кг</Mono></div>
+        <div><div style={{fontSize:9,color:C.muted,fontFamily:"monospace"}}>{t("max_w")}</div><Mono size={13}>{d.max_weight}{t("home_kg")}</Mono></div>
         <div><div style={{fontSize:9,color:C.muted,fontFamily:"monospace"}}>{t("volume_section")}</div><Mono size={13}>{Math.round(d.volume)}</Mono></div>
         <div><div style={{fontSize:9,color:C.muted,fontFamily:"monospace"}}>{t("sets_label")}</div><Mono size={13}>{d.sets}</Mono></div>
       </div>
@@ -5938,7 +7135,7 @@ function MuscleGroupChart({data,groupName,emoji}){
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
       <Kicker>{emoji} {groupName.toUpperCase()}</Kicker>
       <div style={{fontSize:10,color:C.muted,fontFamily:"monospace"}}>
-        max {Math.round(maxW)}{t("kcal_short")||""}кг · {data.length} {t("sessions_count")}
+        max {Math.round(maxW)}{t("home_kg")} · {data.length} {t("sessions_count")}
       </div>
     </div>
     <div style={{width:"100%",overflow:"hidden"}}>
@@ -5959,8 +7156,8 @@ function MuscleGroupChart({data,groupName,emoji}){
     <div style={{display:"flex",gap:12,marginTop:8,flexWrap:"wrap"}}>
       {data.slice(-3).map((d,i)=><div key={i} style={{fontSize:10}}>
         <div style={{color:C.muted,fontFamily:"monospace"}}>{fmtDate(d.date)}</div>
-        <div style={{color:C.accent,fontWeight:600}}>max {d.max_weight}кг</div>
-        <div style={{color:C.muted}}>объём {Math.round(d.volume)}</div>
+        <div style={{color:C.accent,fontWeight:600}}>max {d.max_weight}{t("home_kg")}</div>
+        <div style={{color:C.muted}}>{t("mgc_obem")} {Math.round(d.volume)}</div>
       </div>)}
     </div>
   </Card>;
@@ -5968,13 +7165,20 @@ function MuscleGroupChart({data,groupName,emoji}){
 
 // Короткое название вида спорта для недельной полосы. Коды приходят с бэкенда,
 // полный справочник грузить ради одной подписи незачем.
-const SPORT_SHORT={padel:"падел",football:"футбол",basketball:"баскет",volleyball:"волей",
-  tennis:"теннис",table_tennis:"н.теннис",badminton:"бадм.",handball:"гандбол",
-  boxing:"бокс",mma:"MMA",swimming:"плав.",cycling:"вело",running:"бег",
-  crossfit:"кроссфит",yoga:"йога",pilates:"пилатес",skiing:"лыжи",climbing:"скалолаз."};
+// Храним КЛЮЧИ, а не переводы: карта вычисляется при загрузке модуля, когда
+// язык ещё не известен. Если положить сюда t(), подпись застынет на начальном
+// языке — человек переключил бы язык, весь интерфейс сменился, а недельная
+// полоса видов спорта осталась бы на прежнем до перезапуска приложения.
+const SPORT_SHORT_KEYS={padel:"sps_padel",football:"sps_futbol",basketball:"sps_basket",volleyball:"sps_voley",
+  tennis:"sps_tennis",table_tennis:"sps_n_tennis",badminton:"sps_badm",handball:"sps_gandbol",
+  boxing:"sps_boks",swimming:"sps_plav",cycling:"sps_velo",running:"sps_beg",
+  crossfit:"sps_krossfit",yoga:"sps_yoga",pilates:"sps_pilates",skiing:"sps_lyzhi",climbing:"sps_skalolaz"};
+const SPORT_SHORT_RAW={mma:"MMA"};   // одинаково на всех языках, ключ не нужен
 function sportLabel(code){
   if(!code)return null;
-  return SPORT_SHORT[code]||String(code).slice(0,8);
+  const k=SPORT_SHORT_KEYS[code];
+  if(k) return t(k);
+  return SPORT_SHORT_RAW[code]||String(code).slice(0,8);
 }
 
 function ProgressScreen({stats,tgId,onNav}){
@@ -6006,7 +7210,7 @@ function ProgressScreen({stats,tgId,onNav}){
       .then(r=>r.json()).then(setNorms).catch(()=>{});
   },[tgId]);
 
-  if(!stats)return <div style={{padding:"16px 16px 100px"}}><Loader text="ПРОГРЕСС"/></div>;
+  if(!stats)return <div style={{padding:"16px 16px 100px"}}><Loader text={t("progress_label")}/></div>;
   const weekly=stats.weekly_workouts||[];const peak=Math.max(...weekly,1);
   const blocks=" ▁▂▃▄▅▆▇█";const spark=weekly.map(v=>blocks[Math.min(8,Math.round(8*v/peak))]).join("");
 
@@ -6014,16 +7218,16 @@ function ProgressScreen({stats,tgId,onNav}){
   const selectedGroup=activeGroup&&muscleData?.by_group?.[activeGroup];
 
   return <div style={{padding:"16px 16px 100px"}}>
-    <Kicker>{stats.period_days||30} ДНЕЙ</Kicker><Hero>{t("progress_title2")}</Hero>
+    <Kicker>{stats.period_days||30} {t("streak_days5")}</Kicker><Hero>{t("progress_title2")}</Hero>
     <div style={{height:16}}/>
 
     {/* Основные метрики */}
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:16}}>
       {[
-        {l:"ТРЕНИРОВОК",v:stats.total_workouts||0},
+        {l:t("prog_trenirovok"),v:stats.total_workouts||0},
         {l:t("sets_label"),v:stats.total_sets||0},
-        {l:t("tonnage_label2"),v:`${Math.round((stats.total_volume||0)/1000*10)/10} т`},
-        {l:"СЕРИЯ",v:`${stats.streak_days||0} дн`}
+        {l:t("tonnage_label2"),v:`${Math.round((stats.total_volume||0)/1000*10)/10} ${t("u_t")}`},
+        {l:t("prog_seriya"),v:`${stats.streak_days||0} ${t("u_dn")}`}
       ].map((s,i)=><Card key={i}>
         <div style={{fontSize:10,color:C.muted,fontFamily:"monospace",marginBottom:4}}>{tSport(s)||s.l}</div>
         <Mono>{s.v}</Mono>
@@ -6041,7 +7245,7 @@ function ProgressScreen({stats,tgId,onNav}){
       </div>
       <div style={{display:"flex",gap:5}}>
         {(week.days||[]).map((d,i)=>{
-          const wd=["пн","вт","ср","чт","пт","сб","вс"][i]||"";
+          const wd=[t("prog_pn"),t("prog_vt"),t("prog_sr"),t("prog_cht"),t("prog_pt"),t("prog_sb"),t("prog_vs")][i]||"";
           const bg=d.gym?C.accent:C.card;
           const bd=d.gym?C.accent:d.sport?C.accent:C.border;
           const col=d.gym?C.bg:d.sport?C.accent:C.muted;
@@ -6078,7 +7282,7 @@ function ProgressScreen({stats,tgId,onNav}){
       </select>
     </div>
 
-    {!muscleData?<Loader text="ЗАГРУЗКА"/>:groups.length===0?
+    {!muscleData?<Loader text={t("loading")}/>:groups.length===0?
       <Card style={{marginBottom:16}}><div style={{color:C.muted,fontSize:13,textAlign:"center",padding:"12px 0"}}>{t("no_data_period")}</div></Card>:
       <>
         {/* Кнопки групп мышц */}
@@ -6087,7 +7291,7 @@ function ProgressScreen({stats,tgId,onNav}){
             style={{padding:"6px 12px",borderRadius:20,fontSize:11,cursor:"pointer",
               background:!activeGroup?C.accent:C.card,
               border:`0.5px solid ${!activeGroup?C.accent:C.border}`,
-              color:!activeGroup?C.bg:C.muted,fontFamily:"monospace"}}>ВСЕ</button>
+              color:!activeGroup?C.bg:C.muted,fontFamily:"monospace"}}>{t("all_btn")}</button>
           {groups.map(([name,g])=><button key={name} onClick={()=>setActiveGroup(activeGroup===name?null:name)}
             style={{padding:"6px 12px",borderRadius:20,fontSize:11,cursor:"pointer",
               background:activeGroup===name?C.accent:C.card,
@@ -6120,7 +7324,7 @@ function ProgressScreen({stats,tgId,onNav}){
       </button>
       {showNorms&&<div style={{marginTop:12,paddingTop:12,borderTop:`0.5px solid ${C.border}`}}>
         <div style={{fontSize:11,color:C.muted,marginBottom:10,fontFamily:"monospace"}}>
-          {t("age_label")} {norms.age}{t("age_suffix")||"л"} · {norms.bodyweight}{t("kcal_short")||""}кг · {t("coef_label")||"коэф."} {norms.age_correction}
+          {t("age_label")} {norms.age}{t("age_suffix")} · {norms.bodyweight}{t("home_kg")} · {t("coef_label")} {norms.age_correction}
         </div>
         {norms.norms.map((n,i)=>{
           const levelColor={below_beginner:C.danger,beginner:C.warn,intermediate:C.accent,advanced:C.success,elite:"#00FFFF"}[n.your_level]||C.muted;
@@ -6131,17 +7335,17 @@ function ProgressScreen({stats,tgId,onNav}){
               <span style={{fontSize:13,color:C.text,fontWeight:500}}>{n.exercise}</span>
               <div style={{textAlign:"right"}}>
                 {n.your_max
-                  ?<><Mono size={13}>{n.your_max}{n.unit||"кг"}</Mono><span style={{fontSize:11,color:levelColor,marginLeft:6}}>{levelLabel}</span></>
+                  ?<><Mono size={13}>{n.your_max}{n.unit||t("home_kg")}</Mono><span style={{fontSize:11,color:levelColor,marginLeft:6}}>{levelLabel}</span></>
                   :<span style={{fontSize:11,color:C.muted}}>{t("no_data_short")}</span>
                 }
               </div>
             </div>
             <ProgressBar pct={pct} color={levelColor}/>
             <div style={{display:"flex",justifyContent:"space-between",marginTop:4,fontSize:10,color:C.muted,fontFamily:"monospace"}}>
-              <span>{t("norm_beg")}: {n.levels.beginner}{n.unit||"кг"}</span>
-              <span>{t("norm_mid")}: {n.levels.intermediate}{n.unit||"кг"}</span>
-              <span>{t("norm_adv")}: {n.levels.advanced}{n.unit||"кг"}</span>
-              <span>{t("norm_elite")}: {n.levels.elite}{n.unit||"кг"}</span>
+              <span>{t("norm_beg")}: {n.levels.beginner}{n.unit||t("home_kg")}</span>
+              <span>{t("norm_mid")}: {n.levels.intermediate}{n.unit||t("home_kg")}</span>
+              <span>{t("norm_adv")}: {n.levels.advanced}{n.unit||t("home_kg")}</span>
+              <span>{t("norm_elite")}: {n.levels.elite}{n.unit||t("home_kg")}</span>
             </div>
           </div>;
         })}
@@ -6268,7 +7472,7 @@ function CatalogScreen({exercises,muscleGroups,onNav}){
     </div>}
     <input value={search} onChange={e=>setSearch(e.target.value)} placeholder={t("search_placeholder")} style={{width:"100%",background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 14px",color:C.text,fontSize:13,fontFamily:"monospace",letterSpacing:1,boxSizing:"border-box",marginBottom:12,outline:"none"}}/>
     <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:8,marginBottom:12}}>
-      <button onClick={()=>setActiveGroup(null)} style={{flexShrink:0,padding:"6px 12px",borderRadius:20,background:!activeGroup?C.accent:C.card,color:!activeGroup?C.bg:C.muted,border:`0.5px solid ${!activeGroup?C.accent:C.border}`,fontSize:11,fontFamily:"monospace",cursor:"pointer",fontWeight:700}}>ВСЕ</button>
+      <button onClick={()=>setActiveGroup(null)} style={{flexShrink:0,padding:"6px 12px",borderRadius:20,background:!activeGroup?C.accent:C.card,color:!activeGroup?C.bg:C.muted,border:`0.5px solid ${!activeGroup?C.accent:C.border}`,fontSize:11,fontFamily:"monospace",cursor:"pointer",fontWeight:700}}>{t("all_btn")}</button>
       {muscleGroups?.map(g=><button key={g.id} onClick={()=>setActiveGroup(g.id===activeGroup?null:g.id)} style={{flexShrink:0,padding:"6px 12px",borderRadius:20,background:activeGroup===g.id?C.accent:C.card,color:activeGroup===g.id?C.bg:C.muted,border:`0.5px solid ${activeGroup===g.id?C.accent:C.border}`,fontSize:11,fontFamily:"monospace",cursor:"pointer",display:"inline-flex",alignItems:"center",gap:5}}>{g.icon_url?<img src={g.icon_url} alt="" style={{width:16,height:16,objectFit:"cover",borderRadius:3}}/>:g.emoji} {(tField(g,"name")).toUpperCase()}</button>)}
     </div>
     <div style={{fontSize:10,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{filtered.length}  {t("exercises_label")}</div>
@@ -6318,7 +7522,7 @@ function VoiceRecorder({tgId,onTranscribed,disabled=false}){
       timerRef.current=setInterval(()=>setSeconds(s=>s+1),1000);
     }catch(e){
       console.error("[Voice] startRec error:",e);
-      setError(e.name==="NotAllowedError"?t("no_mic"):e.message||"Ошибка");
+      setError(e.name==="NotAllowedError"?t("no_mic"):e.message||t("voice_oshibka"));
     }
   }
 
@@ -6342,8 +7546,8 @@ function VoiceRecorder({tgId,onTranscribed,disabled=false}){
         body:blob,
       });
       if(!res.ok){
-        const e=await res.json().catch(()=>({detail:"Ошибка сервера"}));
-        throw new Error(e.detail||"Ошибка");
+        const e=await res.json().catch(()=>({detail:t("error_server")}));
+        throw new Error(e.detail||t("voice_oshibka"));
       }
       const d=await res.json();
       if(!d.text)throw new Error(t("speech_not_recognized"));
@@ -6450,11 +7654,11 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
     return()=>{alive=false;};
   },[tgId,sessionId]);
   const requestsLeft=5-(user?.ai_requests_today||0);
-  const suggs=["Составь план тренировки на неделю под набор массы","Что есть до и после тренировки","Программа для похудения на месяц","Тренировка на плечи и руки"];
+  const suggs=[t("ai_sostav_plan_trenirovki_na"),t("ai_chto_est_do_i"),t("ai_programma_dlya_pohudeniya_na"),t("ai_trenirovka_na_plechi_i")];
 
   async function ask(question){
     if(!question.trim()||loading)return;
-    const userMsg={role:"user",content:question,time:new Date().toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"})};
+    const userMsg={role:"user",content:question,time:new Date().toLocaleTimeString(dateLocale(),{hour:"2-digit",minute:"2-digit"})};
     setChatHistory(prev=>[...prev,userMsg]);
     // workoutPlan НЕ сбрасываем: уточнение к уже предложенной тренировке стирало план,
     // и кнопка сохранения исчезала насовсем. Новый план заменит старый сам.
@@ -6464,17 +7668,59 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
       // и про еду. Запрос считается тренировочным, если он про тренировку по словам,
       // ИЛИ если план уже предложен — тогда это уточнение к нему, и состав с кнопкой
       // сохранения терять нельзя (раньше ровно это и происходило).
+      // Узбекские и казахские корни добавлены 05.10.2026. До этого список был
+      // только русско-английским, поэтому вопрос, заданный по-узбекски, никогда
+      // не попадал в режим плана: тренер отвечал текстом, без состава упражнений
+      // и без кнопки сохранения.
       const PLAN_WORDS=["тренировк","программ","сплит","упражнен","жим","присед","тяг",
-        "ноги","спину","груд","плеч","бицепс","трицепс","workout","program","split","exercise"];
+        "ноги","спину","груд","плеч","бицепс","трицепс","workout","program","split","exercise",
+        "train","trening","mashq","жаттығ","dastur","бағдарлам","tricep","triseps",
+        "squat","скват","bicep","biseps","orqa","арқа","leg","oyoq","аяқ","chest","ko‘krak",
+        "кеуде","shoulder","yelka","иық","press","push","bosish","jim","итеру","pull","row",
+        "tortish","tyaga","тарту","тяга"];
       // Про еду, добавки и сон спрашивают теми же словами («что есть до тренировки») —
       // такие вопросы в режим плана не уводим, иначе тренер обязан будет выдать состав
       // упражнений там, где его не просили.
       const FOOD_WORDS=["есть","еда","пита","калори","белк","протеин","углевод","жиры",
         "добавк","креатин","витамин","вода","пить","сон","спать","диет","меню",
-        "eat","food","nutrition","calor","protein","diet","sleep","supplement"];
-      const ql=question.toLowerCase();
-      const looksLikePlan=PLAN_WORDS.some(w=>ql.includes(w));
-      const looksLikeFood=FOOD_WORDS.some(w=>ql.includes(w));
+        "eat","food","nutrition","calor","protein","diet","sleep","supplement",
+        "oqsil","ақуыз","carb","uglevod","көмірсу","creatin","kreatin","kalori",
+        "qo‘shimcha","қоспа","uxla","uyqu","ұйық","ұйқы","ovqat","тамақ","nutrit",
+        "ovqatlan","тамақтан","fat","yog‘","май","water","suv","drink","ichim","ichis",
+        "diyet","menu","menyu","мәзір","meal","taom","тағам",
+        // Удлинённые до трёх символов корни «есть»: «ye» и «же» сами по себе
+        // слишком коротки. «yey» покрывает yeyish/yeyman и не задевает «yelka»,
+        // «жеу» — казахское «жеу керек». Без них вопрос «treningdan oldin nima
+        // yeyish kerak» попадал в режим плана из-за слова «trening».
+        "yey","жеу"];
+      // Два способа поиска, и это не придирка.
+      //
+      // Корни от четырёх символов ищем ПОДСТРОКОЙ, как было раньше. Русский
+      // язык приставочный: «есть» должно поймать «поесть», «съесть», «наесться»,
+      // а «пить» — «выпить» и «попить». Если требовать начало слова, вопрос
+      // «что поесть после тренировки» перестаёт быть вопросом про еду и уезжает
+      // в режим плана из-за слова «тренировк». Именно это я тут и сломал,
+      // когда переходил на поиск по началу слова для всех корней подряд.
+      //
+      // Трёхсимвольные корни ищем в НАЧАЛЕ слова: подстрокой они дают слишком
+      // много ложных попаданий. Короче трёх символов не берём вовсе («ye»,
+      // «су», «іш») — узбекское «ye» лежит внутри «yelka» (плечо), и вопрос
+      // «yelka uchun trening» уехал бы в режим еды при любом способе поиска.
+      //
+      // Апострофы приводим к одному виду: в словах вроде «yog‘», «qo‘shimcha»
+      // у нас стоит типографский U+2018, а телефонная клавиатура даёт обычный
+      // апостроф или U+2019. Без приведения такие корни не срабатывали никогда.
+      const normApos=(s)=>s.replace(/[‘’ʻʼ`´']/g,"'");
+      const ql=normApos(question.toLowerCase());
+      const hasStem=(w0)=>{
+        const w=normApos(w0);
+        if(w.length<3) return false;
+        if(w.length>=4) return ql.includes(w);
+        try{ return new RegExp(`(?:^|[^\\p{L}\\p{N}])${w.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}`,"u").test(ql); }
+        catch{ return ql.includes(w); }   // движок без поддержки \p{...}
+      };
+      const looksLikePlan=PLAN_WORDS.some(hasStem);
+      const looksLikeFood=FOOD_WORDS.some(hasStem);
       const mode=looksLikeFood?"chat":((looksLikePlan||workoutPlan)?"plan":"chat");
       const body=JSON.stringify({question,tg_id:tgId,session_id:sessionId,mode});
 
@@ -6526,7 +7772,7 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
           const aiAnswer=streamed||t("no_answer");
           setAnswer(aiAnswer);
           setChatHistory(prev=>[...prev,{role:"assistant",content:aiAnswer,
-            time:new Date().toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"})}]);
+            time:new Date().toLocaleTimeString(dateLocale(),{hour:"2-digit",minute:"2-digit"})}]);
           return;
         }
         // Ничего не отдали — спокойно повторяем обычным запросом
@@ -6536,14 +7782,14 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
         if(res.status===451){setAiBlocked(true);return;}
         if(!res.ok){
           const err=await res.text().catch(()=>"");
-          setAnswer(`Ошибка сервера (${res.status})${err?" — "+err.slice(0,100):""}. Попробуй позже.`);
+          setAnswer(t("err_server_retry").replace("{code}",res.status+(err?" — "+err.slice(0,100):"")));
           return;
         }
         applyAnswer(await res.json());
       }
     }catch(e){
       setStreamText("");
-      const errMsg="Ошибка соединения — "+e.message;
+      const errMsg=t("ai_oshibka_soedineniya")+" "+e.message;
       setAnswer(errMsg);
       setChatHistory(prev=>[...prev,{role:"assistant",content:errMsg,time:""}]);
     }
@@ -6559,7 +7805,7 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
       try{localStorage.setItem("gymbot_ai_plan",JSON.stringify({sessionId,plan:d.workout_plan}));}catch{}
     }
     setChatHistory(prev=>[...prev,{role:"assistant",content:aiAnswer,
-      time:new Date().toLocaleTimeString("ru",{hour:"2-digit",minute:"2-digit"})}]);
+      time:new Date().toLocaleTimeString(dateLocale(),{hour:"2-digit",minute:"2-digit"})}]);
     // Попросил сохранить словами в чате — открываем выбор даты сами.
     // Сохранять модель не умеет, раньше она просто отвечала «сохранил», и человек
     // не находил тренировку в запланированных.
@@ -6612,7 +7858,7 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
       // Сохраняем в запланированные — выбранная дата и время
       const dt=`${planDate}T${planTime}`;
       const res=await fetch(`${API}/planned/${tgId}`,{method:"POST",headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({title:workoutPlan.title||"AI тренировка",planned_datetime:dt,
+        body:JSON.stringify({title:workoutPlan.title||t("ai_ai_trenirovka"),planned_datetime:dt,
           exercise_ids:exIds,
           exercise_names:workoutPlan.exercises||[],
           exercise_tips:workoutPlan.tips||null,
@@ -6635,7 +7881,7 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
         <Kicker>{t("ai_chat_title")}</Kicker>
         <button onClick={clearHistory} style={{background:"none",border:`0.5px solid ${C.border}`,borderRadius:6,padding:"3px 10px",color:C.muted,fontSize:11,cursor:"pointer",fontFamily:"monospace"}}>
-          🗑 ОЧИСТИТЬ
+          {t("ai_clear")}
         </button>
       </div>
       {aiBlocked&&<Card style={{marginBottom:10,border:`0.5px solid ${C.danger}`}} pad="14px 16px">
@@ -6703,7 +7949,7 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
               el.style.height=Math.min(el.scrollHeight,120)+"px";
             }}
             onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();ask(q);if(qTaRef.current){qTaRef.current.style.height="auto";}}}}
-            placeholder="СПРОСИ ЧТО УГОДНО..." style={{flex:1,background:"none",border:"none",padding:"10px 14px",color:C.text,fontSize:13,fontFamily:"monospace",outline:"none",resize:"none",maxHeight:120,lineHeight:1.4,fontFamily:"monospace"}}/>
+            placeholder={t("ai_sprosi_chto_ugodno")} style={{flex:1,background:"none",border:"none",padding:"10px 14px",color:C.text,fontSize:13,fontFamily:"monospace",outline:"none",resize:"none",maxHeight:120,lineHeight:1.4,fontFamily:"monospace"}}/>
           <button onClick={()=>{ask(q);if(qTaRef.current){qTaRef.current.style.height="auto";}}} disabled={loading||!q.trim()}
             style={{background:C.accent,border:"none",borderRadius:"0 8px 8px 0",padding:"10px 16px",color:C.bg,fontWeight:700,fontSize:14,cursor:"pointer",opacity:loading||!q.trim()?0.5:1,alignSelf:"stretch"}}>→</button>
         </div>
@@ -6717,7 +7963,7 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
         <div style={{fontSize:12,color:C.accent,fontFamily:"monospace",marginBottom:6}}>{t("ai_proposes")}</div>
         <div style={{fontSize:14,fontWeight:600,color:C.text,marginBottom:4}}>{workoutPlan.title}</div>
         {workoutPlan.exercises?.length>0&&(
-          <div style={{fontSize:12,color:C.muted,marginBottom:6}}>{workoutPlan.exercises.slice(0,5).join(", ")}{workoutPlan.exercises.length>5?` +${workoutPlan.exercises.length-5} ещё`:""}</div>
+          <div style={{fontSize:12,color:C.muted,marginBottom:6}}>{workoutPlan.exercises.slice(0,5).join(", ")}{workoutPlan.exercises.length>5?` ${t("ai_plan_more").replace("{n}",workoutPlan.exercises.length-5)}`:""}</div>
         )}
         {workoutPlan.exercises?.length>0&&exercises?.length>0&&(()=>{
           const matched=workoutPlan.exercises.filter(name=>{
@@ -6726,19 +7972,19 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
           });
           return matched.length<workoutPlan.exercises.length?(
             <div style={{fontSize:11,color:C.warn,fontFamily:"monospace",marginBottom:6}}>
-              ⚠ Найдено в каталоге: {matched.length}/{workoutPlan.exercises.length}
+              {t("ui_naydeno_v_kataloge")} {matched.length}/{workoutPlan.exercises.length}
             </div>
           ):null;
         })()}
         <Btn accent full onClick={saveWorkoutPlan} disabled={saving}>
-          {saving?"СОХРАНЯЕМ...":"📅 СОХРАНИТЬ В РАСПИСАНИЕ"}
+          {saving?t("saving"):t("ai_save_plan")}
         </Btn>
         <div style={{fontSize:11,color:C.muted,fontFamily:"monospace",textAlign:"center",marginTop:6}}>{t("ai_date_hint")}</div>
       </div>
     )}
     {saved&&<div style={{marginBottom:12,background:"#00CC6622",border:`0.5px solid ${C.success}`,borderRadius:10,padding:"10px 14px",fontSize:12,color:C.success,fontFamily:"monospace"}}>{t("workout_saved_tab")}</div>}
     {saved&&<button onClick={()=>onNav&&onNav("my_workouts")} style={{width:"100%",marginBottom:12,background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"8px 16px",color:C.text,fontSize:12,fontFamily:"monospace",cursor:"pointer"}}>
-      ОТКРЫТЬ РАСПИСАНИЕ →
+      {t("open_schedule")}
     </button>}
     {showDatePicker&&(
       <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.7)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
@@ -6878,7 +8124,7 @@ function FoodVisionScreen({tgId,onBack,mealType}){
         body:JSON.stringify({image_base64:photo,tg_id:tgId,save:false})});
       if(!res.ok)throw new Error(res.status);
       setResult(await res.json());
-    }catch{setError("Не удалось распознать. Попробуй другое фото.");}
+    }catch{setError(t("failed_recognize"));}
     finally{setLoading(false);}
   }
 
@@ -6890,7 +8136,7 @@ function FoodVisionScreen({tgId,onBack,mealType}){
       // а не заново анализируем фото — иначе правка потеряется при сохранении.
       const res=await fetch(`${API}/nutrition/${tgId}`,{method:"POST",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({meal_name:result.dish_name||"Блюдо",kcal:Number(result.calories)||0,
+        body:JSON.stringify({meal_name:result.dish_name||t("fv_blyudo"),kcal:Number(result.calories)||0,
           protein:Number(result.protein_g)||0,fat:Number(result.fat_g)||0,carb:Number(result.carbs_g)||0,
           meal_type:mealType||null})});
       if(!res.ok){
@@ -6900,7 +8146,7 @@ function FoodVisionScreen({tgId,onBack,mealType}){
       }
       setSaved(true);
     }catch(e){
-      setError(`Не удалось сохранить: ${e.message||"неизвестная ошибка"}`);
+      setError(t("err_save_failed").replace("{err}",e.message||t("fv_neizvestnaya_oshibka")));
     }finally{setLoading(false);}
   }
 
@@ -6915,12 +8161,12 @@ function FoodVisionScreen({tgId,onBack,mealType}){
       const newResult=await res.json();
       setResult(newResult);
       setEditing(false);setEditText("");
-    }catch{setError("Не удалось пересчитать. Попробуй описать иначе.");}
+    }catch{setError(t("fv_ne_udalos_pereschitat_poprob"));}
     finally{setRecalculating(false);}
   }
 
   const confColor={"high":C.success,"medium":C.warn,"low":C.danger};
-  const confLabel={"high":"✅ Высокая","medium":"⚠️ Средняя","low":"❓ Низкая"};
+  const confLabel={"high":t("fv_vysokaya"),"medium":t("fv_srednyaya"),"low":t("fv_nizkaya")};
 
   return(
     <div style={{padding:"16px 16px 100px"}}>
@@ -6933,7 +8179,7 @@ function FoodVisionScreen({tgId,onBack,mealType}){
       {cropping?(
         <div style={{marginBottom:16}}>
           <div style={{fontSize:12,color:C.muted,marginBottom:8,textAlign:"center"}}>
-            Перемещай и увеличивай, чтобы блюдо поместилось целиком
+            {t("ui_peremeschay_i_uvelichivay_chto")}
           </div>
           <div style={{display:"flex",justifyContent:"center",marginBottom:12}}>
             <canvas ref={canvasRef} width={CROP_SIZE} height={CROP_SIZE}
@@ -6948,8 +8194,8 @@ function FoodVisionScreen({tgId,onBack,mealType}){
               style={{flex:1,accentColor:C.accent}}/>
           </div>
           <div style={{display:"flex",gap:8}}>
-            <Btn full onClick={()=>{setCropping(false);if(!preview){setRawFile(null);}}} style={{flex:1}}>Отмена</Btn>
-            <Btn accent full onClick={confirmCrop} style={{flex:2}}>✅ ГОТОВО</Btn>
+            <Btn full onClick={()=>{setCropping(false);if(!preview){setRawFile(null);}}} style={{flex:1}}>{t("fv_otmena")}</Btn>
+            <Btn accent full onClick={confirmCrop} style={{flex:2}}>{t("fv_gotovo")}</Btn>
           </div>
         </div>
       ):!preview?(
@@ -6966,7 +8212,7 @@ function FoodVisionScreen({tgId,onBack,mealType}){
             <Btn full onClick={()=>inputRef.current?.click()} style={{flex:1}}>{t("other_photo2")}</Btn>
             {!result&&!loading&&<Btn accent full onClick={analyze} style={{flex:2}}>{t("analyze_btn2")}</Btn>}
           </div>
-          {!result&&!loading&&<Btn full onClick={recropCurrentPhoto}>🔄 Перекадрировать</Btn>}
+          {!result&&!loading&&<Btn full onClick={recropCurrentPhoto}>{t("fv_perekadrirovat")}</Btn>}
         </div>
       )}
       {loading&&<Card><div style={{textAlign:"center",padding:"16px 0",color:C.accent,fontFamily:"monospace",fontSize:12,letterSpacing:2}}>{t("analyzing_photo2")}</div></Card>}
@@ -6975,7 +8221,7 @@ function FoodVisionScreen({tgId,onBack,mealType}){
           <div style={{color:C.danger,fontSize:13,textAlign:"center",padding:"8px 0",marginBottom:result?8:0}}>{error}</div>
           {result&&!saved&&(
             <Btn accent full onClick={saveToLog} disabled={loading}>
-              {loading?"ПОВТОРЯЕМ...":"🔄 ПОВТОРИТЬ СОХРАНЕНИЕ"}
+              {loading?t("fv_povtoryaem"):t("fv_povtorit_sohranenie")}
             </Btn>
           )}
         </Card>
@@ -6986,7 +8232,7 @@ function FoodVisionScreen({tgId,onBack,mealType}){
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:12}}>
               <div>
                 <div style={{fontSize:16,fontWeight:700,color:C.text}}>{result.dish_name}</div>
-                <div style={{fontSize:12,color:C.muted,marginTop:2}}>~{result.weight_g} г</div>
+                <div style={{fontSize:12,color:C.muted,marginTop:2}}>~{result.weight_g} {t("u_g")}</div>
               </div>
               <div style={{textAlign:"right"}}>
                 <div style={{fontSize:24,fontWeight:700,color:C.accent}}>{result.calories}</div>
@@ -6994,31 +8240,31 @@ function FoodVisionScreen({tgId,onBack,mealType}){
               </div>
             </div>
             <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:10}}>
-              {[{l:"БЕЛКИ",v:result.protein_g},{l:"ЖИРЫ",v:result.fat_g},{l:"УГЛЕВОДЫ",v:result.carbs_g}].map((m,i)=>(
+              {[{l:t("proteins_label"),v:result.protein_g},{l:t("fats_label"),v:result.fat_g},{l:t("carbs_label"),v:result.carbs_g}].map((m,i)=>(
                 <div key={i} style={{textAlign:"center",background:C.bg,borderRadius:8,padding:"8px 4px"}}>
                   <div style={{fontSize:9,color:C.muted,fontFamily:"monospace"}}>{m.l}</div>
-                  <Mono size={15}>{m.v} г</Mono>
+                  <Mono size={15}>{m.v} {t("u_g")}</Mono>
                 </div>
               ))}
             </div>
             <div style={{fontSize:11,color:confColor[result.confidence]||C.muted,fontFamily:"monospace"}}>
-              ТОЧНОСТЬ: {confLabel[result.confidence]||result.confidence}
+              {t("ui_tochnost")} {confLabel[result.confidence]||result.confidence}
             </div>
             {result.note&&<div style={{fontSize:12,color:C.muted,marginTop:6}}>{result.note}</div>}
           </Card>
           {editing&&(
             <Card style={{marginBottom:12}}>
               <div style={{fontSize:12,color:C.muted,marginBottom:8}}>
-                Напиши правильное название или состав блюда. КБЖУ пересчитается автоматически.
+                {t("ui_napishi_pravilnoe_nazvanie_ili")}
               </div>
               <input value={editText} onChange={e=>setEditText(e.target.value)}
-                placeholder="Например: Рисовая каша с молоком и мёдом, 300г"
+                placeholder={t("fv_naprimer_risovaya_kasha_s")}
                 style={{width:"100%",background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,
                   padding:"10px 12px",color:C.text,fontSize:13,outline:"none",marginBottom:10}}/>
               <div style={{display:"flex",gap:8}}>
-                <Btn full onClick={()=>{setEditing(false);setEditText("");}} style={{flex:1}}>Отмена</Btn>
+                <Btn full onClick={()=>{setEditing(false);setEditText("");}} style={{flex:1}}>{t("fv_otmena")}</Btn>
                 <Btn accent full onClick={recalcNutrition} disabled={recalculating||!editText.trim()} style={{flex:2}}>
-                  {recalculating?"ПЕРЕСЧИТЫВАЕМ...":"🔄 ПЕРЕСЧИТАТЬ"}
+                  {recalculating?t("fv_pereschityvaem"):t("fv_pereschitat")}
                 </Btn>
               </div>
             </Card>
@@ -7026,17 +8272,17 @@ function FoodVisionScreen({tgId,onBack,mealType}){
           {saved?(
             <div style={{background:"#00CC6622",border:`0.5px solid ${C.success}`,borderRadius:10,
               padding:"12px",fontSize:13,color:C.success,fontFamily:"monospace",textAlign:"center"}}>
-              ✓ СОХРАНЕНО В ДНЕВНИК ПИТАНИЯ
+              {t("saved_to_diary")}
             </div>
           ):!editing&&(
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
               <div style={{display:"flex",gap:8}}>
                 <Btn full onClick={()=>{setResult(null);setPreview(null);setPhoto(null);}} style={{flex:1}}>{t("new_photo")}</Btn>
                 <Btn accent full onClick={saveToLog} disabled={loading} style={{flex:2}}>
-                  {loading?"СОХРАНЯЕМ...":"💾 В ДНЕВНИК"}
+                  {loading?t("saving"):t("add_to_diary2")}
                 </Btn>
               </div>
-              <Btn full onClick={()=>{setEditing(true);setEditText("");}}>✏️ ИСПРАВИТЬ</Btn>
+              <Btn full onClick={()=>{setEditing(true);setEditText("");}}>{t("fv_ispravit")}</Btn>
             </div>
           )}
         </Fragment>
@@ -7090,7 +8336,7 @@ function NutritionScreen({tgId,onBack,onNav}){
       // план питания») включало схему тренировочного плана и портило ответ.
       const res=await fetch(`${API}/ai/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({tg_id:tgId,question,mode:"chat"})});
       const d=await res.json();
-      if(res.status===429){setAiAnswer("⚠️ Лимит AI запросов на сегодня исчерпан");}
+      if(res.status===429){setAiAnswer(t("nut_limit_ai_zaprosov_na"));}
       else{setAiAnswer(d.answer||t("no_answer"));}
     }catch{setAiAnswer(t("error_request"));}
     finally{setAiLoading(false);}
@@ -7120,18 +8366,18 @@ function NutritionScreen({tgId,onBack,onNav}){
       const r=await res.json();
       const putRes=await fetch(`${API}/nutrition/${tgId}/${logId}`,{method:"PUT",
         headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({meal_name:r.dish_name||"Блюдо",kcal:Number(r.calories)||0,
+        body:JSON.stringify({meal_name:r.dish_name||t("fv_blyudo"),kcal:Number(r.calories)||0,
           protein:Number(r.protein_g)||0,fat:Number(r.fat_g)||0,carb:Number(r.carbs_g)||0})});
       if(!putRes.ok)throw new Error(`update HTTP ${putRes.status}`);
       setEditingLog(null);setEditLogText("");setData(null);load();
-    }catch(e){alert(`Не удалось сохранить: ${e.message||"ошибка"}`);}
+    }catch(e){alert(t("err_save_failed").replace("{err}",e.message||t("nut_oshibka")));}
     finally{setEditLogBusy(false);}
   }
 
   async function setWater(g){setGlasses(g);try{await fetch(`${API}/nutrition/${tgId}/water`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({glasses:g})});}catch{}}
 
   if(error)return<div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Card><div style={{color:C.danger,fontSize:13}}>{error}</div></Card></div>;
-  if(!data)return<div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader text="ПИТАНИЕ"/></div>;
+  if(!data)return<div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader text={t("nut_pitanie")}/></div>;
 
   const pct=Math.min(100,Math.round(((totals.kcal||0)/Math.max(data.target_kcal||2000,1))*100));
 
@@ -7140,25 +8386,25 @@ function NutritionScreen({tgId,onBack,onNav}){
 
     <div style={{display:"flex",alignItems:"center",gap:8,marginTop:8,marginBottom:16}}>
       <button onClick={()=>{const d=new Date(viewDate);d.setDate(d.getDate()-1);setViewDate(d.toISOString().split("T")[0]);}} style={{background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"6px 14px",color:C.text,cursor:"pointer",fontSize:16}}>‹</button>
-      <div style={{flex:1,textAlign:"center",fontFamily:"monospace",fontSize:12,color:isToday?C.accent:C.muted}}>{isToday?"СЕГОДНЯ":new Date(viewDate+"T12:00:00").toLocaleDateString("ru",{day:"numeric",month:"short"})}</div>
+      <div style={{flex:1,textAlign:"center",fontFamily:"monospace",fontSize:12,color:isToday?C.accent:C.muted}}>{isToday?t("today"):new Date(viewDate+"T12:00:00").toLocaleDateString(dateLocale(),{day:"numeric",month:"short"})}</div>
       {!isToday&&<button onClick={()=>setViewDate(new Date().toISOString().split("T")[0])} style={{background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"6px 14px",color:C.text,cursor:"pointer",fontSize:16}}>›</button>}
     </div>
 
     <Card accent style={{marginBottom:12}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-end",marginBottom:8}}>
         <Mono>{totals.kcal||0} <span style={{fontSize:13,color:C.muted,fontWeight:400}}>{t("kcal_short")}</span></Mono>
-        <span style={{fontFamily:"monospace",fontSize:11,color:C.muted}}>цель {data.target_kcal||2000}</span>
+        <span style={{fontFamily:"monospace",fontSize:11,color:C.muted}}>{t("nut_cel")} {data.target_kcal||2000}</span>
       </div>
       <ProgressBar pct={pct}/>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6,marginTop:10}}>
-        {[{l:"Б",v:totals.protein||0},{l:"Ж",v:totals.fat||0},{l:"У",v:totals.carb||0}].map((m,i)=><div key={i} style={{textAlign:"center"}}><div style={{fontSize:9,color:C.muted,fontFamily:"monospace"}}>{m.l} (г)</div><Mono size={13}>{Math.round(m.v)}</Mono></div>)}
+        {[{l:t("u_prot"),v:totals.protein||0},{l:t("u_fat"),v:totals.fat||0},{l:t("u_carb"),v:totals.carb||0}].map((m,i)=><div key={i} style={{textAlign:"center"}}><div style={{fontSize:9,color:C.muted,fontFamily:"monospace"}}>{m.l} {t("nut_g")}</div><Mono size={13}>{Math.round(m.v)}</Mono></div>)}
       </div>
     </Card>
 
     <Card style={{marginBottom:16}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}}>
         <Kicker>{t("water_label")}</Kicker>
-        <span style={{fontFamily:"monospace",fontSize:11,color:C.muted}}>{glasses}/{waterGoal} стаканов · {waterGoal*250}мл</span>
+        <span style={{fontFamily:"monospace",fontSize:11,color:C.muted}}>{glasses}/{waterGoal} {t("glasses_unit")} · {waterGoal*250}{t("nut_ml")}</span>
       </div>
       <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:glasses===0&&isToday?8:0}}>
         {Array.from({length:waterGoal},(_,i)=>(
@@ -7183,13 +8429,13 @@ function NutritionScreen({tgId,onBack,onNav}){
             <span style={{fontSize:20}}>{meal.icon}</span>
             <div>
               <div style={{fontWeight:600,fontSize:14,color:C.text}}>{meal.label}</div>
-              {ml.length>0&&<div style={{fontSize:10,color:C.muted,fontFamily:"monospace"}}>{mt.kcal} ккал · Б{Math.round(mt.protein)} Ж{Math.round(mt.fat)} У{Math.round(mt.carb)}</div>}
+              {ml.length>0&&<div style={{fontSize:10,color:C.muted,fontFamily:"monospace"}}>{mt.kcal} {t("kcal_unit")} · {t("u_prot")}{Math.round(mt.protein)} {t("u_fat")}{Math.round(mt.fat)} {t("u_carb")}{Math.round(mt.carb)}</div>}
             </div>
           </div>
           {isToday&&<div style={{display:"flex",gap:6}}>
             <button onClick={()=>onNav&&onNav("food_vision",{meal_type:meal.type})} style={{background:"none",border:`0.5px solid ${C.border}`,borderRadius:8,padding:"5px 8px",color:C.muted,fontSize:13,cursor:"pointer"}}>📷</button>
             <button onClick={()=>onNav&&onNav("food_search",{meal_type:meal.type})} style={{background:"none",border:`0.5px solid ${C.border}`,borderRadius:8,padding:"5px 8px",color:C.muted,fontSize:13,cursor:"pointer"}}>🔍</button>
-            <button onClick={()=>{setAdding(adding===meal.type?null:meal.type);setForm({meal_name:"",kcal:"",protein:"",fat:"",carb:""}); }} style={{background:adding===meal.type?"rgba(200,255,0,0.1)":"none",border:`0.5px solid ${adding===meal.type?C.accent:C.border}`,borderRadius:8,padding:"5px 10px",color:adding===meal.type?C.accent:C.muted,fontSize:12,cursor:"pointer"}}>{adding===meal.type?"✕":"+ добавить"}</button>
+            <button onClick={()=>{setAdding(adding===meal.type?null:meal.type);setForm({meal_name:"",kcal:"",protein:"",fat:"",carb:""}); }} style={{background:adding===meal.type?"rgba(200,255,0,0.1)":"none",border:`0.5px solid ${adding===meal.type?C.accent:C.border}`,borderRadius:8,padding:"5px 10px",color:adding===meal.type?C.accent:C.muted,fontSize:12,cursor:"pointer"}}>{adding===meal.type?"✕":t("add_meal")}</button>
           </div>}
         </div>
         {ml.map(l=>(
@@ -7197,7 +8443,7 @@ function NutritionScreen({tgId,onBack,onNav}){
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 0",borderTop:`0.5px solid ${C.border}`}}>
             <div style={{flex:1}}>
               <div style={{fontSize:13,color:C.text}}>{l.meal_name}</div>
-              <div style={{fontSize:10,color:C.muted,fontFamily:"monospace",marginTop:2}}>Б{l.protein}г · Ж{l.fat}г · У{l.carb}г</div>
+              <div style={{fontSize:10,color:C.muted,fontFamily:"monospace",marginTop:2}}>{t("u_prot")}{l.protein}{t("u_g")} · {t("u_fat")}{l.fat}{t("u_g")} · {t("u_carb")}{l.carb}{t("u_g")}</div>
             </div>
             <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
               <Mono size={13}>{l.kcal} <span style={{fontSize:10,color:C.muted,fontWeight:400}}>{t("kcal_short")}</span></Mono>
@@ -7207,14 +8453,14 @@ function NutritionScreen({tgId,onBack,onNav}){
           </div>
           {editingLog===l.id&&(
             <div style={{padding:"8px 0",borderTop:`0.5px solid ${C.border}`}}>
-              <div style={{fontSize:11,color:C.muted,marginBottom:6}}>Исправь название/состав — КБЖУ пересчитается автоматически</div>
+              <div style={{fontSize:11,color:C.muted,marginBottom:6}}>{t("nut_isprav_nazvanie_sostav_kbzhu")}</div>
               <input value={editLogText} onChange={e=>setEditLogText(e.target.value)}
-                placeholder="Например: Рисовая каша с молоком, 300г"
+                placeholder={t("nut_naprimer_risovaya_kasha_s")}
                 style={{width:"100%",background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"8px 12px",color:C.text,fontSize:13,outline:"none",marginBottom:8}}/>
               <div style={{display:"flex",gap:8}}>
-                <Btn full onClick={()=>{setEditingLog(null);setEditLogText("");}} style={{flex:1}}>Отмена</Btn>
+                <Btn full onClick={()=>{setEditingLog(null);setEditLogText("");}} style={{flex:1}}>{t("fv_otmena")}</Btn>
                 <Btn accent full onClick={()=>recalcAndUpdateLog(l.id)} disabled={editLogBusy||!editLogText.trim()} style={{flex:2}}>
-                  {editLogBusy?"ПЕРЕСЧИТЫВАЕМ...":"🔄 ПЕРЕСЧИТАТЬ И СОХРАНИТЬ"}
+                  {editLogBusy?t("fv_pereschityvaem"):t("nut_pereschitat_i_sohranit")}
                 </Btn>
               </div>
             </div>
@@ -7224,13 +8470,13 @@ function NutritionScreen({tgId,onBack,onNav}){
         {adding===meal.type&&isToday&&<div style={{marginTop:12,paddingTop:12,borderTop:`0.5px solid ${C.border}`}}>
           <input value={form.meal_name} onChange={e=>setForm(p=>({...p,meal_name:e.target.value}))} placeholder={t("dish_name")} style={{width:"100%",background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"8px 12px",color:C.text,fontSize:13,outline:"none",marginBottom:8}}/>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:6,marginBottom:10}}>
-            {[{k:"kcal",p:"Ккал"},{k:"protein",p:"Белки"},{k:"fat",p:"Жиры"},{k:"carb",p:"Углев"}].map(f=>(
+            {[{k:"kcal",p:t("calories_short")},{k:"protein",p:t("nut_belki")},{k:"fat",p:t("nut_zhiry")},{k:"carb",p:t("carbs_short")}].map(f=>(
               <input key={f.k} type="number" value={form[f.k]} onChange={e=>setForm(p=>({...p,[f.k]:e.target.value}))} placeholder={f.p} style={{background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"8px 6px",color:C.text,fontSize:12,outline:"none",textAlign:"center"}}/>
             ))}
           </div>
           <div style={{display:"flex",gap:8}}>
             <Btn full onClick={()=>setAdding(null)} style={{flex:1}}>{t("cancel_btn2")}</Btn>
-            <Btn accent full onClick={addMeal} disabled={saving||!form.meal_name.trim()||!form.kcal} style={{flex:2}}>{saving?"СОХРАНЯЕМ...":"ДОБАВИТЬ"}</Btn>
+            <Btn accent full onClick={addMeal} disabled={saving||!form.meal_name.trim()||!form.kcal} style={{flex:2}}>{saving?t("saving"):t("add")}</Btn>
           </div>
         </div>}
       </Card>;
@@ -7251,7 +8497,7 @@ function NutritionScreen({tgId,onBack,onNav}){
           <div style={{fontSize:11,color:C.muted}}>{t("or_write")}</div>
         </div>
         <textarea value={aiQ} onChange={e=>setAiQ(e.target.value)}
-          placeholder="Например: что мне не хватает в питании сегодня? или как лучше распределить белки?"
+          placeholder={t("nut_naprimer_chto_mne_ne")}
           style={{width:"100%",background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,
             padding:"10px 12px",color:C.text,fontSize:13,outline:"none",resize:"none",
             minHeight:80,fontFamily:"inherit",boxSizing:"border-box",marginBottom:10}}/>
@@ -7272,16 +8518,16 @@ function NutritionScreen({tgId,onBack,onNav}){
 // ── FoodSearchScreen ─────────────────────────────────────────────────────────
 function FoodSearchScreen({tgId,onBack,onNav,mealType}){
   const CATS=[
-    {v:"",l:"Все"},
-    {v:"meat",l:"🥩 Мясо"},{v:"fish",l:"🐟 Рыба"},{v:"dairy",l:"🥛 Молочка"},
-    {v:"eggs",l:"🥚 Яйца"},{v:"grains",l:"🌾 Крупы"},{v:"bread",l:"🍞 Хлеб"},
-    {v:"vegetables",l:"🥦 Овощи"},{v:"fruits",l:"🍎 Фрукты"},{v:"nuts",l:"🥜 Орехи"},
-    {v:"drinks",l:"🧃 Напитки"},{v:"snacks",l:"🍫 Снеки"},{v:"other",l:"🫙 Прочее"},
-    {v:"supplements",l:"💊 Спортпит"},
+    {v:"",l:t("fs_vse")},
+    {v:"meat",l:t("fcat_myaso")},{v:"fish",l:t("fcat_ryba")},{v:"dairy",l:t("fcat_molochka")},
+    {v:"eggs",l:t("alg_yayca")},{v:"grains",l:t("fcat_krupy")},{v:"bread",l:t("fcat_hleb")},
+    {v:"vegetables",l:t("fcat_ovoschi")},{v:"fruits",l:t("fcat_frukty")},{v:"nuts",l:t("alg_orehi")},
+    {v:"drinks",l:t("fcat_napitki")},{v:"snacks",l:t("fcat_sneki")},{v:"other",l:t("fcat_prochee")},
+    {v:"supplements",l:t("fs_sportpit")},
   ];
   const MEAL_OPTS=[
-    {value:"breakfast",label:"Завтрак"},{value:"lunch",label:"Обед"},
-    {value:"dinner",label:"Ужин"},{value:"snack",label:"Перекус"},
+    {value:"breakfast",label:t("meal_breakfast")},{value:"lunch",label:t("meal_lunch")},
+    {value:"dinner",label:t("meal_dinner")},{value:"snack",label:t("meal_snack")},
   ];
   const [q,setQ]=useState("");
   const [cat,setCat]=useState("");
@@ -7350,20 +8596,23 @@ function FoodSearchScreen({tgId,onBack,onNav,mealType}){
 
       <Card accent style={{marginBottom:16}}>
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:8,textAlign:"center"}}>
-          {[{l:"Ккал",v:calc.kcal},{l:"Белки",v:calc.protein+"г"},{l:"Жиры",v:calc.fat+"г"},{l:"Углев",v:calc.carb+"г"}].map((m,i)=>(
+          {[{l:t("calories_short"),v:calc.kcal},{l:t("nut_belki"),v:calc.protein+t("u_g")},{l:t("nut_zhiry"),v:calc.fat+t("u_g")},{l:t("carbs_short"),v:calc.carb+t("u_g")}].map((m,i)=>(
             <div key={i}><div style={{fontSize:9,color:C.muted,fontFamily:"monospace",marginBottom:2}}>{m.l}</div><Mono size={14}>{m.v}</Mono></div>
           ))}
         </div>
-        <div style={{fontSize:10,color:C.muted,fontFamily:"monospace",textAlign:"center",marginTop:8}}>на {weight}г</div>
+        <div style={{fontSize:10,color:C.muted,fontFamily:"monospace",textAlign:"center",marginTop:8}}>{t("fs_na")} {weight}{t("u_g")}</div>
       </Card>
 
       {sel.serving_size_g&&<div style={{fontFamily:"monospace",fontSize:11,color:C.muted,marginBottom:12}}>
-        1 порция = {sel.serving_size_g}г
-        {sel.servings_per_pack&&` · ${sel.servings_per_pack} порций в упаковке`}
+        {t("ui_1_porciya")} {sel.serving_size_g}{t("u_g")}
+        {sel.servings_per_pack&&` · ${t("sup_per_pack").replace("{n}",sel.servings_per_pack)}`}
       </div>}
 
       <div style={{marginBottom:12}}>
-        <Kicker>{t("field_weight_g")||"ВЕС (г)"}</Kicker>
+        {/* Без ||: t() при промахе возвращает сам ключ, а он непустой — поэтому
+            запасной вариант никогда не срабатывал и на экране стояло слово
+            «field_weight_g». Ключ теперь есть во всех четырёх языках. */}
+        <Kicker>{t("field_weight_g")}</Kicker>
         <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:8}}>
           {(sel.serving_size_g?[sel.serving_size_g,100,200,300]:[50,100,150,200,300]).map(w=>(
             <button key={w} onClick={()=>setWeight(String(w))}
@@ -7371,7 +8620,7 @@ function FoodSearchScreen({tgId,onBack,onNav,mealType}){
                 background:weight===String(w)?C.accent:C.card,
                 border:`0.5px solid ${weight===String(w)?C.accent:C.border}`,
                 color:weight===String(w)?C.bg:C.text,fontFamily:"monospace"}}>
-              {w===sel.serving_size_g?"1 порция":w+"г"}
+              {w===sel.serving_size_g?t("one_portion"):w+t("u_g")}
             </button>
           ))}
         </div>
@@ -7388,7 +8637,7 @@ function FoodSearchScreen({tgId,onBack,onNav,mealType}){
       {saved
         ?<div style={{textAlign:"center",color:C.accent,fontFamily:"monospace",fontSize:14,padding:20}}>{t("added_done")}</div>
         :<Btn accent full onClick={logProduct} disabled={saving||!weight||parseFloat(weight)<=0}>
-          {saving?"СОХРАНЯЕМ...":"ДОБАВИТЬ В ДНЕВНИК"}
+          {saving?t("saving"):t("add_meal2")}
         </Btn>
       }
     </div>;
@@ -7417,17 +8666,17 @@ function FoodSearchScreen({tgId,onBack,onNav,mealType}){
       ))}
     </div>
 
-    {loading&&<Loader text="ПОИСК"/>}
+    {loading&&<Loader text={t("fs_poisk")}/>}
 
     {!loading&&results.length===0&&(q||cat)&&(
       <div style={{textAlign:"center",color:C.muted,fontFamily:"monospace",fontSize:12,padding:32}}>
-        НИЧЕГО НЕ НАЙДЕНО
+        {t("not_found_hint").toUpperCase()}
       </div>
     )}
 
     {!loading&&results.length===0&&!q&&!cat&&(
       <div style={{textAlign:"center",color:C.muted,fontFamily:"monospace",fontSize:12,padding:32}}>
-        ВВЕДИТЕ НАЗВАНИЕ ИЛИ ВЫБЕРИТЕ КАТЕГОРИЮ
+        {t("enter_name_or_cat")}
       </div>
     )}
 
@@ -7438,7 +8687,7 @@ function FoodSearchScreen({tgId,onBack,onNav,mealType}){
             <div style={{fontSize:14,color:C.text,fontWeight:600,marginBottom:2}}>{p.name}</div>
             {p.brand&&<div style={{fontSize:11,color:C.muted,fontFamily:"monospace"}}>{p.brand}</div>}
             <div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginTop:4}}>
-              Б{p.protein}г · Ж{p.fat}г · У{p.carbs}г
+              {t("u_prot")}{p.protein}{t("u_g")} · {t("u_fat")}{p.fat}{t("u_g")} · {t("u_carb")}{p.carbs}{t("u_g")}
             </div>
           </div>
           <div style={{flexShrink:0,textAlign:"right",marginLeft:12}}>
@@ -7458,9 +8707,9 @@ function FoodSearchScreen({tgId,onBack,onNav,mealType}){
 // ── SportLogScreen ────────────────────────────────────────────────────────────
 function SportLogScreen({tgId,onBack,initialSport=null}){
   const [sports,setSports]=useState([
-    {v:"football",l:"⚽ Футбол"},{v:"volleyball",l:"🏐 Волейбол"},
-    {v:"basketball",l:"🏀 Баскетбол"},{v:"table_tennis",l:"🏓 Настольный теннис"},
-    {v:"padel",l:"🎾 Падел"},{v:"tennis",l:"🎾 Большой теннис"},{v:"yoga",l:"🧘 Йога"},
+    {v:"football",l:t("aw_futbol")},{v:"volleyball",l:t("aw_voleybol")},
+    {v:"basketball",l:t("aw_basketbol")},{v:"table_tennis",l:t("aw_nastolnyy_tennis")},
+    {v:"padel",l:t("aw_padel")},{v:"tennis",l:t("aw_bolshoy_tennis")},{v:"yoga",l:t("aw_yoga")},
   ]);
   useEffect(()=>{
     apiGet(`${API}/sport-types`).then(d=>{
@@ -7495,9 +8744,9 @@ function SportLogScreen({tgId,onBack,initialSport=null}){
       <div style={{fontSize:52,marginBottom:16}}>{SPORTS.find(s=>s.v===sport)?.l.split(" ")[0]||"⚽"}</div>
       <Hero style={{textAlign:"center",marginBottom:8}}>{t("record_btn")}</Hero>
       <div style={{color:C.muted,fontFamily:"monospace",fontSize:13,marginBottom:4}}>
-        {SPORTS.find(s=>s.v===sport)?.l} · {duration} мин
+        {SPORTS.find(s=>s.v===sport)?.l} · {duration} {t("home_min")}
       </div>
-      {saved>0&&<div style={{color:C.accent,fontFamily:"monospace",fontSize:18,marginBottom:4}}>~{saved} ккал</div>}
+      {saved>0&&<div style={{color:C.accent,fontFamily:"monospace",fontSize:18,marginBottom:4}}>~{saved} {t("kcal_unit")}</div>}
       <div style={{color:C.success,fontSize:12,fontFamily:"monospace",marginBottom:24}}>{t("pts_bonus")}</div>
       <div style={{display:"flex",gap:10}}>
         <Btn full onClick={()=>{setSaved(null);setNotes("");setDuration("60");}} style={{flex:1}}>{t("another_one")}</Btn>
@@ -7539,7 +8788,7 @@ function SportLogScreen({tgId,onBack,initialSport=null}){
           </button>
         ))}
         <input type="number" value={duration} onChange={e=>setDuration(e.target.value)}
-          placeholder="Своё"
+          placeholder={t("splog_svoe")}
           style={{width:70,background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,
             padding:"6px 10px",color:C.text,fontSize:13,outline:"none",textAlign:"center"}}/>
       </div>
@@ -7571,14 +8820,14 @@ function SportLogScreen({tgId,onBack,initialSport=null}){
     <div style={{marginBottom:20}}>
       <Kicker>{t("sport_notes_opt")}</Kicker>
       <textarea value={notes} onChange={e=>setNotes(e.target.value)}
-        placeholder="Счёт, партнёры, ощущения..."
+        placeholder={t("score_optional")}
         style={{width:"100%",background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,
           padding:"10px 12px",color:C.text,fontSize:13,outline:"none",resize:"none",
           minHeight:60,fontFamily:"inherit",boxSizing:"border-box",marginTop:6}}/>
     </div>
 
     <Btn accent full onClick={save} disabled={saving||!duration||parseInt(duration)<=0}>
-      {saving?"СОХРАНЯЕМ...":"✓ ЗАПИСАТЬ ЗАНЯТИЕ"}
+      {saving?t("saving"):t("sport_save_btn")}
     </Btn>
   </div>;
 }
@@ -7593,14 +8842,14 @@ function GamificationScreen({tgId,onBack,user}){
 
   const rankColors={beginner:"#CD7F32",athlete:"#C0C0C0",champion:"#FFD700",legend:"#00FFFF"};
   const reasonLabels={
-    workout_finished:"🏋️ Тренировка завершена",
-    checkin:"✓ Чек-ин",
-    sport_football:"⚽ Футбол",sport_volleyball:"🏐 Волейбол",sport_basketball:"🏀 Баскетбол",
-    sport_table_tennis:"🏓 Настольный теннис",sport_padel:"🎾 Падел",
-    sport_tennis:"🎾 Теннис",sport_yoga:"🧘 Йога",
+    workout_finished:t("gam_trenirovka_zavershena"),
+    checkin:t("gam_chek_in"),
+    sport_football:t("aw_futbol"),sport_volleyball:t("aw_voleybol"),sport_basketball:t("aw_basketbol"),
+    sport_table_tennis:t("aw_nastolnyy_tennis"),sport_padel:t("aw_padel"),
+    sport_tennis:t("gam_tennis"),sport_yoga:t("aw_yoga"),
   };
 
-  if(!data)return<div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader text="СТАТУС"/></div>;
+  if(!data)return<div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader text={t("status_label")}/></div>;
 
   const rankColor=rankColors[data.rank]||C.accent;
 
@@ -7617,20 +8866,20 @@ function GamificationScreen({tgId,onBack,user}){
       <Mono size={32} color={rankColor}>{data.total_points}</Mono>
       <div style={{fontSize:12,color:C.muted,fontFamily:"monospace",marginTop:4}}>{t("pts_label")}</div>
       <div style={{fontSize:12,color:C.accent,fontFamily:"monospace",marginTop:8}}>
-        AI запросов в день: {data.ai_limit}
+        {t("ui_ai_zaprosov_v_den")} {data.ai_limit}
       </div>
     </Card>
 
     {data.next_rank&&<Card style={{marginBottom:16}}>
       <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
         <Kicker>{t("next_rank")}</Kicker>
-        <span style={{fontFamily:"monospace",fontSize:11,color:C.muted}}>{data.pts_to_next} балл.</span>
+        <span style={{fontFamily:"monospace",fontSize:11,color:C.muted}}>{data.pts_to_next} {t("pts_short")}</span>
       </div>
       <ProgressBar pct={data.progress_pct}/>
       <div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginTop:6}}>
-        Следующий: {
-          {athlete:"🥈 Атлет",champion:"🥇 Чемпион",legend:"💎 Легенда"}[data.next_rank]
-        } ({data.next_rank_pts} балл.)
+        {t("ui_sleduyuschiy")} {
+          {athlete:t("gam_atlet"),champion:t("gam_chempion"),legend:t("gam_legenda")}[data.next_rank]
+        } ({data.next_rank_pts} {t("ui_ball")}
       </div>
     </Card>}
 
@@ -7638,10 +8887,10 @@ function GamificationScreen({tgId,onBack,user}){
       <Kicker>{t("how_earn")}</Kicker>
       <div style={{marginTop:8,display:"flex",flexDirection:"column",gap:6}}>
         {[
-          {icon:"🏋️",l:"Тренировка завершена",pts:10},
-          {icon:"⚽",l:"Занятие спортом",pts:8},
-          {icon:"✓",l:"Чек-ин",pts:5},
-          {icon:"📷",l:"Питание внесено",pts:2},
+          {icon:"🏋️",l:t("workout_done2"),pts:10},
+          {icon:"⚽",l:t("gam_zanyatie_sportom"),pts:8},
+          {icon:"✓",l:t("menu_checkin"),pts:5},
+          {icon:"📷",l:t("gam_pitanie_vneseno"),pts:2},
         ].map((r,i)=>(
           <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"6px 0",
             borderBottom:i<3?`0.5px solid ${C.border}`:"none"}}>
@@ -7656,7 +8905,7 @@ function GamificationScreen({tgId,onBack,user}){
     {data.streak_rewards?.length>0&&<Card style={{marginBottom:16}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
         <Kicker>{t("streak_series")}</Kicker>
-        <Mono size={14}>{data.streak_days||0} дн.</Mono>
+        <Mono size={14}>{data.streak_days||0} {t("alt_days")}</Mono>
       </div>
       <div style={{display:"flex",flexDirection:"column",gap:6}}>
         {data.streak_rewards.map((r,i)=>(
@@ -7718,7 +8967,7 @@ function ReferralScreen({tgId,onBack}){
 
   function shareLink(){
     if(!data?.ref_link)return;
-    const text=`Привет! Тренируюсь в GymBot — умный AI-тренер в Telegram. Присоединяйся по моей ссылке и получи бонусные баллы!
+    const text=`${t("ui_privet_treniruyus_v_gymbot")}
 ${data.ref_link}`;
     if(window.Telegram?.WebApp?.openTelegramLink)
       window.Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(data.ref_link)}&text=${encodeURIComponent(text)}`);
@@ -7726,7 +8975,7 @@ ${data.ref_link}`;
       navigator.clipboard?.writeText(text);
   }
 
-  if(!data)return<div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader text="ЗАГРУЗКА"/></div>;
+  if(!data)return<div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader text={t("loading")}/></div>;
 
   if(!data.enabled)return(
     <div style={{padding:"16px 16px 100px"}}>
@@ -7734,7 +8983,7 @@ ${data.ref_link}`;
       <Hero>{t("referral_title")}</Hero>
       <Card style={{marginTop:16,textAlign:"center"}}>
         <div style={{color:C.muted,fontSize:13,padding:"20px 0"}}>
-          Реферальная программа временно недоступна
+          {t("ui_referalnaya_programma_vremenno")}
         </div>
       </Card>
     </div>
@@ -7752,7 +9001,7 @@ ${data.ref_link}`;
       <div style={{fontSize:12,color:C.muted,marginBottom:12}}>{data.ref_link}</div>
       <div style={{display:"flex",gap:8}}>
         <Btn full onClick={copyLink} style={{flex:1}}>
-          {copied?"✓ СКОПИРОВАНО":"📋 КОПИРОВАТЬ"}
+          {copied?t("ref_skopirovano"):t("ref_kopirovat")}
         </Btn>
         <Btn accent full onClick={shareLink} style={{flex:1}}>{t("share_btn2")}</Btn>
       </div>
@@ -7774,10 +9023,10 @@ ${data.ref_link}`;
       <Kicker>{t("how_works")}</Kicker>
       <div style={{marginTop:8,display:"flex",flexDirection:"column",gap:8}}>
         {[
-          {n:"1",t:`Поделись ссылкой с другом`},
-          {n:"2",t:`Друг регистрируется в GymBot`},
-          {n:"3",t:`Ты получаешь ${data.bonus_per_referral} баллов`},
-          {n:"4",t:`Друг получает бонус при старте`},
+          {n:"1",t:t("ref_step1")},
+          {n:"2",t:t("ref_step2")},
+          {n:"3",t:t("ref_step3").replace("{n}",data.bonus_per_referral)},
+          {n:"4",t:t("ref_step4")},
         ].map((s,i)=>(
           <div key={i} style={{display:"flex",gap:10,alignItems:"flex-start"}}>
             <div style={{width:22,height:22,borderRadius:"50%",background:C.accent,
@@ -7790,14 +9039,14 @@ ${data.ref_link}`;
     </Card>
 
     {data.referrals?.length>0&&<Card>
-      <Kicker>МОИ РЕФЕРАЛЫ ({data.referrals_count})</Kicker>
+      <Kicker>{t("ref_moi_referaly")}{data.referrals_count})</Kicker>
       <div style={{marginTop:8}}>
         {data.referrals.map((r,i)=>(
           <div key={i} style={{display:"flex",justifyContent:"space-between",
             padding:"6px 0",borderBottom:i<data.referrals.length-1?`0.5px solid ${C.border}`:"none"}}>
             <span style={{fontSize:13,color:C.text}}>{r.name}{r.username?` @${r.username}`:""}</span>
             <span style={{fontSize:11,color:C.muted,fontFamily:"monospace"}}>
-              {r.joined?new Date(r.joined).toLocaleDateString("ru",{day:"numeric",month:"short"}):"—"}
+              {r.joined?new Date(r.joined).toLocaleDateString(dateLocale(),{day:"numeric",month:"short"}):"—"}
             </span>
           </div>
         ))}
@@ -7819,10 +9068,10 @@ function FoodGuideScreen({onBack}){
     <Card accent style={{marginBottom:10}}>
       <Kicker>{t("food_catalog_kbju")}</Kicker>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginTop:8}}>
-        {[{l:"КАЛОРИИ",v:sel.kcal,u:"ккал"},{l:"БЕЛОК",v:sel.protein,u:"г"},{l:"ЖИРЫ",v:sel.fat,u:"г"},{l:"УГЛЕВОДЫ",v:sel.carb,u:"г"}].map((m,i)=><div key={i}><div style={{fontSize:9,color:C.muted,fontFamily:"monospace"}}>{m.l}</div><Mono size={14}>{m.v} <span style={{fontSize:11,color:C.muted,fontWeight:400}}>{m.u}</span></Mono></div>)}
+        {[{l:t("calories_label"),v:sel.kcal,u:t("kcal_unit")},{l:t("fg_belok"),v:sel.protein,u:t("u_g")},{l:t("fats_label"),v:sel.fat,u:t("u_g")},{l:t("carbs_label"),v:sel.carb,u:t("u_g")}].map((m,i)=><div key={i}><div style={{fontSize:9,color:C.muted,fontFamily:"monospace"}}>{m.l}</div><Mono size={14}>{m.v} <span style={{fontSize:11,color:C.muted,fontWeight:400}}>{m.u}</span></Mono></div>)}
       </div>
     </Card>
-    {[{label:"⏰ КОГДА ЕСТЬ",value:sel.timing},{label:"💡 СОВЕТЫ",value:sel.tips},{label:"🏆 ЛУЧШИЕ ПРОДУКТЫ",value:sel.best},{label:"✅ СОЧЕТАЕТСЯ С",value:sel.combines},{label:"❌ НЕ СОЧЕТАТЬ",value:sel.avoid}].map((r,i)=><Card key={i} style={{marginBottom:8}}><Kicker>{r.label}</Kicker><div style={{fontSize:13,color:C.text,lineHeight:1.6,marginTop:4}}>{r.value}</div></Card>)}
+    {[{label:t("food_when"),value:sel.timing},{label:t("food_tips"),value:sel.tips},{label:t("food_best"),value:sel.best},{label:t("food_combines"),value:sel.combines},{label:t("food_avoid"),value:sel.avoid}].map((r,i)=><Card key={i} style={{marginBottom:8}}><Kicker>{r.label}</Kicker><div style={{fontSize:13,color:C.text,lineHeight:1.6,marginTop:4}}>{r.value}</div></Card>)}
   </div>;
   if(!cats)return <div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader/></div>;
   return <div style={{padding:"16px 16px 100px"}}>
@@ -7832,7 +9081,7 @@ function FoodGuideScreen({onBack}){
       {cats.map((c,i)=><Card key={i} onClick={()=>setSel(c)}>
         <div style={{display:"flex",gap:14,alignItems:"center"}}>
           <span style={{fontSize:32}}>{c.emoji}</span>
-          <div style={{flex:1}}><div style={{fontWeight:600,fontSize:15,color:C.text}}>{c.name}</div><div style={{fontSize:11,color:C.muted,marginTop:2,fontFamily:"monospace"}}>{c.kcal} ккал · Б {c.protein}г · Ж {c.fat}г · У {c.carb}г</div></div>
+          <div style={{flex:1}}><div style={{fontWeight:600,fontSize:15,color:C.text}}>{c.name}</div><div style={{fontSize:11,color:C.muted,marginTop:2,fontFamily:"monospace"}}>{c.kcal} {t("kcal_unit")} · {t("u_prot")} {c.protein}{t("u_g")} · {t("u_fat")} {c.fat}{t("u_g")} · {t("u_carb")} {c.carb}{t("u_g")}</div></div>
           <span style={{color:C.accent,fontSize:16}}>→</span>
         </div>
       </Card>)}
@@ -7844,44 +9093,44 @@ function FoodGuideScreen({onBack}){
 function SupplementsScreen({onBack,user}){
   const [sel,setSel]=useState(null);
   const supps=[
-    {name:"Протеин",icon:"🥛",dose:"20–40г за приём",timing:"После тренировки или в любое время дня",
-      tips:"Восполнение белка. Сывороточный — быстрый, казеин — медленный (на ночь).",
-      evidence:"🟢 Высокий уровень доказательности",
+    {name:t("supp_protein"),icon:"🥛",dose:t("sup_20_40g_za_priem"),timing:t("sup_posle_trenirovki_ili_v"),
+      tips:t("sup_vospolnenie_belka_syvorotoch"),
+      evidence:t("sup_vysokiy_uroven_dokazatelnost"),
       contraindications:["kidney_disease"],
       links:[{label:"Examine.com — Protein",url:"https://examine.com/supplements/protein-powder/"}]},
-    {name:"Креатин моногидрат",icon:"⚡",dose:"3–5г/день",timing:"В любое время, ежедневно",
-      tips:"Без загрузки. Результат через 2–4 недели. Запивай водой (250мл). Один из самых изученных препаратов.",
-      evidence:"🟢 Высокий уровень доказательности",
+    {name:t("supp_creatine"),icon:"⚡",dose:t("sup_3_5g_den"),timing:t("supp_timing_anytime"),
+      tips:t("sup_bez_zagruzki_rezultat_cherez"),
+      evidence:t("sup_vysokiy_uroven_dokazatelnost"),
       contraindications:["kidney_disease"],
       links:[{label:"Examine.com — Creatine",url:"https://examine.com/supplements/creatine/"}]},
-    {name:"Омега-3",icon:"🐟",dose:"1–3г EPA+DHA/день",timing:"Во время еды",
-      tips:"Противовоспалительный эффект, суставы, сердце. Смотри на содержание EPA+DHA, не общий жир рыбы.",
-      evidence:"🟢 Высокий уровень доказательности",
+    {name:t("supp_omega"),icon:"🐟",dose:t("sup_1_3g_epa_dha"),timing:t("supp_timing_food"),
+      tips:t("sup_protivovospalitelnyy_effekt_"),
+      evidence:t("sup_vysokiy_uroven_dokazatelnost"),
       contraindications:["fish_oil"],
       links:[{label:"Examine.com — Omega-3",url:"https://examine.com/supplements/fish-oil/"}]},
-    {name:"Витамин D3",icon:"☀️",dose:"2000–5000 МЕ/день",timing:"Утром с жирной едой",
-      tips:"Иммунитет, тестостерон, кости. Принимать с K2 (100–200мкг) для правильного усвоения кальция.",
-      evidence:"🟢 Высокий уровень доказательности",
+    {name:t("supp_vitd"),icon:"☀️",dose:t("sup_2000_5000_me_den"),timing:t("supp_timing_morning"),
+      tips:t("sup_immunitet_testosteron_kosti_"),
+      evidence:t("sup_vysokiy_uroven_dokazatelnost"),
       contraindications:[],
       links:[{label:"Examine.com — Vitamin D",url:"https://examine.com/supplements/vitamin-d/"}]},
-    {name:"Магний",icon:"💊",dose:"200–400мг",timing:"Перед сном",
-      tips:"Качество сна, мышечное восстановление, снижение стресса. Форма: глицинат или малат (не оксид — плохо усваивается).",
-      evidence:"🟡 Умеренный уровень доказательности",
+    {name:t("supp_magnesium"),icon:"💊",dose:t("sup_200_400mg"),timing:t("supp_timing_sleep"),
+      tips:t("sup_kachestvo_sna_myshechnoe_vos"),
+      evidence:t("sup_umerennyy_uroven_dokazatelno"),
       contraindications:[],
       links:[{label:"Examine.com — Magnesium",url:"https://examine.com/supplements/magnesium/"}]},
-    {name:"Кофеин",icon:"☕",dose:"3–6мг/кг веса",timing:"За 30–45 мин до тренировки",
-      tips:"Повышает выносливость, силу и концентрацию. Не принимать после 15:00 — нарушает сон. Допуск развивается быстро.",
-      evidence:"🟢 Высокий уровень доказательности",
+    {name:t("supp_caffeine"),icon:"☕",dose:t("sup_3_6mg_kg_vesa"),timing:t("supp_timing_before"),
+      tips:t("sup_povyshaet_vynoslivost_silu_i"),
+      evidence:t("sup_vysokiy_uroven_dokazatelnost"),
       contraindications:["hypertension","heart_disease"],
       links:[{label:"Examine.com — Caffeine",url:"https://examine.com/supplements/caffeine/"}]},
-    {name:"Цинк",icon:"🔩",dose:"15–30мг/день",timing:"Во время еды или перед сном",
-      tips:"Иммунитет, тестостерон, восстановление. Не принимать вместе с кальцием — конкурируют за усвоение.",
-      evidence:"🟡 Умеренный уровень доказательности",
+    {name:t("supp_zinc"),icon:"🔩",dose:t("sup_15_30mg_den"),timing:t("supp_timing_food_sleep"),
+      tips:t("sup_immunitet_testosteron_vossta"),
+      evidence:t("sup_umerennyy_uroven_dokazatelno"),
       contraindications:[],
       links:[{label:"Examine.com — Zinc",url:"https://examine.com/supplements/zinc/"}]},
-    {name:"Коллаген",icon:"🦴",dose:"10г/день",timing:"За 1 час до тренировки с витамином C",
-      tips:"Суставы и связки. Необходим витамин C (100мг) для синтеза коллагена. Эффект накопительный — 8–12 недель.",
-      evidence:"🟡 Умеренный уровень доказательности",
+    {name:t("supp_collagen"),icon:"🦴",dose:t("sup_10g_den"),timing:t("supp_timing_collagen"),
+      tips:t("sup_sustavy_i_svyazki_neobhodim"),
+      evidence:t("sup_umerennyy_uroven_dokazatelno"),
       contraindications:[],
       links:[{label:"Examine.com — Collagen",url:"https://examine.com/supplements/collagen/"}]},
   ];
@@ -7893,12 +9142,12 @@ function SupplementsScreen({onBack,user}){
 
   function getWarning(s){
     const w=[];
-    if(s.contraindications.some(c=>userConditions.includes(c)))w.push("⚠️ Проконсультируйся с врачом — есть противопоказания");
-    if(s.contraindications.some(c=>userAllergies.includes(c)))w.push("🚫 Возможна аллергическая реакция");
+    if(s.contraindications.some(c=>userConditions.includes(c)))w.push(t("sup_prokonsultiruysya_s_vrachom_"));
+    if(s.contraindications.some(c=>userAllergies.includes(c)))w.push(t("sup_vozmozhna_allergicheskaya_re"));
     return w;
   }
   function personalDose(s){
-    if(s.name==="Кофеин"&&weight)return`${Math.round(3*weight)}–${Math.round(6*weight)}мг (${Math.round(3*weight/100)}–${Math.round(6*weight/100)} таб по 100мг)`;
+    if(s.name===t("supp_caffeine")&&weight)return t("sup_tabs").replace("{a}",Math.round(3*weight)+"–"+Math.round(6*weight)).replace("{b}",Math.round(3*weight/100)+"–"+Math.round(6*weight/100));
     return s.dose;
   }
 
@@ -7912,7 +9161,7 @@ function SupplementsScreen({onBack,user}){
       {warnings.length>0&&warnings.map((w,i)=><div key={i} style={{background:"#FF444422",border:`0.5px solid ${C.danger}`,borderRadius:10,padding:"10px 14px",marginBottom:10,fontSize:13,color:C.danger}}>{w}</div>)}
       <Card accent style={{marginBottom:10}}>
         <div style={{display:"flex",flexDirection:"column",gap:10}}>
-          <div><div style={{fontSize:9,color:C.muted,fontFamily:"monospace",marginBottom:4}}>ДОЗА{weight?" (ТВОЙ ВЕС "+weight+"КГ)":""}</div><div style={{fontSize:14,color:C.accent,fontWeight:600}}>{personalDose(sel)}</div></div>
+          <div><div style={{fontSize:9,color:C.muted,fontFamily:"monospace",marginBottom:4}}>{t("supp_dose_label")}{weight?" "+t("sup_your_weight").replace("{w}",weight):""}</div><div style={{fontSize:14,color:C.accent,fontWeight:600}}>{personalDose(sel)}</div></div>
           <div><div style={{fontSize:9,color:C.muted,fontFamily:"monospace",marginBottom:4}}>{t("when_take_section")}</div><div style={{fontSize:14,color:C.accent,fontWeight:600}}>{sel.timing}</div></div>
         </div>
       </Card>
@@ -7923,9 +9172,9 @@ function SupplementsScreen({onBack,user}){
 
   return <div style={{padding:"16px 16px 100px"}}>
     <BackBtn onBack={onBack}/><Kicker>{t("supps_ref")}</Kicker><Hero>{t("supps_title2")}</Hero>
-    {user&&<div style={{fontSize:12,color:C.muted,fontFamily:"monospace",marginTop:6,marginBottom:8}}>ПРОФИЛЬ · {user.weight}кг · {user.fitness_level?.toUpperCase()}</div>}
+    {user&&<div style={{fontSize:12,color:C.muted,fontFamily:"monospace",marginTop:6,marginBottom:8}}>{t("section_profile")} · {user.weight}{t("home_kg")} · {getLevelLabel(user.fitness_level)}</div>}
     <div style={{background:"#FFB80015",border:`0.5px solid ${C.warn}`,borderRadius:10,padding:"10px 14px",marginBottom:12,fontSize:11,color:C.warn,lineHeight:1.6}}>
-      ⚠️ Применение витаминов и добавок носит рекомендательный характер и не является медицинской рекомендацией. Перед применением проконсультируйтесь с врачом.
+      {t("ui_primenenie_vitaminov_i_dobavok")}
     </div>
     <div style={{height:4}}/>
     <div style={{display:"flex",flexDirection:"column",gap:10}}>
@@ -7957,7 +9206,7 @@ function MeasurementsScreen({onBack,tgId}){
   const [saving,setSaving]=useState(false);
   const [saved,setSaved]=useState(false);
   const [form,setForm]=useState({waist:"",hips:"",chest:"",arm:"",thigh:""});
-  const fields=[{key:"waist",label:"Талия"},{key:"hips",label:"Бёдра"},{key:"chest",label:"Грудь"},{key:"arm",label:"Рука (бицепс)"},{key:"thigh",label:"Бедро"}];
+  const fields=[{key:"waist",label:t("field_waist")},{key:"hips",label:t("field_hips")},{key:"chest",label:t("field_chest")},{key:"arm",label:t("field_arm")},{key:"thigh",label:t("field_thigh")}];
 
   useEffect(()=>{
     if(view==="history"&&!history){
@@ -7979,7 +9228,7 @@ function MeasurementsScreen({onBack,tgId}){
   return <div style={{padding:"16px 16px 100px"}}>
     <BackBtn onBack={onBack}/><Kicker>{t("measurements_cat")}</Kicker><Hero>{t("measurements_title2")}</Hero>
     <div style={{display:"flex",gap:0,margin:"16px 0",border:`0.5px solid ${C.border}`,borderRadius:10,overflow:"hidden"}}>
-      {[{id:"add",label:"ДОБАВИТЬ"},{id:"history",label:"ИСТОРИЯ"}].map(t=>(
+      {[{id:"add",label:t("add")},{id:"history",label:t("measurements_history")}].map(t=>(
         <button key={t.id} onClick={()=>setView(t.id)} style={{flex:1,padding:"10px",background:view===t.id?C.accent:C.card,border:"none",color:view===t.id?C.bg:C.muted,fontFamily:"monospace",fontSize:11,fontWeight:700,cursor:"pointer"}}>
           {t.label}
         </button>
@@ -7996,26 +9245,26 @@ function MeasurementsScreen({onBack,tgId}){
               <input type="number" value={form[f.key]} onChange={e=>setForm(p=>({...p,[f.key]:e.target.value}))} placeholder="0"
                 style={{background:"none",border:"none",color:C.accent,fontSize:22,fontFamily:"monospace",fontWeight:700,width:80,outline:"none"}}/>
             </div>
-            <span style={{fontFamily:"monospace",fontSize:14,color:C.muted}}>см</span>
+            <span style={{fontFamily:"monospace",fontSize:14,color:C.muted}}>{t("meas_sm")}</span>
           </div>
         </Card>)}
       </div>
       <Btn accent full onClick={save} disabled={saving||!Object.values(form).some(v=>v)}>
-        {saving?"СОХРАНЯЕМ...":"СОХРАНИТЬ ЗАМЕРЫ"}
+        {saving?t("saving"):t("save_measurements")}
       </Btn>
       <div style={{fontSize:11,color:C.muted,fontFamily:"monospace",textAlign:"center",marginTop:8}}>{t("measurements_hint")}</div>
     </>}
 
     {view==="history"&&(
-      !history?<Loader text="ИСТОРИЯ"/>:
+      !history?<Loader text={t("measurements_history")}/>:
       history.length===0?<Card><div style={{textAlign:"center",padding:"16px 0",color:C.muted}}>{t("measurements_none")}</div></Card>:
       <div style={{display:"flex",flexDirection:"column",gap:10}}>
         {history.map((h,i)=><Card key={i}>
-          <Kicker>{new Date(h.logged_at||h.created_at).toLocaleDateString("ru",{day:"numeric",month:"long"})}</Kicker>
+          <Kicker>{new Date(h.logged_at||h.created_at).toLocaleDateString(dateLocale(),{day:"numeric",month:"long"})}</Kicker>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:"6px 16px",marginTop:8}}>
             {fields.map(f=>h[f.key]?<div key={f.key}>
               <span style={{fontSize:11,color:C.muted,fontFamily:"monospace"}}>{f.label}: </span>
-              <Mono size={13}>{h[f.key]} <span style={{fontSize:11,color:C.muted,fontWeight:400}}>см</span></Mono>
+              <Mono size={13}>{h[f.key]} <span style={{fontSize:11,color:C.muted,fontWeight:400}}>{t("meas_sm")}</span></Mono>
             </div>:null)}
           </div>
         </Card>)}
@@ -8081,7 +9330,7 @@ function CheckinScreen({onBack,tgId}){
             </Card>
           ))}
         </div>
-        <Btn accent full onClick={send} disabled={saving}>{saving?"СОХРАНЯЕМ...":"ОТПРАВИТЬ ЧЕК-ИН"}</Btn>
+        <Btn accent full onClick={send} disabled={saving}>{saving?t("saving"):t("send_checkin")}</Btn>
       </>
     }
   </div>;
@@ -8090,7 +9339,7 @@ function CheckinScreen({onBack,tgId}){
 function LanguageScreen({tgId,user,onBack,onUserUpdated}){
   const [saving,setSaving]=useState(false);
   const langs=[{code:"ru",label:"🇷🇺 Русский"},{code:"en",label:"🇬🇧 English"},{code:"uz",label:"🇺🇿 O'zbek"},{code:"kz",label:"🇰🇿 Қазақша"}];
-  async function setLang(code){setSaving(code);try{await fetch(`${API}/user/${tgId}`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({lang:code})});LANG_STORE.current=code;storeLang(code);onUserUpdated&&onUserUpdated(code);setTimeout(onBack,500);}catch{}finally{setSaving(false);};}
+  async function setLang(code){setSaving(code);try{await fetch(`${API}/user/${tgId}`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({lang:code})});LANG_STORE.current=code;storeLang(code);invalidateApi("/home");onUserUpdated&&onUserUpdated(code);setTimeout(onBack,500);}catch{}finally{setSaving(false);};}
   // Через normLang: если в users.lang лежит "kk" или "RU", галочка «текущий»
   // иначе не встала бы ни на один пункт списка.
   const cur=normLang(user?.lang)||"ru";
@@ -8129,9 +9378,9 @@ function SupportScreen({onBack,tgId}){
   return <div style={{padding:"16px 16px 100px"}}>
     <BackBtn onBack={onBack}/><Kicker>{t("support_cat")}</Kicker><Hero>{t("support_title2")}</Hero><div style={{height:16}}/>
     {sent?<Card accent><div style={{textAlign:"center",padding:"20px 0"}}><div style={{fontSize:32,color:C.accent}}>✓</div><div style={{fontFamily:"monospace",fontSize:13,color:C.accent,marginTop:8}}>{t("sent")}</div></div></Card>:<>
-      <Card style={{marginBottom:16}}><div style={{fontSize:12,color:C.muted,fontFamily:"monospace",marginBottom:10}}>{t("support_problem")}</div><textarea value={msg} onChange={e=>setMsg(e.target.value)} placeholder="Опишите ваше обращение, мы ответим в ближайшее время" rows={5} style={{width:"100%",background:"none",border:"none",color:C.text,fontSize:14,lineHeight:1.6,resize:"none",outline:"none",boxSizing:"border-box"}}/></Card>
+      <Card style={{marginBottom:16}}><div style={{fontSize:12,color:C.muted,fontFamily:"monospace",marginBottom:10}}>{t("support_problem")}</div><textarea value={msg} onChange={e=>setMsg(e.target.value)} placeholder={t("support_placeholder")} rows={5} style={{width:"100%",background:"none",border:"none",color:C.text,fontSize:14,lineHeight:1.6,resize:"none",outline:"none",boxSizing:"border-box"}}/></Card>
       <Btn accent full onClick={send} disabled={saving||!msg.trim()}>
-              {saving?"ОТПРАВЛЯЕМ...":"ОТПРАВИТЬ"}
+              {saving?t("sending"):t("send_btn")}
             </Btn>
             {error&&<div style={{marginTop:10,fontSize:12,color:C.danger,fontFamily:"monospace",textAlign:"center"}}>{error}</div>}
     </>}
@@ -8143,7 +9392,7 @@ function GoalsScreen({tgId,onBack}){
   function load(){if(!tgId){setData({goals:[]});return;}fetch(`${API}/goals/${tgId}`).then(r=>r.json()).then(setData).catch(()=>setData({goals:[]}));}
   useEffect(()=>{load();},[]);
   async function add(){if(!form.description.trim())return;setSaving(true);try{const res=await fetch(`${API}/goals/${tgId}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({description:form.description,target_value:parseFloat(form.target_value)||null,unit:form.unit||null,deadline:form.deadline||null,goal_type:"custom"})});if(res.ok){setAdding(false);setForm({description:"",target_value:"",unit:"кг",deadline:""});load();}}catch{}finally{setSaving(false);};}
-  if(!data)return <div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader text="ЦЕЛИ"/></div>;
+  if(!data)return <div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader text={t("goals_celi")}/></div>;
   const active=data.goals.filter(g=>!g.is_achieved);const done=data.goals.filter(g=>g.is_achieved);
   return <div style={{padding:"16px 16px 100px"}}>
     <BackBtn onBack={onBack}/><Kicker>{t("progress_title")}</Kicker><Hero>{t("goals_title2")}</Hero><div style={{height:16}}/>
@@ -8151,8 +9400,8 @@ function GoalsScreen({tgId,onBack}){
     <Card style={{marginBottom:16}}><Kicker>{t("new_goal")}</Kicker><div style={{display:"flex",flexDirection:"column",gap:10,marginTop:8}}>
       <input value={form.description} onChange={e=>setForm(p=>({...p,description:e.target.value}))} placeholder={t("goal_desc")} style={{background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 12px",color:C.text,fontSize:14,outline:"none"}}/>
       <div style={{display:"flex",gap:8}}>
-        <input type="number" value={form.target_value} onChange={e=>setForm(p=>({...p,target_value:e.target.value}))} placeholder="Цель" style={{flex:2,background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 12px",color:C.accent,fontSize:14,fontFamily:"monospace",outline:"none"}}/>
-        <input value={form.unit} onChange={e=>setForm(p=>({...p,unit:e.target.value}))} placeholder="ед." style={{flex:1,background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 12px",color:C.muted,fontSize:14,outline:"none"}}/>
+        <input type="number" value={form.target_value} onChange={e=>setForm(p=>({...p,target_value:e.target.value}))} placeholder={t("goal_target")} style={{flex:2,background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 12px",color:C.accent,fontSize:14,fontFamily:"monospace",outline:"none"}}/>
+        <input value={form.unit} onChange={e=>setForm(p=>({...p,unit:e.target.value}))} placeholder={t("goal_unit")} style={{flex:1,background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 12px",color:C.muted,fontSize:14,outline:"none"}}/>
       </div>
       <input type="date" value={form.deadline} onChange={e=>setForm(p=>({...p,deadline:e.target.value}))} style={{colorScheme:"dark",background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 12px",color:C.muted,fontSize:13,outline:"none"}}/>
       <div style={{display:"flex",gap:8}}><Btn full onClick={()=>setAdding(false)} style={{flex:1}}>{t("cancel_btn2")}</Btn><Btn accent full onClick={add} disabled={saving||!form.description.trim()} style={{flex:2}}>{saving?"...":t("save_profile")}</Btn></div>
@@ -8161,7 +9410,7 @@ function GoalsScreen({tgId,onBack}){
     {active.map(g=><Card key={g.id} style={{marginBottom:8}}>
       <div style={{display:"flex",justifyContent:"space-between",marginBottom:6}}><div style={{fontWeight:600,fontSize:14,color:C.text,flex:1}}>{g.description}</div><Mono size={12}>{g.pct}%</Mono></div>
       <div style={{marginBottom:6}}><ProgressBar pct={g.pct}/></div>
-      <div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,color:C.muted,fontFamily:"monospace"}}>{g.current_value}/{g.target_value} {g.unit}</span>{g.days_left!=null&&<span style={{fontSize:11,color:g.days_left<7?C.danger:C.muted,fontFamily:"monospace"}}>{g.days_left} дн.</span>}</div>
+      <div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontSize:11,color:C.muted,fontFamily:"monospace"}}>{g.current_value}/{g.target_value} {g.unit}</span>{g.days_left!=null&&<span style={{fontSize:11,color:g.days_left<7?C.danger:C.muted,fontFamily:"monospace"}}>{g.days_left} {t("alt_days")}</span>}</div>
     </Card>)}
     {done.length>0&&<><Kicker style={{marginTop:16}}>{t("goal_achieved")}</Kicker>{done.map(g=><Card key={g.id} style={{marginBottom:8,opacity:0.6}}><div style={{display:"flex",justifyContent:"space-between"}}><span style={{fontSize:14,color:C.success}}>✓ {g.description}</span><Mono size={12} color={C.success}>100%</Mono></div></Card>)}</>}
   </div>;
@@ -8170,7 +9419,7 @@ function GoalsScreen({tgId,onBack}){
 function RemindersScreen({tgId,onBack,onNav}){
   const [data,setData]=useState(null);
   useEffect(()=>{if(!tgId){setData({reminders:[]});return;}fetch(`${API}/reminders/${tgId}`).then(r=>r.json()).then(setData).catch(()=>setData({reminders:[]}));},[]);
-  const fmt=iso=>{const d=new Date(iso);return d.toLocaleString("ru",{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});};
+  const fmt=iso=>{const d=new Date(iso);return d.toLocaleString(dateLocale(),{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});};
   if(!data)return <div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader/></div>;
   return <div style={{padding:"16px 16px 100px"}}>
     <BackBtn onBack={onBack}/><Kicker>{t("reminders_cat")}</Kicker><Hero>{t("reminders_title2")}</Hero><div style={{height:16}}/>
@@ -8204,7 +9453,7 @@ function LeaderboardScreen({tgId,onBack}){
   const rankColors={beginner:"#CD7F32",athlete:"#C0C0C0",champion:"#FFD700",legend:"#00FFFF"};
   const medals=["🥇","🥈","🥉"];
 
-  if(!data)return<div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader text="ЗАГРУЗКА"/></div>;
+  if(!data)return<div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader text={t("loading")}/></div>;
 
   return<div style={{padding:"16px 16px 100px"}}>
     <BackBtn onBack={onBack}/>
@@ -8215,7 +9464,7 @@ function LeaderboardScreen({tgId,onBack}){
     {data.me&&<Card accent style={{marginBottom:16,textAlign:"center"}}>
       <div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:4}}>{t("my_position")}</div>
       <div style={{fontSize:32,fontWeight:700,color:C.accent}}>#{data.my_position}</div>
-      <div style={{fontSize:13,color:C.text,marginTop:4}}>{data.me.name} · {data.me.pts} балл.</div>
+      <div style={{fontSize:13,color:C.text,marginTop:4}}>{data.me.name} · {data.me.pts} {t("pts_short")}</div>
       <div style={{fontSize:11,color:C.muted,marginTop:2}}>{data.me.rank}</div>
     </Card>}
 
@@ -8235,7 +9484,7 @@ function LeaderboardScreen({tgId,onBack}){
             </div>
             <div style={{flex:1,minWidth:0}}>
               <div style={{fontWeight:600,fontSize:14,color:l.is_me?C.accent:C.text}}>
-                {l.name}{l.is_me?" (ты)":""}
+                {l.name}{l.is_me?" "+t("lb_ty"):""}
               </div>
               <div style={{fontSize:11,color:C.muted,marginTop:2}}>
                 {l.rank}
@@ -8252,7 +9501,7 @@ function LeaderboardScreen({tgId,onBack}){
 
     {data.leaders?.length===0&&<Card>
       <div style={{textAlign:"center",padding:"20px 0",color:C.muted}}>
-        Пока никто не в рейтинге. Тренируйся и зарабатывай баллы!
+        {t("ui_poka_nikto_ne_v")}
       </div>
     </Card>}
   </div>;
@@ -8266,7 +9515,7 @@ function AchievementsScreen({tgId,onBack}){
     fetch(`${API}/achievements/${tgId}`).then(r=>r.json()).then(setData).catch(()=>setData(null));
   },[]);
 
-  if(!data)return<div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader text="ДОСТИЖЕНИЯ"/></div>;
+  if(!data)return<div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader text={t("achievements_title2")}/></div>;
 
   const unlocked=data.achievements.filter(a=>a.unlocked);
   const locked=data.achievements.filter(a=>!a.unlocked);
@@ -8276,7 +9525,7 @@ function AchievementsScreen({tgId,onBack}){
     <Kicker>{t("gamification_title2")}</Kicker>
     <Hero style={{marginBottom:8}}>{t("achievements_title2")}</Hero>
     <div style={{fontFamily:"monospace",fontSize:12,color:C.muted,marginBottom:20}}>
-      ОТКРЫТО {data.unlocked_count} / {data.total}
+      {t("unlocked_label")} {data.unlocked_count} / {data.total}
     </div>
 
     {/* Прогресс-бар */}
@@ -8299,7 +9548,7 @@ function AchievementsScreen({tgId,onBack}){
             <div>
               <div style={{fontSize:11,color:C.accent,fontFamily:"monospace",marginBottom:2}}>{t("new_achievement")}</div>
               <div style={{fontWeight:700,fontSize:15,color:C.text}}>{tField(a,"name")||a.name}</div>
-              <div style={{fontSize:12,color:C.muted,marginTop:2}}>{tField(a,"desc")||a.desc} · +{a.pts} балл.</div>
+              <div style={{fontSize:12,color:C.muted,marginTop:2}}>{tField(a,"desc")||a.desc} · +{a.pts} {t("pts_short")}</div>
             </div>
           </div>
         </Card>
@@ -8308,16 +9557,16 @@ function AchievementsScreen({tgId,onBack}){
 
     {/* Открытые */}
     {unlocked.length>0&&<>
-      <Kicker style={{marginBottom:8}}>ОТКРЫТО ({unlocked.length})</Kicker>
+      <Kicker style={{marginBottom:8}}>{t("ach_otkryto")}{unlocked.length})</Kicker>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:16}}>
         {unlocked.map((a,i)=>(
           <Card key={i} style={{border:`0.5px solid ${C.accent}33`}}>
             <div style={{fontSize:28,marginBottom:6}}>{a.emoji}</div>
             <div style={{fontWeight:600,fontSize:13,color:C.text,marginBottom:3}}>{tField(a,"name")||a.name}</div>
             <div style={{fontSize:11,color:C.muted,lineHeight:1.4,marginBottom:6}}>{tField(a,"desc")||a.desc}</div>
-            <div style={{fontFamily:"monospace",fontSize:11,color:C.accent}}>+{a.pts} балл.</div>
+            <div style={{fontFamily:"monospace",fontSize:11,color:C.accent}}>+{a.pts} {t("pts_short")}</div>
             {a.unlocked_at&&<div style={{fontSize:10,color:C.muted,marginTop:4,fontFamily:"monospace"}}>
-              {new Date(a.unlocked_at).toLocaleDateString("ru",{day:"numeric",month:"short"})}
+              {new Date(a.unlocked_at).toLocaleDateString(dateLocale(),{day:"numeric",month:"short"})}
             </div>}
           </Card>
         ))}
@@ -8326,14 +9575,14 @@ function AchievementsScreen({tgId,onBack}){
 
     {/* Заблокированные */}
     {locked.length>0&&<>
-      <Kicker style={{marginBottom:8}}>ЕЩЁ НЕ ОТКРЫТО ({locked.length})</Kicker>
+      <Kicker style={{marginBottom:8}}>{t("ach_esche_ne_otkryto")}{locked.length})</Kicker>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
         {locked.map((a,i)=>(
           <Card key={i} style={{opacity:0.5}}>
             <div style={{fontSize:28,marginBottom:6,filter:"grayscale(1)"}}>🔒</div>
             <div style={{fontWeight:600,fontSize:13,color:C.muted,marginBottom:3}}>{tField(a,"name")||a.name}</div>
             <div style={{fontSize:11,color:C.muted,lineHeight:1.4,marginBottom:6}}>{tField(a,"desc")||a.desc}</div>
-            <div style={{fontFamily:"monospace",fontSize:11,color:C.muted}}>+{a.pts} балл.</div>
+            <div style={{fontFamily:"monospace",fontSize:11,color:C.muted}}>+{a.pts} {t("pts_short")}</div>
           </Card>
         ))}
       </div>
@@ -8368,7 +9617,7 @@ export default function App(){
         .then(r=>{
           if(r.status===404){
             // Пользователь не найден в БД — новая регистрация через Mini App
-            setUser({first_name:tg?.initDataUnsafe?.user?.first_name||"Атлет",ai_requests_today:0,_not_found:true});
+            setUser({first_name:tg?.initDataUnsafe?.user?.first_name||t("onb_atlet"),ai_requests_today:0,_not_found:true});
             return null;
           }
           if(!r.ok) throw new Error(r.status);
@@ -8379,9 +9628,9 @@ export default function App(){
         // в T и рисовался бы по-русски, а каталог сервер отдал бы на казахском —
         // вперемешку. Нормализуем в одном месте, у входа.
         .then(d=>{if(d){setUser(d);const lc=normLang(d.lang)||"ru";LANG_STORE.current=lc;storeLang(lc);setLang(lc);}})
-        .catch(()=>setUser({first_name:tg?.initDataUnsafe?.user?.first_name||"Атлет",ai_requests_today:0,_error:true}));
+        .catch(()=>setUser({first_name:tg?.initDataUnsafe?.user?.first_name||t("onb_atlet"),ai_requests_today:0,_error:true}));
     } else {
-      setUser({first_name:"Атлет",ai_requests_today:0});
+      setUser({first_name:t("onb_atlet"),ai_requests_today:0});
     }
   }
 
@@ -8552,7 +9801,7 @@ export default function App(){
   // в онбординге, а существующие иначе остались бы без отметки навсегда.
   if(user&&!(user.consents?.terms&&user.consents?.basic))return<ConsentGateScreen tgId={tgId} onDone={()=>{setUser(null);loadUser();}}/>;
   // Загрузка
-  if(!user)return<div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:C.bg}}><Loader text="ЗАГРУЗКА"/></div>;
+  if(!user)return<div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:C.bg}}><Loader text={t("loading")}/></div>;
 
   return <div style={{background:C.bg,minHeight:"100vh",color:C.text,fontFamily:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",position:"relative"}}>
     <div style={{
