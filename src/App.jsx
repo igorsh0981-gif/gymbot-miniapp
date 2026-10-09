@@ -3817,6 +3817,37 @@ function dateLocale() {
   return l === "kz" ? "kk" : (l || "ru");
 }
 
+/** Сегодняшняя дата по часам ТЕЛЕФОНА, в виде YYYY-MM-DD.
+ *
+ *  Везде стоял `new Date().toISOString().split("T")[0]`, а toISOString переводит
+ *  в UTC. В Ташкенте это +5, поэтому с полуночи до пяти утра «сегодня» было
+ *  вчерашним днём: дневник питания открывался на вчера, запись занятия спортом
+ *  ложилась вчерашним числом, а потом это же расхождение всплывало в разборе
+ *  тренировки как перепутанный порядок событий.
+ */
+function localToday() {
+  const d = new Date();
+  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().split("T")[0];
+}
+
+/** Отметка времени из базы (наивный UTC, без «Z») → момент для показа.
+ *
+ *  Браузер по спецификации читает «2026-10-08T21:14:03» без смещения как
+ *  МЕСТНОЕ время, хотя в базе это UTC. Поэтому к разобранной дате добавляем
+ *  пять часов и получаем тот же момент в ташкентских стенных часах.
+ *  Сдвиг уже стоял тремя копиями числом 5*3600000 — здесь он получает имя.
+ *
+ *  Без него карточка ночной тренировки показывала вчерашнее число. Раньше
+ *  тренер ошибался так же, и расхождения не было видно; теперь он называет
+ *  дату верно, и человек увидел бы на одном экране «8 окт.» в списке и
+ *  «9 октября» в разборе.
+ */
+function utcToLocal(iso) {
+  if (!iso) return null;
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? null : new Date(d.getTime() + 5 * 3600000);
+}
+
 function tField(obj, field) {
   if (!obj) return "";
   const lang = LANG_STORE.current;
@@ -5513,7 +5544,7 @@ function WorkoutHistoryScreen({workouts,onNav,tgId,refreshToken=0}){
     catch{}finally{setDeleting(null);}
   }
 
-  const fmtDt=iso=>{if(!iso)return"—";const d=new Date(new Date(iso).getTime()+5*3600000);return d.toLocaleString(dateLocale(),{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});};
+  const fmtDt=iso=>{const d=utcToLocal(iso);return d?d.toLocaleString(dateLocale(),{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"—";};
   const fmtDate=iso=>{if(!iso)return"—";const d=new Date(iso+"T12:00:00");return d.toLocaleDateString(dateLocale(),{day:"numeric",month:"short"});};
   const statusColor={scheduled:C.accent,reminded:C.warn,completed:C.success,missed:C.danger};
   const intensityLabel={low:t("wh_nizkaya"),medium:t("wh_srednyaya"),high:t("wh_vysokaya")};
@@ -5550,7 +5581,7 @@ function WorkoutHistoryScreen({workouts,onNav,tgId,refreshToken=0}){
           {workouts.map(w=><Card key={w.id} onClick={()=>onNav("workout_detail",{workoutId:w.id})}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
               <div>
-                <Kicker>{new Date(w.date||w.started_at).toLocaleDateString(dateLocale(),{day:"numeric",month:"short"})}</Kicker>
+                <Kicker>{utcToLocal(w.date||w.started_at)?.toLocaleDateString(dateLocale(),{day:"numeric",month:"short"})||"—"}</Kicker>
                 <div style={{fontWeight:600,fontSize:15,color:C.text}}>{w.workout_type==="completed"?t("workout_type"):w.workout_type||t("workout_type")}</div>
               </div>
               <div style={{textAlign:"right"}}><Mono>{w.sets_count||0}</Mono><span style={{fontSize:11,color:C.muted}}> {t("sets_short2")}</span></div>
@@ -5570,7 +5601,7 @@ function WorkoutHistoryScreen({workouts,onNav,tgId,refreshToken=0}){
         {!sportSessions?<Loader text={t("sport_cat")}/>:
          sportSessions.length===0?<Card><div style={{textAlign:"center",padding:"20px 0",color:C.muted}}>{t("no_sport_yet")}</div></Card>:
          <div style={{display:"flex",flexDirection:"column",gap:8}}>
-           {(()=>{const today=new Date().toISOString().split("T")[0];
+           {(()=>{const today=localToday();
              const future=sportSessions.filter(s=>s.session_date>=today);
              const past=sportSessions.filter(s=>s.session_date<today);
              return(<>
@@ -6703,7 +6734,7 @@ function MyWorkoutsDetailScreen({tgId,onBack,onNav}){
   }
   useEffect(()=>{load();},[]);
   async function del(id){setDeleting(id);try{await fetch(`${API}/planned/${tgId}/${id}`,{method:"DELETE"});load();}catch{}finally{setDeleting(null);};}
-  const fmtDt=iso=>{if(!iso)return"—";const d=new Date(new Date(iso).getTime()+5*3600000);return d.toLocaleString(dateLocale(),{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});};
+  const fmtDt=iso=>{const d=utcToLocal(iso);return d?d.toLocaleString(dateLocale(),{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}):"—";};
   const statusColor={scheduled:C.accent,reminded:C.warn,completed:C.success,missed:C.danger};
   if(!data)return <div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader/></div>;
   return <div style={{padding:"16px 16px 100px"}}>
@@ -6771,7 +6802,7 @@ function PlannedDetailScreen({pwId,tgId,onBack,exercises=[],muscleGroups=[],read
   }
 
   if(!data)return <div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader/></div>;
-  const dt=data.planned_datetime?new Date(new Date(data.planned_datetime).getTime()+5*3600000).toLocaleString(dateLocale(),{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}):"—";
+  const dt=utcToLocal(data.planned_datetime)?.toLocaleString(dateLocale(),{day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"})||"—";
 
   return <div style={{padding:"16px 16px 100px"}}>
     <BackBtn onBack={onBack}/><Kicker>{t("scheduled_workout")}</Kicker>
@@ -6968,7 +6999,7 @@ function PlanWorkoutScreen({tgId,exercises,muscleGroups,onBack}){
     <div style={{height:16}}/>
     <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:16}}>
       <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("name_opt_section")}</div><input value={form.title} onChange={e=>setForm(p=>({...p,title:e.target.value}))} placeholder={selExs.slice(0,2).map(e=>e.name.split(" ")[0]).join("+")||t("my_workout_name")} style={{background:"none",border:"none",color:C.text,fontSize:16,width:"100%",outline:"none"}}/></Card>
-      <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("sport_date")}</div><div style={{display:"flex",alignItems:"center",gap:8}}><input id="plan-date-input" type="date" value={form.date} min={new Date().toISOString().split("T")[0]} onChange={e=>setForm(p=>({...p,date:e.target.value}))} style={{colorScheme:"dark",background:"none",border:"none",color:C.accent,fontSize:20,fontFamily:"monospace",fontWeight:700,outline:"none",flex:1,WebkitAppearance:"none",appearance:"none"}}/><span style={{fontSize:22,flexShrink:0}}>📅</span></div></Card>
+      <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("sport_date")}</div><div style={{display:"flex",alignItems:"center",gap:8}}><input id="plan-date-input" type="date" value={form.date} min={localToday()} onChange={e=>setForm(p=>({...p,date:e.target.value}))} style={{colorScheme:"dark",background:"none",border:"none",color:C.accent,fontSize:20,fontFamily:"monospace",fontWeight:700,outline:"none",flex:1,WebkitAppearance:"none",appearance:"none"}}/><span style={{fontSize:22,flexShrink:0}}>📅</span></div></Card>
       <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("time_label2")}</div><div style={{display:"flex",alignItems:"center",gap:8}}><input id="plan-time-input" type="time" value={form.time} onChange={e=>setForm(p=>({...p,time:e.target.value}))} style={{colorScheme:"dark",background:"none",border:"none",color:C.accent,fontSize:20,fontFamily:"monospace",fontWeight:700,outline:"none",flex:1,WebkitAppearance:"none",appearance:"none"}}/><span style={{fontSize:22,flexShrink:0}}>⏰</span></div></Card>
     </div>
     <div style={{marginBottom:16}}><Kicker>{t("pw_uprazhneniya")}{selExs.length})</Kicker>{selExs.map((e,i)=><div key={e.id} style={{padding:"6px 0",borderBottom:`0.5px solid ${C.border}`,display:"flex",gap:10}}><Mono color={C.accent} size={13}>{i+1}</Mono><span style={{fontSize:13,color:C.text}}>{tField(e,"name")}</span></div>)}</div>
@@ -7606,7 +7637,7 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
   // Выбор даты объявлен здесь, выше ask(): открывать его теперь может и сам ответ
   // тренера, когда человек попросил сохранить тренировку словами в чате.
   const [showDatePicker,setShowDatePicker]=useState(false);
-  const [planDate,setPlanDate]=useState(()=>{const d=new Date();d.setDate(d.getDate()+1);return d.toISOString().split("T")[0];});
+  const [planDate,setPlanDate]=useState(()=>{const d=new Date();d.setDate(d.getDate()+1);return new Date(d.getTime()-d.getTimezoneOffset()*60000).toISOString().split("T")[0];});
   const [planTime,setPlanTime]=useState("10:00");
   // Сессия диалога живёт в localStorage, а не в состоянии компонента. Экран AI
   // рендерится условно (if(tab==="ai")), поэтому при любом переходе он размонтировался
@@ -7992,7 +8023,7 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
           <div style={{fontSize:14,fontWeight:700,color:C.text,marginBottom:16,fontFamily:"monospace"}}>{t("when_workout2")}</div>
           <div style={{marginBottom:12}}>
             <div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:6}}>{t("sport_date")}</div>
-            <input type="date" value={planDate} min={new Date().toISOString().split("T")[0]}
+            <input type="date" value={planDate} min={localToday()}
               onChange={e=>setPlanDate(e.target.value)}
               style={{colorScheme:"dark",width:"100%",background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 12px",color:C.accent,fontSize:16,fontFamily:"monospace",outline:"none"}}/>
           </div>
@@ -8297,7 +8328,7 @@ function NutritionScreen({tgId,onBack,onNav}){
   const MEALS=[{type:"breakfast",label:t("meal_breakfast"),icon:"🌅"},{type:"lunch",label:t("meal_lunch"),icon:"☀️"},{type:"dinner",label:t("meal_dinner"),icon:"🌙"},{type:"snack",label:t("meal_snack"),icon:"🍎"}];
   const [data,setData]=useState(null);
   const [error,setError]=useState(null);
-  const [viewDate,setViewDate]=useState(()=>new Date().toISOString().split("T")[0]);
+  const [viewDate,setViewDate]=useState(()=>new Date().toISOString().split("T")[0]); // UTC намеренно: сервер бакетирует питание по UTC-дате, см. tech_debt
   const [adding,setAdding]=useState(null);
   const [saving,setSaving]=useState(false);
   const [form,setForm]=useState({meal_name:"",kcal:"",protein:"",fat:"",carb:""});
@@ -8721,7 +8752,7 @@ function SportLogScreen({tgId,onBack,initialSport=null}){
   const [duration,setDuration]=useState("60");
   const [intensity,setIntensity]=useState("medium");
   const [notes,setNotes]=useState("");
-  const [date,setDate]=useState(()=>new Date().toISOString().split("T")[0]);
+  const [date,setDate]=useState(localToday);
   const [saving,setSaving]=useState(false);
   const [saved,setSaved]=useState(null);
 
