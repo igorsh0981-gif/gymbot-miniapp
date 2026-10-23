@@ -35,6 +35,108 @@ const haptic = {
   notify(type = "success") { if (haptic._ok()) { try { tg.HapticFeedback.notificationOccurred(type); } catch {} } },
 };
 
+// ── Очередь записей тренировки ───────────────────────────────────────────────
+// «Подход выполнен» больше не ждёт сервер: подход сразу появляется на экране,
+// а запрос уходит отсюда фоном. Раньше человек после каждого подхода смотрел
+// 2–3 секунды на «Сохраняем…», а в подвальном зале без связи подход терялся.
+// Очередь лежит в localStorage и переживает закрытие приложения. Отправка
+// строго по порядку: сервер узнаёт повтор подхода по последней строке, оценка
+// RPE должна лечь на свой подход, а «пропустить отдых» — прийти после подхода,
+// который этот отдых запустил.
+const SET_QUEUE_KEY = "gymbot_set_queue";
+const SET_QUEUE_PARKED_KEY = "gymbot_set_queue_parked";
+const SQ_STALE_REST_MS = 20000;   // позже этого подход отдых уже не запускает
+const SQ_PARK_AFTER = 6;          // столько сбоев 5xx подряд — запись в сторону, очередь дальше
+const _sqLoad = (k) => { try { const v = JSON.parse(localStorage.getItem(k) || "[]"); return Array.isArray(v) ? v : []; } catch { return []; } };
+const _sq = {
+  // Отложенные в прошлый раз записи получают ещё одну попытку при запуске
+  items: [..._sqLoad(SET_QUEUE_KEY), ..._sqLoad(SET_QUEUE_PARKED_KEY).map(it => ({ ...it, fails: 0 }))],
+  parked: [],
+  busy: false, timer: null, tries: 0, lastStatus: null, dropped: 0, listeners: new Set(),
+};
+try { localStorage.removeItem(SET_QUEUE_PARKED_KEY); } catch {}
+function _sqUid() { return tg?.initDataUnsafe?.user?.id || null; }
+function _sqSave() {
+  try {
+    localStorage.setItem(SET_QUEUE_KEY, JSON.stringify(_sq.items));
+    localStorage.setItem(SET_QUEUE_PARKED_KEY, JSON.stringify(_sq.parked));
+  } catch {}
+}
+function _sqEmit() { _sq.listeners.forEach(f => { try { f(); } catch {} }); }
+// Записи этого пользователя: на одном телефоне может быть несколько аккаунтов
+// Telegram с общим хранилищем, и чужая запись не должна стопорить свою очередь.
+function _sqMine() { const u = _sqUid(); return _sq.items.filter(it => !it.uid || !u || it.uid === u); }
+function sqPending() { return _sqMine().length; }
+function sqPendingSets(workoutId) { return _sqMine().filter(it => it.kind === "set" && it.workoutId === workoutId).length; }
+function sqSubscribe(f) { _sq.listeners.add(f); return () => _sq.listeners.delete(f); }
+function sqPush(kind, url, body, extra = {}) {
+  _sq.items.push({ kind, url, body, at: Date.now(), uid: _sqUid(), fails: 0, ...extra });
+  _sqSave(); _sqEmit(); sqKick(0);
+}
+function sqKick(delay = 0) { clearTimeout(_sq.timer); _sq.timer = setTimeout(_sqRun, delay); }
+async function _sqRun() {
+  if (_sq.busy) return;
+  _sq.busy = true;
+  try {
+    for (;;) {
+      const it = _sqMine()[0];
+      if (!it) break;
+      const body = { ...(it.body || {}) };
+      if (it.kind === "set") {
+        const age = Date.now() - (it.at || Date.now());
+        body.age_ms = Math.max(0, age);
+        if (age > SQ_STALE_REST_MS) body.rest_sec = null;   // отдых давно прошёл
+      }
+      let res = null;
+      const ctl = typeof AbortController !== "undefined" ? new AbortController() : null;
+      const killer = ctl ? setTimeout(() => ctl.abort(), 15000) : null;   // зависший запрос не держит очередь
+      try {
+        res = await fetch(it.url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body), signal: ctl?.signal });
+      } catch {} finally { if (killer) clearTimeout(killer); }
+      const st = res ? res.status : 0;
+      const drop = () => { _sq.items = _sq.items.filter(x => x !== it); _sq.tries = 0; _sq.lastStatus = null; _sqSave(); _sqEmit(); };
+      if (res && res.ok) { drop(); continue; }
+      if (st === 404 || st === 422 || st === 400) {
+        // Тренировки нет или запрос негодный — повтор не поможет, а очередь встала бы навсегда
+        console.warn("[set queue] отброшено", st, it);
+        if (it.kind === "set") _sq.dropped++;
+        drop(); continue;
+      }
+      if (st >= 500 && ++it.fails >= SQ_PARK_AFTER) {
+        // Сервер упорно не принимает именно эту запись — откладываем её до
+        // следующего запуска, чтобы за ней не встали все остальные подходы.
+        console.warn("[set queue] отложено до следующего запуска", st, it);
+        _sq.parked.push(it); drop(); continue;
+      }
+      _sq.tries++; _sq.lastStatus = st; _sqSave(); _sqEmit();
+      // 401/403 — устарела подпись Telegram: поможет только новое открытие
+      // приложения, поэтому без частых повторов, но очередь сохраняем.
+      const delay = (st === 401 || st === 403) ? 60000 : Math.min(30000, 2000 * 2 ** Math.min(_sq.tries - 1, 4));
+      sqKick(delay);
+      return;
+    }
+  } finally { _sq.busy = false; }
+}
+/** Дождаться отправки очереди. Ждём, пока она движется: ставим предел не на
+ *  общее время, а на простой — 20 подходов после зала без связи уходят дольше
+ *  восьми секунд, и обрезать их на середине нельзя. true — всё ушло. */
+async function sqFlush(stallMs = 8000, maxMs = 90000) {
+  const start = Date.now();
+  let left = sqPending(), changed = Date.now();
+  while (left && Date.now() - changed < stallMs && Date.now() - start < maxMs) {
+    if (!_sq.busy) { _sq.tries = 0; sqKick(0); }   // человек ждёт — без пауз между повторами
+    await new Promise(r => setTimeout(r, 300));
+    const now = sqPending();
+    if (now !== left) { left = now; changed = Date.now(); }
+  }
+  return sqPending() === 0;
+}
+try {
+  window.addEventListener("online", () => sqKick(0));
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "visible") sqKick(0); });
+} catch {}
+if (_sq.items.length) sqKick(1500);   // осталось с прошлого запуска
+
 // ─────────────────────────────────────────────────────────────────────────────
 //  Кэш GET-запросов с инвалидацией по событиям
 //
@@ -144,7 +246,7 @@ const _MUTATION_EVENTS = [
   [/\/workout\/[^/]+\/(finish|close-active)/, "workout_finished"],
   // Запись подхода — десятки раз за тренировку, и главный экран в это время
   // всё равно не смотрят. Сбрасывать на каждый подход незачем.
-  [/\/workout\/[^/]+\/(set|state)/, null],
+  [/\/workout\/[^/]+\/(set|state|rest|last-set-rpe)/, null],
   [/\/workout\//,            "workout_started"],
   [/\/planned\//,            "planned_changed"],
   // Еда пишется через /nutrition/, а /food/ — только распознавание фото и
@@ -757,7 +859,7 @@ const T = {
     open_telegram:"Открой приложение через Telegram.",
     failed_load:"Не удалось загрузить",
     failed_recognize:"Не удалось распознать. Попробуй другое фото.",
-    limit_exceeded:"Дневной лимит запросов исчерпан. Попробуй завтра.",ai_unavailable:"AI-тренер временно недоступен. Попробуй чуть позже — лимит запросов не списан.",last_time:"Прошлый раз",day_today_l:"сегодня",day_yesterday:"вчера",days_ago_n:"{n} дн. назад",set_save_failed:"Подход не сохранился — проверь связь и нажми ещё раз",
+    limit_exceeded:"Дневной лимит запросов исчерпан. Попробуй завтра.",ai_unavailable:"AI-тренер временно недоступен. Попробуй чуть позже — лимит запросов не списан.",last_time:"Прошлый раз",day_today_l:"сегодня",day_yesterday:"вчера",days_ago_n:"{n} дн. назад",set_save_failed:"Подход не сохранился — проверь связь и нажми ещё раз",sq_dropped:"Не сохранено подходов: {n} — тренировка уже закрыта на сервере",sq_waiting:"⏳ Ждут отправки: {n}. Уйдут сами, как появится связь",sq_finish_pending:"Ещё не отправлено подходов: {n}. Завершить сейчас? Они уйдут позже, но в итоги этой тренировки не попадут.",
     specify_name:"Укажите название",
     specify_name_cal:"Укажите название и калории",
     delete_confirm:"Удалить занятие?",
@@ -1639,7 +1741,7 @@ const T = {
     open_telegram:"Open via Telegram.",
     failed_load:"Failed to load",
     failed_recognize:"Failed to recognize. Try another photo.",
-    limit_exceeded:"Daily limit reached. Try tomorrow.",ai_unavailable:"The AI coach is temporarily unavailable. Try again a bit later — your request limit wasn't used.",last_time:"Last time",day_today_l:"today",day_yesterday:"yesterday",days_ago_n:"{n} days ago",set_save_failed:"Set not saved — check your connection and tap again",
+    limit_exceeded:"Daily limit reached. Try tomorrow.",ai_unavailable:"The AI coach is temporarily unavailable. Try again a bit later — your request limit wasn't used.",last_time:"Last time",day_today_l:"today",day_yesterday:"yesterday",days_ago_n:"{n} days ago",set_save_failed:"Set not saved — check your connection and tap again",sq_dropped:"{n} set(s) not saved — the workout is already closed on the server",sq_waiting:"⏳ Waiting to send: {n}. They will go as soon as you are online",sq_finish_pending:"{n} set(s) not sent yet. Finish now? They will be sent later but won't count in this workout's summary.",
     specify_name:"Enter name",
     specify_name_cal:"Enter name and calories",
     delete_confirm:"Delete activity?",
@@ -2517,7 +2619,7 @@ const T = {
     open_telegram:"Telegram orqali oching.",
     failed_load:"Yuklab bo'lmadi",
     failed_recognize:"Tanib bo'lmadi. Boshqa foto urinib ko'ring.",
-    limit_exceeded:"Kunlik limit tugadi. Ertaga urinib ko'ring.",ai_unavailable:"AI-murabbiy vaqtincha ishlamayapti. Birozdan keyin urinib ko‘r — so‘rovlar limiti sarflanmadi.",last_time:"O‘tgan safar",day_today_l:"bugun",day_yesterday:"kecha",days_ago_n:"{n} kun oldin",set_save_failed:"Yondashuv saqlanmadi — aloqani tekshirib, qayta bos",
+    limit_exceeded:"Kunlik limit tugadi. Ertaga urinib ko'ring.",ai_unavailable:"AI-murabbiy vaqtincha ishlamayapti. Birozdan keyin urinib ko‘r — so‘rovlar limiti sarflanmadi.",last_time:"O‘tgan safar",day_today_l:"bugun",day_yesterday:"kecha",days_ago_n:"{n} kun oldin",set_save_failed:"Yondashuv saqlanmadi — aloqani tekshirib, qayta bos",sq_dropped:"Saqlanmagan yondashuvlar: {n} — mashg‘ulot serverda allaqachon yopilgan",sq_waiting:"⏳ Yuborilishini kutmoqda: {n}. Aloqa paydo bo‘lishi bilan o‘zi ketadi",sq_finish_pending:"Hali yuborilmagan yondashuvlar: {n}. Hozir tugatasizmi? Ular keyinroq ketadi, lekin bu mashg‘ulot natijalariga kirmaydi.",
     specify_name:"Nomni kiriting",
     specify_name_cal:"Nom va kaloriyalarni kiriting",
     delete_confirm:"Mashg'ulotni o'chirilsinmi?",
@@ -3395,7 +3497,7 @@ const T = {
     open_telegram:"Telegram арқылы ашыңыз.",
     failed_load:"Жүктеу мүмкін емес",
     failed_recognize:"Танып болмады. Басқа фото байқаңыз.",
-    limit_exceeded:"Күндік лимит таусылды. Ертең байқаңыз.",ai_unavailable:"AI-жаттықтырушы уақытша қолжетімсіз. Сәл кейінірек қайталап көр — сұраулар лимиті жұмсалмады.",last_time:"Өткен жолы",day_today_l:"бүгін",day_yesterday:"кеше",days_ago_n:"{n} күн бұрын",set_save_failed:"Тәсіл сақталмады — байланысты тексеріп, қайта бас",
+    limit_exceeded:"Күндік лимит таусылды. Ертең байқаңыз.",ai_unavailable:"AI-жаттықтырушы уақытша қолжетімсіз. Сәл кейінірек қайталап көр — сұраулар лимиті жұмсалмады.",last_time:"Өткен жолы",day_today_l:"бүгін",day_yesterday:"кеше",days_ago_n:"{n} күн бұрын",set_save_failed:"Тәсіл сақталмады — байланысты тексеріп, қайта бас",sq_dropped:"Сақталмаған тәсілдер: {n} — жаттығу серверде жабылып қойған",sq_waiting:"⏳ Жіберуді күтуде: {n}. Байланыс пайда болғанда өздері кетеді",sq_finish_pending:"Әлі жіберілмеген тәсілдер: {n}. Қазір аяқтайсыз ба? Олар кейін кетеді, бірақ осы жаттығудың қорытындысына кірмейді.",
     specify_name:"Атауды енгізіңіз",
     specify_name_cal:"Атау мен калорияларды енгізіңіз",
     delete_confirm:"Сабақты жоюды растайсыз ба?",
@@ -4525,7 +4627,9 @@ function MenuScreen({user,onNav,activeWorkout=false}){
       <Btn accent full onClick={cardAction}>{card.cta}</Btn>
       {card.state==="resume"&&<Btn full onClick={()=>{
         if(!window.confirm(t("home_close_confirm")))return;
-        fetch(`${API}/workout/${tgId}/close-active`,{method:"POST"})
+        // Пустую тренировку сервер удаляет; подходы из очереди тогда пропали бы
+        (sqPending()>0?sqFlush():Promise.resolve(true))
+          .then(()=>fetch(`${API}/workout/${tgId}/close-active`,{method:"POST"}))
           .then(()=>apiGet(`${API}/home/${tgId}`,{force:true}))
           .then(d=>setHome(d))
           .catch(()=>window.alert(t("home_load_error")));
@@ -5929,6 +6033,13 @@ function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscle
   const [lastSets,setLastSets]=useState({}); // {exerciseId: {found, date, sets:[{weight,reps}]}} — fallback когда нет совета AI
   const [infoEx,setInfoEx]=useState(null);   // упражнение, чья техника открыта в шторке
   const [logErr,setLogErr]=useState(null);   // подход не сохранился на сервере
+  const [finishing,setFinishing]=useState(false); // ждём отправки очереди перед завершением
+  // Сколько записей ещё в очереди и чем кончилась последняя попытка (null — ошибок не было)
+  const [sqCount,setSqCount]=useState(()=>sqPending());
+  const [sqStatus,setSqStatus]=useState(()=>_sq.lastStatus);
+  const [sqDropped,setSqDropped]=useState(()=>_sq.dropped);
+  useEffect(()=>sqSubscribe(()=>{setSqCount(sqPending());setSqStatus(_sq.lastStatus);setSqDropped(_sq.dropped);}),[]);
+  const lastTapRef=useRef(0);   // защита от двойного нажатия «Подход выполнен»
 
   // Сменилось упражнение (стрелки, точки, замена на месте) — поля чистые.
   // Иначе на следующем упражнении стояли цифры предыдущего, и подстановка из
@@ -5939,19 +6050,32 @@ function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscle
     setLocalSet({reps:"",weight:"",time:"",distance:""});
   },[curExId]);
 
+  const lastSetsPending=useRef(new Set());
   useEffect(()=>{
     const curEx=selExs[curIdx];
-    if(!curEx||!tgId)return;
+    if(!curEx||!tgId||!curEx.name)return;
     // Грузим всегда, даже когда есть совет AI: эти же данные подставляются
     // в поля веса и повторов, чтобы не вводить всё заново каждый подход.
-    if(lastSets[curEx.id]!==undefined)return; // уже загружено (или уже пробовали и не нашли)
-    const exName=curEx.name;
-    if(!exName)return;
-    fetch(`${API}/exercises/${tgId}/last-sets?exercise_name=${encodeURIComponent(exName)}`)
+    if(lastSets[curEx.id]!==undefined||lastSetsPending.current.has(curEx.id))return;
+    // Сразу для всех упражнений тренировки, у которых «прошлого раза» ещё нет:
+    // раньше это был отдельный запрос на каждом переходе, по 2,2–2,4 с.
+    const need=selExs.filter(e=>e?.name&&lastSets[e.id]===undefined&&!lastSetsPending.current.has(e.id));
+    need.forEach(e=>lastSetsPending.current.add(e.id));
+    const one=()=>fetch(`${API}/exercises/${tgId}/last-sets?exercise_name=${encodeURIComponent(curEx.name)}`)
       .then(r=>r.json())
       .then(d=>setLastSets(prev=>({...prev,[curEx.id]:d})))
       .catch(()=>setLastSets(prev=>({...prev,[curEx.id]:{found:false}})));
-  },[curIdx,selExs,tgId,exTips]);
+    fetch(`${API}/exercises/${tgId}/last-sets-batch`,{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({names:need.map(e=>e.name)})})
+      .then(r=>{if(!r.ok)throw new Error(r.status);return r.json();})
+      .then(d=>{
+        const res=d?.results||{};
+        setLastSets(prev=>{const n={...prev};need.forEach(e=>{n[e.id]=res[e.name]||{found:false};});return n;});
+      })
+      // Пакетного запроса нет (старый сервер) или сбой — как раньше, по одному
+      .catch(one)
+      .finally(()=>need.forEach(e=>lastSetsPending.current.delete(e.id)));
+  },[curIdx,selExs,tgId,lastSets]);
   const [sets,setSets]=useState(_useSaved?(_sv.sets||{}):{});
   const [lastSetAt,setLastSetAt]=useState(_useSaved?(_sv.lastSetAt||null):null);
   const [prefillFrom,setPrefillFrom]=useState(null); // дата тренировки, из которой подставлены цифры
@@ -6071,11 +6195,23 @@ function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscle
           if(t)setStartTime(Date.now()-t>IDLE_RESET_MS?Date.now():t);
         }
 
-        // Подходы — только серверные
+        // Подходы — серверные плюс те, что ещё лежат в очереди этого телефона:
+        // иначе после восстановления неотправленные пропали бы с экрана, а номер
+        // следующего подхода совпал бы с номером ещё не дошедшего.
         const srv={};
         (exs.length?exs:selExs).forEach(e=>{
           const arr=d.sets?.[String(e.id)]||d.sets?.[e.name]||[];
           srv[e.id]=arr.map(x=>({weight:x.weight||"",reps:x.reps||"",time:"",distance:""}));
+        });
+        _sq.items.forEach(it=>{
+          if(it.kind!=="set"||it.workoutId!==d.workout_id)return;
+          const b=it.body||{};
+          if(srv[b.exercise_id]===undefined)return;
+          // Подход мог уже дойти до сервера, а ответ — ещё нет: тогда он есть
+          // в ответе /active, и второй раз его не добавляем.
+          if(srv[b.exercise_id].length>=(b.set_number||0))return;
+          const str=v=>v==null?"":String(v);
+          srv[b.exercise_id]=[...srv[b.exercise_id],{weight:str(b.weight),reps:str(b.reps),time:str(b.duration_sec),distance:str(b.distance_km)}];
         });
         setSets(srv);
       })
@@ -6100,7 +6236,12 @@ function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscle
         }));
       }catch{}
     }
-    // И на сервер — с задержкой, чтобы не слать запрос на каждое нажатие.
+  },[step,curIdx,sets,workoutId,selExs.map(e=>e.id).join(","),lastSetAt,warmupDone,warmup?.id]);
+  useEffect(()=>{
+    if(step===STEP.FN)return;
+    // На сервер — с задержкой, чтобы не слать запрос на каждое нажатие.
+    // Подходов в этом состоянии нет, поэтому и от них оно не зависит: раньше
+    // запрос уходил после каждого подхода впустую, по 1,4–2,6 с на сервере.
     // Подходы сюда не кладём: они уже записаны отдельно и лежат в workout_sets.
     // Пустой состав не отправляем: на сервере лежит единственная информация
     // о том, из чего состоит тренировка, и затереть её пустотой нельзя.
@@ -6119,7 +6260,7 @@ function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscle
     return()=>clearTimeout(_stateTimer.current);
     // Состав — по списку id, а не по длине: перестановка и замена упражнения
     // длину не меняют, и без этого они не сохранялись вовсе.
-  },[step,curIdx,sets,workoutId,selExs.map(e=>e.id).join(","),lastSetAt,warmupDone,warmup?.id]);
+  },[step,curIdx,workoutId,selExs.map(e=>e.id).join(","),warmupDone,warmup?.id]);
 
   // Защита от повреждённого восстановленного состояния: если мы на экране логирования (LG),
   // но selExs пуст или curIdx указывает за пределы массива — вместо немого чёрного экрана
@@ -6193,18 +6334,30 @@ function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscle
     // Таймер в приложении остаётся как визуальный, но больше не единственный —
     // раньше он просто вставал, стоило заблокировать телефон.
     const rs=lastSets[ex.id]?.rest_sec||restSecFor(ex);
-    const res=await fetch(`${API}/workout/${workoutId}/set?tg_id=${tgId}`,{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({exercise_id:ex.id,exercise_name:ex.name,set_number:done+1,reps:parseInt(localSet.reps)||null,weight:parseFloat(localSet.weight)||null,duration_sec:parseInt(localSet.time)||null,distance_km:parseFloat(localSet.distance)||null,rest_sec:rs>0?rs:null})});
-    // Раньше ответ не проверялся: при ошибке сервера подход оставался только
-    // на экране, человек шёл дальше, а при завершении тренировки его не было.
-    // Теперь цифры остаются в полях, и можно нажать ещё раз.
-    if(!res.ok)throw new Error(`set HTTP ${res.status}`);
+    // Подход сразу на экране, а запрос — в очередь: она отправит его фоном,
+    // повторит при сбое и не потеряет при закрытии приложения. Повтор после
+    // потерянного ответа сервер узнаёт и второй раз не записывает.
+    // Пределы — от опечаток: «100000» повторов база не примет вовсе, и такой
+    // подход стоял бы в очереди вечно.
+    const lim=(v,max)=>{const n=Number(v);return n>0?Math.min(n,max):null;};
+    sqPush("set",`${API}/workout/${workoutId}/set?tg_id=${tgId}`,
+      {exercise_id:ex.id,exercise_name:ex.name,set_number:done+1,reps:lim(parseInt(localSet.reps),1000),weight:lim(parseFloat(localSet.weight),1000),duration_sec:lim(parseInt(localSet.time),86400),distance_km:lim(parseFloat(localSet.distance),500),rest_sec:rs>0?rs:null},
+      {workoutId});
     setSets(p=>({...p,[ex.id]:[...(p[ex.id]||[]),{...localSet}]}));
     setLastSetAt(Date.now());
     setLocalSet({reps:"",weight:"",time:"",distance:""});
     if(rs>0){setTimerAuto(rs);setTimerEx(ex.name);setShowTimer(true);}
   }
   async function finish(){
+    // Итоги, рекорды и разбор тренера сервер считает по записанным подходам —
+    // поэтому сначала отправляем очередь.
+    if(finishing)return;
+    if(sqPending()>0){
+      setFinishing(true);
+      const sent=await sqFlush();
+      setFinishing(false);
+      if(!sent&&!window.confirm(t("sq_finish_pending").replace("{n}",sqPendingSets(workoutId)||sqPending())))return;
+    }
     console.log("[finish] START workoutId:",workoutId,"plannedWorkoutId:",plannedWorkoutId,"tgId:",tgId);
     try{localStorage.removeItem("gymbot_active_workout");}catch{}
     const dur=workoutDurationMin();
@@ -6611,7 +6764,7 @@ ${exList}
       <div style={{padding:"16px 16px 100px"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
           <Kicker>{t("warmup_badge3")}</Kicker>
-          <button onClick={finish} style={{background:"none",border:`0.5px solid ${C.danger}`,borderRadius:8,padding:"5px 10px",color:C.danger,fontSize:11,fontFamily:"monospace",cursor:"pointer"}}>{t("finish_workout")}</button>
+          <button onClick={finish} disabled={finishing} style={{background:"none",border:`0.5px solid ${C.danger}`,borderRadius:8,padding:"5px 10px",color:C.danger,fontSize:11,fontFamily:"monospace",cursor:"pointer",opacity:finishing?0.6:1}}>{finishing?t("aw_sohranyaem"):t("finish_workout")}</button>
         </div>
         {warmup.photo_url&&<img src={warmup.photo_url} alt="" style={{width:"100%",borderRadius:12,marginBottom:12,maxHeight:180,objectFit:"cover"}} onError={e=>e.target.style.display="none"}/>}
         <Hero style={{fontSize:20,marginBottom:4}}>{warmup.name}</Hero>
@@ -6656,8 +6809,8 @@ ${exList}
           <div style={{fontSize:11,color:C.muted,fontFamily:"monospace"}}>
             {ex.group_icon_url?<img src={ex.group_icon_url} alt="" style={{width:16,height:16,objectFit:"cover",borderRadius:3,verticalAlign:"middle",marginRight:4}}/>:ex.group_emoji+" "}{tGroup(ex)?.toUpperCase()}
           </div>
-          <button onClick={finish} style={{background:"none",border:`0.5px solid ${C.danger}`,borderRadius:8,padding:"5px 10px",color:C.danger,fontSize:11,fontFamily:"monospace",cursor:"pointer"}}>
-            {t("finish_workout")}
+          <button onClick={finish} disabled={finishing} style={{background:"none",border:`0.5px solid ${C.danger}`,borderRadius:8,padding:"5px 10px",color:C.danger,fontSize:11,fontFamily:"monospace",cursor:"pointer",opacity:finishing?0.6:1}}>
+            {finishing?t("aw_sohranyaem"):t("finish_workout")}
           </button>
         </div>
 
@@ -6820,12 +6973,18 @@ ${exList}
         {/* Главная кнопка */}
         <button onClick={async()=>{
           if(logBusy)return;
+          // Запись теперь мгновенная, logBusy держится один кадр. Второе касание
+          // через 200 мс записало бы ещё один подход с подставленными цифрами.
+          if(Date.now()-lastTapRef.current<1200)return;
+          lastTapRef.current=Date.now();
           setLogBusy(true);setLogErr(null);
           try{
             await doLog();
             haptic.notify("success");
             setShowTimer(true);
-            setLocalSet({reps:"",weight:"",time:"",distance:""});
+            // Поля чистит сам doLog. Второй сброс здесь, после await, стирал
+            // уже подставленные цифры следующего подхода: запись теперь
+            // мгновенная, и подстановка успевает отработать раньше.
           }catch(e){
             console.warn("[set] не сохранён",e);
             haptic.notify("error");
@@ -6837,6 +6996,14 @@ ${exList}
           {logBusy?t("aw_sohranyaem"):t("set_done")}
         </button>
         {logErr&&<div role="alert" style={{fontSize:12,color:C.danger,textAlign:"center",margin:"-2px 0 10px",lineHeight:1.4}}>{logErr}</div>}
+        {/* Подходы ждут связи — показываем, только если отправка уже не удалась */}
+        {sqDropped>0&&<div role="alert" style={{fontSize:12,color:C.danger,textAlign:"center",margin:"-2px 0 10px",lineHeight:1.4}}>{t("sq_dropped").replace("{n}",sqDropped)}</div>}
+        {sqCount>0&&sqStatus!==null&&(
+          <button type="button" onClick={()=>sqKick(0)} aria-live="polite"
+            style={{display:"block",width:"100%",background:"none",border:"none",padding:0,fontSize:12,color:C.warn,textAlign:"center",margin:"-2px 0 10px",lineHeight:1.4,cursor:"pointer"}}>
+            {t("sq_waiting").replace("{n}",sqCount)} · {t("retry")}
+          </button>
+        )}
 
         {/* Навигация между упражнениями */}
         <div style={{display:"flex",gap:10,marginBottom:10}}>
@@ -6890,15 +7057,18 @@ ${exList}
 
         {/* Таймер отдыха */}
         {showTimer&&<RestTimer autoStart={timerAuto}
-          onRpe={timerEx&&tgId?(v)=>{fetch(`${API}/workout/${tgId}/last-set-rpe`,{
-            method:"POST",headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({exercise_name:timerEx,rpe:v}),
-          }).catch(()=>{});}:null}
+          onRpe={timerEx&&tgId?(v)=>{
+            // Через очередь: если подход ещё не ушёл, оценка встала бы на предыдущий
+            sqPush("rpe",`${API}/workout/${tgId}/last-set-rpe`,{exercise_name:timerEx,rpe:v});
+          }:null}
           onClose={()=>{
             setShowTimer(false);setTimerAuto(null);setTimerEx(null);
             // Отдых прерван вручную — снимаем его и на сервере, иначе уведомление
             // придёт, когда человек уже делает следующий подход.
-            if(tgId)fetch(`${API}/workout/${tgId}/rest/cancel`,{method:"POST"}).catch(()=>{});
+            // Через очередь: иначе отмена обгоняла подход, который ещё летит,
+            // подход приезжал следом и снова заводил отдых — напоминание
+            // «отдых окончен» приходило посреди следующего подхода.
+            if(tgId)sqPush("cancel",`${API}/workout/${tgId}/rest/cancel`,{});
           }}/>}
       </div>
     );
