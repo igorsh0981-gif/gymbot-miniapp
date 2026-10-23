@@ -148,6 +148,86 @@ if (_sq.items.length) sqKick(1500);   // осталось с прошлого з
 //  перезапуска приложения опаснее лишнего запроса.
 // ─────────────────────────────────────────────────────────────────────────────
 const _apiCache = new Map();   // url -> {t, data}
+
+// ── Последний ответ — на диске, для мгновенного первого кадра ────────────────
+// Главный экран, профиль и каталог сохраняются в localStorage и при следующем
+// запуске показываются сразу, пока идёт свежий запрос; придёт ответ — экран
+// обновится. Раньше первый кадр ждал сеть Ташкент — Калифорния и обратно.
+// Чтобы старое не путало, запись стирается тем же событием, что и кэш в
+// памяти (завершили тренировку — главный экран с диска уже не берём), и
+// не живёт дольше недели.
+const SWR_PREFIX = "gymbot_swr:";
+const SWR_MAX_AGE = 7 * 86400000;
+const SWR_RULES = [/\/home\/\d+$/, /\/user\/\d+$/, /\/exercises\?lang=[a-z]+&lite=1$/, /\/exercises\/\d+\/details\?lang=[a-z]+$/];
+function swrRead(url){
+  try{
+    const e=JSON.parse(localStorage.getItem(SWR_PREFIX+url)||"null");
+    return e&&Date.now()-e.t<SWR_MAX_AGE?e.d:null;
+  }catch{return null;}
+}
+// Из профиля на диск не попадают данные о здоровье: для первого кадра они
+// не нужны, а лежать в хранилище браузера неделю им незачем. Профиль с диска
+// помечается _disk — экран профиля ждёт свежий, чтобы не сохранить форму
+// с пустыми заболеваниями поверх настоящих.
+const SWR_STRIP = {user:["medical_conditions","allergies"]};
+function swrWrite(url,data){
+  if(!data||!SWR_RULES.some(r=>r.test(url)))return;
+  let d=data;
+  if(/\/user\/\d+$/.test(url)){d={...data};for(const k of SWR_STRIP.user)delete d[k];}
+  const v=JSON.stringify({t:Date.now(),d});
+  const put=()=>{try{localStorage.setItem(SWR_PREFIX+url,v);return true;}catch{return false;}};
+  if(put())return;
+  // Хранилище переполнено. Освобождаем от самого объёмного и легко
+  // восстановимого, по шагам, а не ждём, пока откажет запись очереди подходов
+  // (она тоже живёт в localStorage). Технику текущего языка не трогаем
+  // никогда: она заранее загружена под тренировку без связи.
+  const cur=LANG_STORE.current||"ru";
+  const isCat=k=>/\/exercises\?lang=/.test(k), isDet=k=>/\/exercises\/\d+\/details\?lang=/.test(k);
+  const otherLang=k=>!k.includes(`lang=${cur}`);
+  const steps=[k=>isCat(k)&&otherLang(k), k=>isDet(k)&&otherLang(k)];
+  // Каталог текущего языка жертвуем ради всего остального, но не ради самого себя
+  if(!isCat(url))steps.push(k=>isCat(k));
+  for(const pred of steps){
+    swrRemove(pred);
+    if(put())return;
+  }
+}
+function swrRemove(pred){
+  try{
+    for(let i=localStorage.length-1;i>=0;i--){
+      const k=localStorage.key(i);
+      if(k&&k.startsWith(SWR_PREFIX)&&pred(k.slice(SWR_PREFIX.length)))localStorage.removeItem(k);
+    }
+  }catch{}
+}
+/** Уборка при запуске: просроченное, чужие аккаунты на этом устройстве
+ *  (Telegram даёт общее хранилище всем, кто открывает приложение с телефона)
+ *  и каталог с техникой на других языках. */
+function swrSweep(tgId,lang){
+  try{
+    const now=Date.now();
+    for(let i=localStorage.length-1;i>=0;i--){
+      const k=localStorage.key(i);
+      if(!k||!k.startsWith(SWR_PREFIX))continue;
+      const url=k.slice(SWR_PREFIX.length);
+      let drop=false;
+      try{const e=JSON.parse(localStorage.getItem(k)||"null");drop=!e||!(now-e.t<SWR_MAX_AGE);}catch{drop=true;}
+      const own=url.match(/\/(home|user)\/(\d+)$/);
+      if(own&&String(own[2])!==String(tgId))drop=true;
+      const lm=url.match(/[?&]lang=([a-z]+)/);
+      if(lm&&lang&&lm[1]!==lang)drop=true;
+      if(drop)localStorage.removeItem(k);
+    }
+  }catch{}
+}
+function swrDrop(parts){
+  try{
+    for(let i=localStorage.length-1;i>=0;i--){
+      const k=localStorage.key(i);
+      if(k&&k.startsWith(SWR_PREFIX)&&parts.some(p=>k.includes(p)))localStorage.removeItem(k);
+    }
+  }catch{}
+}
 const _apiInflight = new Map(); // url -> Promise, чтобы два экрана не дёргали одно и то же
 
 // Сколько живёт ответ. Короткий у того, что меняется от действий человека,
@@ -159,6 +239,7 @@ const API_TTL = [
   // кэша и качался заново при каждом запуске. Слэш перед словом обязателен,
   // иначе правило поймало бы /custom-exercises/.
   [/\/exercises(\?|$)/,     30 * 60 * 1000],
+  [/\/exercises\/\d+\/details/, 24 * 60 * 60 * 1000],   // техника одного упражнения
   // Как и у каталога, не просто $: у справочника сплитов теперь есть параметр
   // языка, и с якорем на конец строки правило бы не совпало.
   [/\/splits(\?|$)/,        60 * 60 * 1000],
@@ -199,7 +280,7 @@ function apiGet(url,{force=false}={}){
       // Пока запрос летел, кэш сбросили — данные уже неактуальны, в кэш не кладём.
       // Вызывающему отдаём как есть: экран хотя бы что-то покажет, а следующий
       // заход сходит на сервер заново.
-      if(_apiGen===genAtStart) _apiCache.set(url,{t:Date.now(),data:d});
+      if(_apiGen===genAtStart){ _apiCache.set(url,{t:Date.now(),data:d}); swrWrite(url,d); }
       return d;
     })
     .finally(()=>{
@@ -214,6 +295,7 @@ function apiGet(url,{force=false}={}){
 /** Сбросить кэш по подстрокам пути. invalidateApi("/home","/planned") */
 function invalidateApi(...parts){
   _apiGen++;
+  swrDrop(parts);
   for(const key of Array.from(_apiCache.keys()))
     if(parts.some(p=>key.includes(p))) _apiCache.delete(key);
   for(const key of Array.from(_apiInflight.keys()))
@@ -430,7 +512,7 @@ const T = {
     difficulty_label:"СЛОЖНОСТЬ",
     equipment_label:"ОБОРУДОВАНИЕ",
     description_label:"ОПИСАНИЕ",
-    technique_label:"ТЕХНИКА ВЫПОЛНЕНИЯ",
+    technique_label:"ТЕХНИКА ВЫПОЛНЕНИЯ", tech_offline:"Техника загрузится, когда появится связь.",
     more_info:"ПОДРОБНЕЕ →",
     open_plan:"ОТКРЫТЬ СОСТАВ →",
     continue_workout2:"ПРОДОЛЖИТЬ ТРЕНИРОВКУ",
@@ -1312,7 +1394,7 @@ const T = {
     difficulty_label:"DIFFICULTY",
     equipment_label:"EQUIPMENT",
     description_label:"DESCRIPTION",
-    technique_label:"TECHNIQUE",
+    technique_label:"TECHNIQUE", tech_offline:"The technique will load once you are back online.",
     more_info:"MORE →",
     open_plan:"OPEN PLAN →",
     continue_workout2:"CONTINUE WORKOUT",
@@ -2190,7 +2272,7 @@ const T = {
     difficulty_label:"QIYINLIK",
     equipment_label:"JIHOZLAR",
     description_label:"TAVSIF",
-    technique_label:"BAJARISH TEXNIKASI",
+    technique_label:"BAJARISH TEXNIKASI", tech_offline:"Texnika aloqa tiklanganda yuklanadi.",
     more_info:"BATAFSIL →",
     open_plan:"TARKIBNI OCHISH →",
     continue_workout2:"MASHQNI DAVOM ETTIRISH",
@@ -3068,7 +3150,7 @@ const T = {
     difficulty_label:"ҚИЫНДЫҚ",
     equipment_label:"ЖАБДЫҚТАР",
     description_label:"СИПАТТАМА",
-    technique_label:"ОРЫНДАУ ТЕХНИКАСЫ",
+    technique_label:"ОРЫНДАУ ТЕХНИКАСЫ", tech_offline:"Техника байланыс қалпына келгенде жүктеледі.",
     more_info:"ТОЛЫҒЫРАҚ →",
     open_plan:"ҚҰРАМЫН АШУ →",
     continue_workout2:"ЖАТТЫҒУДЫ ЖАЛҒАСТЫРУ",
@@ -4013,6 +4095,21 @@ function Card({children,accent,danger,onClick,style={},pad="14px 16px"}){
 function Loader({text=t("loading")}){
   return <div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"60vh"}}><div style={{textAlign:"center"}}><div style={{fontFamily:"monospace",fontSize:12,color:C.accent,letterSpacing:3}}>{text}</div><div style={{color:C.muted,fontSize:24,marginTop:8}}>◌</div></div></div>;
 }
+/** Экран ждёт свежий профиль (на руках копия с прошлого запуска, без данных
+ *  о здоровье). Сразу — загрузка; если за 5 секунд не пришёл — «нет связи»
+ *  и кнопка повтора, а не вечное колёсико. */
+function DiskWait({onBack,text,onRetry}){
+  const [slow,setSlow]=useState(false);
+  useEffect(()=>{const tm=setTimeout(()=>setSlow(true),5000);return()=>clearTimeout(tm);},[]);
+  return <div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/>
+    {slow
+      ?<div style={{textAlign:"center",marginTop:40}}>
+        <div style={{fontSize:14,color:C.muted}}>{t("home_load_error")}</div>
+        {onRetry&&<Btn full onClick={onRetry} style={{marginTop:16}}>{t("retry")}</Btn>}
+      </div>
+      :<Loader text={text}/>}
+  </div>;
+}
 function BackBtn({onBack}){
   return <button onClick={onBack} style={{background:"none",border:"none",color:C.muted,fontFamily:"monospace",fontSize:12,letterSpacing:1,cursor:"pointer",padding:"0 0 16px 0",display:"block"}}>{t("back")}</button>;
 }
@@ -4524,8 +4621,11 @@ function ConsentGateScreen({tgId,onDone}){
 // Берём их из общего кэша запросов, а не из отдельного объекта: своим кэшем
 // главный экран не видел сбросов по событиям и мог показывать данные до тренировки.
 function _cachedHome(tgId){
-  const hit=tgId?_apiCache.get(`${API}/home/${tgId}`):null;
-  return hit?hit.data:null;
+  if(!tgId)return null;
+  const hit=_apiCache.get(`${API}/home/${tgId}`);
+  // Нет в памяти — берём прошлый ответ с диска: экран рисуется сразу,
+  // а запрос ниже всё равно сходит за свежим и подменит его.
+  return hit?hit.data:swrRead(`${API}/home/${tgId}`);
 }
 
 function MenuScreen({user,onNav,activeWorkout=false}){
@@ -4988,6 +5088,8 @@ function ProfileScreen({user,tgId,onBack,onUserUpdated,onNav}){
   const [saved,setSaved]=useState(false);
   const [form,setForm]=useState({age:"",weight:"",height:"",gender:"male",fitness_level:"beginner",desired_result:"stay_healthy",ai_tone:"",medical_conditions:[],allergies:[]});
 
+  // _disk — профиль с прошлого запуска, без заболеваний и аллергий: ждём свежий
+  if(user?._disk)return <DiskWait onBack={onBack} text={t("section_profile")} onRetry={onUserUpdated}/>;
   if(!user)return <div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader text={t("section_profile")}/></div>;
 
   function startEdit(){
@@ -5890,6 +5992,81 @@ function restSecFor(ex){
   return 90;                         // руки, пресс, ягодицы
 }
 
+/** Описание и техника упражнения. Лёгкий каталог приходит без техники —
+ *  догружаем её при открытии карточки или шторки, один раз на упражнение и
+ *  язык (ответ кэшируется на сутки). Свои упражнения и полный каталог старого
+ *  формата уже содержат технику — им ничего не догружаем. */
+function exDetailsUrl(id,lang){return `${API}/exercises/${id}/details?lang=${encodeURIComponent(lang)}`;}
+function exNeedsText(e){return !!e&&!!e.id&&!e.technique&&!!e.has_technique&&!e.is_custom;}
+/** Уже загруженная техника: из памяти или с диска (переживает перезапуск). */
+function peekExDetails(id,lang){
+  const u=exDetailsUrl(id,lang);
+  const h=_apiCache.get(u);
+  return h?h.data:swrRead(u);
+}
+/** Техника всех упражнений тренировки — одним запросом на старте, чтобы
+ *  шторка открывалась и там, где нет связи. Кладём в тот же кэш, откуда
+ *  читает useExerciseText, и на диск. */
+function primeExDetails(list,lang){
+  const ids=[...new Set((list||[]).filter(exNeedsText).map(e=>e.id))]
+    .filter(id=>!peekExDetails(id,lang)).slice(0,30);
+  if(!ids.length)return;
+  apiGet(`${API}/exercises/details?ids=${ids.join(",")}&lang=${encodeURIComponent(lang)}`)
+    .then(d=>{
+      for(const it of d?.items||[]){
+        if(!it?.id)continue;
+        const u=exDetailsUrl(it.id,lang);
+        _apiCache.set(u,{t:Date.now(),data:it});
+        swrWrite(u,it);
+      }
+    })
+    .catch(()=>{});   // не вышло — догрузится по одному при открытии шторки
+}
+function useExerciseText(ex){
+  const lang=LANG_STORE.current||"ru";
+  const id=ex?.id;
+  const need=exNeedsText(ex);
+  const key=need?`${id}|${lang}`:null;
+  const [st,setSt]=useState({key:null,data:null,failed:false});
+  const [retry,setRetry]=useState(0);
+  useEffect(()=>{
+    if(!key)return;
+    let alive=true;
+    setSt({key,data:peekExDetails(id,lang),failed:false});
+    apiGet(exDetailsUrl(id,lang))
+      .then(d=>{if(alive&&d?.id===id)setSt({key,data:d,failed:false});})
+      // Что-то уже есть (с диска) — оставляем. Нет ничего: без связи (fetch
+      // отклонился TypeError'ом или браузер офлайн) — пишем, что ждём связь;
+      // ответ сервера с ошибкой (упражнение удалили, 502 на выкладке) — просто
+      // не показываем технику, «нет связи» там было бы неправдой.
+      .catch(e=>{
+        if(!alive)return;
+        const offline=!navigator.onLine||e instanceof TypeError;
+        setSt(s=>s.key===key&&s.data?s:{key,data:null,failed:offline,gone:!offline});
+      });
+    return()=>{alive=false;};
+  },[key,retry]);
+  useEffect(()=>{
+    if(!(key&&st.key===key&&st.failed))return;
+    const on=()=>setRetry(r=>r+1);
+    window.addEventListener("online",on);
+    return()=>window.removeEventListener("online",on);
+  },[key,st.key,st.failed]);
+  if(!ex||!need)return ex;
+  // До эффекта (первый кадр) смотрим кэш сразу — без мигания пустой шторки
+  const data=st.key===key?st.data:peekExDetails(id,lang);
+  const failed=st.key===key&&st.failed&&!data;
+  const gone=st.key===key&&st.gone&&!data;
+  return {...ex,description:data?.description||ex.description,technique:data?.technique||ex.technique,
+    _techPending:!data&&!failed&&!gone,_techFailed:failed};
+}
+/** Место под технику, пока её нет: «…» во время загрузки, без связи — объяснение. */
+function TechPlaceholder({full}){
+  if(!full||full.technique||!(full._techPending||full._techFailed))return null;
+  return <Card style={{marginBottom:10}}><Kicker>{t("technique_label")}</Kicker>
+    <div style={{fontSize:13,color:C.muted,lineHeight:1.6,marginTop:6}}>{full._techFailed?t("tech_offline"):"…"}</div></Card>;
+}
+
 // ── Фото и техника упражнения на экране подхода ──────────────────────────────
 /** Фото упражнения из каталога на месте пустого низа экрана. Тап — шторка
  *  с видео и техникой. Адрес фото бывает, а файла нет (папку в R2 заводит
@@ -5900,7 +6077,7 @@ function ExerciseMediaCard({ex,onOpen}){
   useEffect(()=>{setFailed(false);},[ex?.photo_url]);
   if(!ex)return null;
   const hasVideo=!!ex.video_url;
-  const hasText=!!(ex.technique||ex.description);
+  const hasText=!!(ex.technique||ex.has_technique||ex.description);
   const showPhoto=!!ex.photo_url&&!failed;
   if(!showPhoto&&!hasVideo&&!hasText)return null;
   const label=(
@@ -5942,6 +6119,7 @@ function ExerciseInfoSheet({ex,onClose}){
   onCloseRef.current=onClose;
   const [videoFailed,setVideoFailed]=useState(false);
   const [photoFailed,setPhotoFailed]=useState(false);
+  const full=useExerciseText(ex);
   useEffect(()=>{
     const prevFocus=document.activeElement;
     try{closeRef.current?.focus({preventScroll:true});}catch{}
@@ -5962,7 +6140,7 @@ function ExerciseInfoSheet({ex,onClose}){
     };
   },[]);
   if(!ex)return null;
-  const desc=tField(ex,"description"), tech=tField(ex,"technique");
+  const desc=tField(full,"description"), tech=tField(full,"technique");
   return(
     <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:150,background:"rgba(0,0,0,0.6)",display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
       <div role="dialog" aria-modal="true" aria-labelledby="ex-sheet-title" onClick={e=>e.stopPropagation()}
@@ -5983,7 +6161,8 @@ function ExerciseInfoSheet({ex,onClose}){
           :ex.photo_url&&!photoFailed&&<img src={ex.photo_url} alt={tField(ex,"name")} onError={()=>setPhotoFailed(true)}
               style={{width:"100%",borderRadius:12,marginBottom:12,objectFit:"cover",maxHeight:260,display:"block"}}/>}
         {desc&&<Card style={{marginBottom:10}}><Kicker>{t("description_label")}</Kicker><div style={{fontSize:14,color:C.text,lineHeight:1.6,marginTop:6}}>{desc}</div></Card>}
-        {tech&&<Card style={{marginBottom:10}}><Kicker>{t("technique_label")}</Kicker><div style={{fontSize:14,color:C.text,lineHeight:1.8,marginTop:6,whiteSpace:"pre-wrap"}}>{tech}</div></Card>}
+        {tech?<Card style={{marginBottom:10}}><Kicker>{t("technique_label")}</Kicker><div style={{fontSize:14,color:C.text,lineHeight:1.8,marginTop:6,whiteSpace:"pre-wrap"}}>{tech}</div></Card>
+          :<TechPlaceholder full={full}/>}
         {ex.equipment&&<Card><Kicker>{t("equipment_label")}</Kicker><div style={{fontSize:14,color:C.text,marginTop:4}}>{tEquip(ex.equipment)}</div></Card>}
       </div>
     </div>
@@ -6049,6 +6228,17 @@ function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscle
     setPrefillFrom(null);setLogErr(null);
     setLocalSet({reps:"",weight:"",time:"",distance:""});
   },[curExId]);
+
+  // Техника упражнений тренировки — заранее и одним запросом (см. primeExDetails)
+  // Шторка открывает объект из каталога, а не из selExs (у тренировки, начатой
+  // до обновления, в selExs техника есть, а в лёгком каталоге — нет), поэтому
+  // и подгружаем по объектам каталога.
+  const selIdsKey=selExs.map(e=>e?.id).join(",");
+  useEffect(()=>{
+    if(!selExs.length)return;
+    const list=selExs.map(e=>e?.is_custom?e:((exercises||[]).find(c=>c.id===e?.id)||e));
+    primeExDetails(list,LANG_STORE.current||"ru");
+  },[selIdsKey,exercises]);
 
   const lastSetsPending=useRef(new Set());
   useEffect(()=>{
@@ -6797,7 +6987,8 @@ ${exList}
     // Фото, видео и технику берём из свежего каталога: состав тренировки,
     // восстановленный из localStorage, хранит объекты на момент старта —
     // со старым языком описания и без медиа, если их добавили позже.
-    const exMedia=(exercises||[]).find(e=>e.id===ex.id)||ex;
+    // Свои упражнения — из другой таблицы, их id может совпасть с каталожным
+    const exMedia=ex.is_custom?ex:((exercises||[]).find(e=>e.id===ex.id)||ex);
     const lsCur=lastSets[ex.id];
     const lastIdx=lsCur?.sets?.length?Math.min(doneSets.length,lsCur.sets.length-1):-1;
     const lastAgo=lsCur?.date?fmtDayAgo(lsCur.date):"";
@@ -7794,6 +7985,7 @@ function CatalogScreen({exercises,muscleGroups,onNav}){
   const [activeGroup,setActiveGroup]=useState(null);
   const [search,setSearch]=useState("");
   const [selected,setSelected]=useState(null);
+  const selectedFull=useExerciseText(selected);
   const filtered=(exercises||[]).filter(e=>(!activeGroup||e.muscle_group_id===activeGroup)&&(!search||(e.name.toLowerCase().includes(search.toLowerCase())||(tField(e,"name")||"").toLowerCase().includes(search.toLowerCase()))));
 
   // Предзагрузка фото видимой выборки — прогреваем кэш браузера ДО того как карточки
@@ -7829,11 +8021,12 @@ function CatalogScreen({exercises,muscleGroups,onNav}){
     <div style={{display:"flex",gap:8,marginBottom:14}}>
       {[{l:t("sets_label"),v:selected.sets_recommended},{l:t("reps_label2"),v:selected.reps_recommended},{l:t("difficulty_label"),v:getDiff(selected.difficulty)||selected.difficulty}].map((s,i)=><Card key={i} style={{flex:1,textAlign:"center"}}><div style={{fontSize:9,color:C.muted,fontFamily:"monospace",marginBottom:4}}>{s.l}</div><div style={{fontSize:14,fontWeight:700,color:C.accent}}>{s.v||"—"}</div></Card>)}
     </div>
-    {selected.description&&<Card style={{marginBottom:10}}><Kicker>{t("description_label")}</Kicker><div style={{fontSize:14,color:C.text,lineHeight:1.6,marginTop:6}}>{tField(selected,"description")}</div></Card>}
-    {selected.technique&&<Card style={{marginBottom:10}}>
+    {selectedFull.description&&<Card style={{marginBottom:10}}><Kicker>{t("description_label")}</Kicker><div style={{fontSize:14,color:C.text,lineHeight:1.6,marginTop:6}}>{tField(selectedFull,"description")}</div></Card>}
+    {selectedFull.technique&&<Card style={{marginBottom:10}}>
       <Kicker>{t("technique_label")}</Kicker>
-      <div style={{fontSize:14,color:C.text,lineHeight:1.8,marginTop:6,whiteSpace:"pre-wrap"}}>{tField(selected,"technique")}</div>
+      <div style={{fontSize:14,color:C.text,lineHeight:1.8,marginTop:6,whiteSpace:"pre-wrap"}}>{tField(selectedFull,"technique")}</div>
     </Card>}
+    {selected&&!selectedFull.technique&&<TechPlaceholder full={selectedFull}/>}
     {selected.equipment&&<Card><Kicker>{t("equipment_label")}</Kicker><div style={{fontSize:14,color:C.text,marginTop:4}}>{tEquip(selected.equipment)}</div></Card>}
   </div>;
 
@@ -9479,8 +9672,12 @@ function FoodGuideScreen({onBack}){
 }
 
 // ─── SUPPLEMENTS ──────────────────────────────────────────────────────────────
-function SupplementsScreen({onBack,user}){
+function SupplementsScreen({onBack,user,onRetry=null}){
   const [sel,setSel]=useState(null);
+  // Предупреждения строятся по заболеваниям и аллергиям, а в копии профиля
+  // с прошлого запуска их нет — без свежего профиля список показал бы добавки
+  // без единого предупреждения.
+  if(user?._disk)return <DiskWait onBack={onBack} onRetry={onRetry}/>;
   const supps=[
     {name:t("supp_protein"),icon:"🥛",dose:t("sup_20_40g_za_priem"),timing:t("sup_posle_trenirovki_ili_v"),
       tips:t("sup_vospolnenie_belka_syvorotoch"),
@@ -9984,7 +10181,13 @@ export default function App(){
   const [nav,setNav]=useState(getNav);
   const {tab,screen,params={}}=nav;
 
-  const [user,setUser]=useState(null);
+  // Профиль с прошлого запуска — чтобы не держать экран загрузки, пока идёт
+  // запрос. Свежий придёт в loadUser и заменит его.
+  const [user,setUser]=useState(()=>{
+    const id=tg?.initDataUnsafe?.user?.id;
+    const u=id?swrRead(`${API}/user/${id}`):null;
+    return u&&u.telegram_id===id?{...u,_disk:true}:null;
+  });
   // Триггер перерисовки при смене языка. Начальное значение берём из того же
   // хранилища, что и LANG_STORE, иначе они разойдутся на первом рендере и
   // каталог будет запрошен не на том языке, на котором рисуется интерфейс.
@@ -10000,11 +10203,27 @@ export default function App(){
 
   function push(tab,screen,params={}){const s={_g:true,tab,screen,params};window.history.pushState(s,"");setNav(s);}
   function replace(tab,screen,params={}){const s={_g:true,tab,screen,params};window.history.replaceState(s,"");setNav(s);}
+  // Номер последнего запроса профиля. Ответы приходят не по порядку: при
+  // медленном старте человек успевает сменить язык, и запоздавший первый ответ
+  // со старым языком перебил бы новый. Применяем только ответ на последний запрос.
+  const loadSeq=useRef(0);
+  const loadInflight=useRef(0);
+  // Фоновый повтор, пока на экране профиль с диска. Пока предыдущий запрос
+  // летит, новый не шлём: иначе на медленной связи (ответ дольше 20 с) каждый
+  // повтор отменял бы предыдущий, и свежий профиль не доехал бы никогда.
+  function retryUser(){
+    if(loadInflight.current>0||document.visibilityState==="hidden")return;
+    loadUser();
+  }
   function loadUser(){
     if(tgId){
+      const my=++loadSeq.current;
+      loadInflight.current++;
       fetch(`${API}/user/${tgId}`)
         .then(r=>{
+          if(my!==loadSeq.current)return null;
           if(r.status===404){
+            swrDrop([`/user/${tgId}`,`/home/${tgId}`]);
             // Пользователь не найден в БД — новая регистрация через Mini App
             setUser({first_name:tg?.initDataUnsafe?.user?.first_name||t("onb_atlet"),ai_requests_today:0,_not_found:true});
             return null;
@@ -10016,8 +10235,11 @@ export default function App(){
         // регистре или "kk" вместо "kz". Тогда интерфейс не нашёл бы такой ключ
         // в T и рисовался бы по-русски, а каталог сервер отдал бы на казахском —
         // вперемешку. Нормализуем в одном месте, у входа.
-        .then(d=>{if(d){setUser(d);const lc=normLang(d.lang)||"ru";LANG_STORE.current=lc;storeLang(lc);setLang(lc);}})
-        .catch(()=>setUser({first_name:tg?.initDataUnsafe?.user?.first_name||t("onb_atlet"),ai_requests_today:0,_error:true}));
+        .then(d=>{if(d&&my===loadSeq.current){swrWrite(`${API}/user/${tgId}`,d);setUser(d);const lc=normLang(d.lang)||"ru";LANG_STORE.current=lc;storeLang(lc);setLang(lc);}})
+        // Нет связи, а профиль уже есть (с диска или от прошлой загрузки) —
+        // оставляем его: приложение работает на нём, а не падает в заглушку.
+        .catch(()=>{if(my===loadSeq.current)setUser(p=>p&&p.telegram_id===tgId?p:{first_name:tg?.initDataUnsafe?.user?.first_name||t("onb_atlet"),ai_requests_today:0,_error:true});})
+        .finally(()=>{loadInflight.current--;});
     } else {
       setUser({first_name:t("onb_atlet"),ai_requests_today:0});
     }
@@ -10045,12 +10267,26 @@ export default function App(){
       s.textContent='input[type="date"],input[type="time"]{color-scheme:dark;} input[type="date"]::-webkit-calendar-picker-indicator,input[type="time"]::-webkit-calendar-picker-indicator{filter:invert(1) brightness(0.8) sepia(1) hue-rotate(60deg);cursor:pointer;}';
       document.head.appendChild(s);
     }
+    swrSweep(tgId,LANG_STORE.current||"ru");
     loadUser();
     if(!window.history.state?._g)window.history.replaceState({_g:true,tab:"menu",screen:null,params:{}},"");
     function onPop(e){const s=e.state;if(s&&s._g){setNav(s);if(s.tab==="menu"&&!s.screen)setMenuRefresh(r=>r+1);}else{const h={_g:true,tab:"menu",screen:null,params:{}};window.history.replaceState(h,"");setNav(h);}}
     window.addEventListener("popstate",onPop);
     return()=>window.removeEventListener("popstate",onPop);
   },[]);
+
+  // Профиль с прошлого запуска, а свежий не пришёл (нет связи, сервер
+  // выкладывается) — пробуем ещё: при возврате связи, при возврате в приложение
+  // и раз в 20 секунд. Без этого экран профиля ждал бы до перезапуска.
+  const userFromDisk=!!user?._disk;
+  useEffect(()=>{
+    if(!userFromDisk)return;
+    const again=()=>retryUser();
+    window.addEventListener("online",again);
+    document.addEventListener("visibilitychange",again);
+    const iv=setInterval(again,20000);
+    return()=>{window.removeEventListener("online",again);document.removeEventListener("visibilitychange",again);clearInterval(iv);};
+  },[userFromDisk]);
 
   // Каталог упражнений: описание и технику сервер отдаёт уже на нужном языке,
   // поэтому язык входит в адрес запроса, а значит и в ключ кэша. Переключение
@@ -10069,6 +10305,10 @@ export default function App(){
   const wantCatalogLang = useRef(null);  // язык, который нужен прямо сейчас
   const [catalogRetry,setCatalogRetry]=useState(0);
   const catalogTries = useRef({lang:null,n:0});  // счётчик попыток, свой на каждый язык
+  // На экране каталог с прошлого запуска, свежий ещё не приходил. Отдельно от
+  // haveCatalogLang: язык у него правильный, но если запрос упадёт, повторять
+  // всё равно нужно — иначе сессия так и пройдёт на недельной копии.
+  const catalogFromDisk = useRef(false);
   useEffect(()=>{
     const want = lang || "ru";
     wantCatalogLang.current = want;
@@ -10078,12 +10318,20 @@ export default function App(){
       haveCatalogLang.current = stale ? null : want;
     };
     let timer=null;
-    apiGet(`${API}/exercises?lang=${encodeURIComponent(want)}`)
+    // Тот же язык с прошлого запуска — показываем сразу, свежий заменит
+    if(haveCatalogLang.current!==want){
+      const cached=swrRead(`${API}/exercises?lang=${encodeURIComponent(want)}&lite=1`);
+      if(cached?.exercises?.length){apply(cached,false);catalogFromDisk.current=true;}
+    }
+    // lite=1: каталог без текстов техники — они почти весь вес ответа, а читают
+    // их по одному при открытии карточки (useExerciseText догружает).
+    apiGet(`${API}/exercises?lang=${encodeURIComponent(want)}&lite=1`)
       .then(d=>{
         const stale = wantCatalogLang.current !== want;
         // Нужный язык уже на экране — чужой ответ только испортит описания.
         if(stale && haveCatalogLang.current) return;
         apply(d, stale);
+        if(!stale) catalogFromDisk.current=false;
       })
       .catch(()=>{
         // Пустой список ставим только если показывать всё равно нечего.
@@ -10100,7 +10348,7 @@ export default function App(){
         // закрытия, а исчерпав общий лимит, не повторило бы запрос при
         // следующей смене языка.
         const tries = catalogTries.current.lang===want ? catalogTries.current.n : 0;
-        if(wantCatalogLang.current===want && haveCatalogLang.current!==want && tries<3){
+        if(wantCatalogLang.current===want && (haveCatalogLang.current!==want || catalogFromDisk.current) && tries<3){
           catalogTries.current={lang:want,n:tries+1};
           timer=setTimeout(()=>setCatalogRetry(n=>n+1), 4000);
         }
@@ -10173,7 +10421,7 @@ export default function App(){
     if(screen==="food_guide")return <FoodGuideScreen onBack={goBack}/>;
     if(screen==="measurements")return <MeasurementsScreen onBack={goBack} tgId={tgId}/>;
     if(screen==="checkin")return <CheckinScreen onBack={goBack} tgId={tgId}/>;
-    if(screen==="supplements")return <SupplementsScreen onBack={goBack} user={user}/>;
+    if(screen==="supplements")return <SupplementsScreen onBack={goBack} user={user} onRetry={loadUser}/>;
     if(screen==="rest_timer")return <StandaloneTimer onBack={goBack}/>;
     if(screen==="language")return <LanguageScreen tgId={tgId} user={user} onBack={goBack} onUserUpdated={(code)=>{loadUser();if(code)setLang(code);}}/>;
     if(screen==="support")return <SupportScreen onBack={goBack} tgId={tgId}/>;
