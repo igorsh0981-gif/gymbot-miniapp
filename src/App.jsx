@@ -24,6 +24,17 @@ window.fetch = (url, options = {}) => {
   return res;
 };
 
+// ── Тактильный отклик ────────────────────────────────────────────────────────
+// Как в AiEvent (src/tg/haptics.ts): только через Telegram и с проверкой версии,
+// вне Telegram и на старых клиентах — молча ничего. navigator.vibrate не трогаем:
+// в WebView он ведёт себя непредсказуемо, а на iOS его нет вовсе.
+const haptic = {
+  _ok() { try { return !!tg?.HapticFeedback && !!tg?.isVersionAtLeast?.("6.1"); } catch { return false; } },
+  select() { if (haptic._ok()) { try { tg.HapticFeedback.selectionChanged(); } catch {} } },
+  impact(style = "light") { if (haptic._ok()) { try { tg.HapticFeedback.impactOccurred(style); } catch {} } },
+  notify(type = "success") { if (haptic._ok()) { try { tg.HapticFeedback.notificationOccurred(type); } catch {} } },
+};
+
 // ─────────────────────────────────────────────────────────────────────────────
 //  Кэш GET-запросов с инвалидацией по событиям
 //
@@ -485,7 +496,7 @@ const T = {
     greet_streak:["ТЫ В ОГНЕ","СЕРИЯ ДЕРЖИТСЯ","НЕ СБАВЛЯЕШЬ","ВОТ ЭТО ДИСЦИПЛИНА"],
     greet_today:["СЕГОДНЯ УЖЕ СДЕЛАНО","ОТЛИЧНАЯ РАБОТА","ДЕЛО СДЕЛАНО","МОЛОДЕЦ"],
     greet_normal:["ПРИВЕТ","РАД ТЕБЯ ВИДЕТЬ","НУ ЧТО, ПОЕХАЛИ","ГОТОВ К РАБОТЕ"],
-    home_load_error:"Не удалось загрузить. Проверь связь.", retry:"ПОВТОРИТЬ", loading:"ЗАГРУЗКА",
+    home_load_error:"Не удалось загрузить. Проверь связь.", retry:"ПОВТОРИТЬ",
     home_k_profile:"Нужен профиль", home_k_resume:"Не завершено", home_k_planned:"Запланировано на сегодня", home_k_suggest:"Тренер предлагает",
     home_days_streak:"дн. подряд", home_of:"из", home_this_week:"на этой неделе", home_sport:"спорт",
     home_min:"мин", home_exercises:"упражнений", home_other_option:"Другой вариант",
@@ -746,7 +757,7 @@ const T = {
     open_telegram:"Открой приложение через Telegram.",
     failed_load:"Не удалось загрузить",
     failed_recognize:"Не удалось распознать. Попробуй другое фото.",
-    limit_exceeded:"Дневной лимит запросов исчерпан. Попробуй завтра.",
+    limit_exceeded:"Дневной лимит запросов исчерпан. Попробуй завтра.",ai_unavailable:"AI-тренер временно недоступен. Попробуй чуть позже — лимит запросов не списан.",last_time:"Прошлый раз",day_today_l:"сегодня",day_yesterday:"вчера",days_ago_n:"{n} дн. назад",set_save_failed:"Подход не сохранился — проверь связь и нажми ещё раз",
     specify_name:"Укажите название",
     specify_name_cal:"Укажите название и калории",
     delete_confirm:"Удалить занятие?",
@@ -1367,7 +1378,7 @@ const T = {
     greet_streak:["YOU'RE ON FIRE","STREAK ALIVE","KEEPING IT UP","THAT'S DISCIPLINE"],
     greet_today:["DONE FOR TODAY","GREAT WORK","MISSION COMPLETE","WELL DONE"],
     greet_normal:["HEY","GOOD TO SEE YOU","LET'S GO","READY TO WORK"],
-    home_load_error:"Could not load. Check your connection.", retry:"RETRY", loading:"LOADING",
+    home_load_error:"Could not load. Check your connection.", retry:"RETRY",
     home_k_profile:"Profile needed", home_k_resume:"Unfinished", home_k_planned:"Planned for today", home_k_suggest:"Coach suggests",
     home_days_streak:"day streak", home_of:"of", home_this_week:"this week", home_sport:"sport",
     home_min:"min", home_exercises:"exercises", home_other_option:"Other option",
@@ -1628,7 +1639,7 @@ const T = {
     open_telegram:"Open via Telegram.",
     failed_load:"Failed to load",
     failed_recognize:"Failed to recognize. Try another photo.",
-    limit_exceeded:"Daily limit reached. Try tomorrow.",
+    limit_exceeded:"Daily limit reached. Try tomorrow.",ai_unavailable:"The AI coach is temporarily unavailable. Try again a bit later — your request limit wasn't used.",last_time:"Last time",day_today_l:"today",day_yesterday:"yesterday",days_ago_n:"{n} days ago",set_save_failed:"Set not saved — check your connection and tap again",
     specify_name:"Enter name",
     specify_name_cal:"Enter name and calories",
     delete_confirm:"Delete activity?",
@@ -2245,7 +2256,7 @@ const T = {
     greet_streak:["ZO'R KETYAPSIZ","SERIYA DAVOM ETMOQDA","SUSAYMAYAPSIZ","MANA BU INTIZOM"],
     greet_today:["BUGUN BAJARILDI","AJOYIB ISH","ISH BITDI","BARAKALLA"],
     greet_normal:["SALOM","KO'RGANIMDAN XURSANDMAN","QANI KETDIK","ISHGA TAYYOR"],
-    home_load_error:"Yuklab bo'lmadi. Aloqani tekshiring.", retry:"QAYTA", loading:"YUKLANMOQDA",
+    home_load_error:"Yuklab bo'lmadi. Aloqani tekshiring.", retry:"QAYTA",
     home_k_profile:"Profil kerak", home_k_resume:"Tugallanmagan", home_k_planned:"Bugunga rejalashtirilgan", home_k_suggest:"Murabbiy taklif qiladi",
     home_days_streak:"kun ketma-ket", home_of:"dan", home_this_week:"shu haftada", home_sport:"sport",
     home_min:"daq.", home_exercises:"mashq", home_other_option:"Boshqa variant",
@@ -2506,7 +2517,7 @@ const T = {
     open_telegram:"Telegram orqali oching.",
     failed_load:"Yuklab bo'lmadi",
     failed_recognize:"Tanib bo'lmadi. Boshqa foto urinib ko'ring.",
-    limit_exceeded:"Kunlik limit tugadi. Ertaga urinib ko'ring.",
+    limit_exceeded:"Kunlik limit tugadi. Ertaga urinib ko'ring.",ai_unavailable:"AI-murabbiy vaqtincha ishlamayapti. Birozdan keyin urinib ko‘r — so‘rovlar limiti sarflanmadi.",last_time:"O‘tgan safar",day_today_l:"bugun",day_yesterday:"kecha",days_ago_n:"{n} kun oldin",set_save_failed:"Yondashuv saqlanmadi — aloqani tekshirib, qayta bos",
     specify_name:"Nomni kiriting",
     specify_name_cal:"Nom va kaloriyalarni kiriting",
     delete_confirm:"Mashg'ulotni o'chirilsinmi?",
@@ -2905,7 +2916,7 @@ const T = {
     sport_section:"Спорт түрлері", sport_desc:"Калория есебімен сабақты жазу",
     sport_section_title:"Спорт түрлері", sport_section_desc:"Калория есебімен сабақты жазу",
     resume_workout:"ЖАТТЫҒУДЫ ЖАЛҒАСТЫРУ", resume_desc:"Аяқталмаған жаттығуыңыз бар",
-    finish_workout:"АЯҚТАУ", set_done:"✓ ЖОЛДАС ОРЫНДАЛДЫ", set_done_label:"ЖОЛДАС ОРЫНДАЛДЫ",
+    finish_workout:"АЯҚТАУ", set_done:"✓ ТӘСІЛ ОРЫНДАЛДЫ", set_done_label:"ТӘСІЛ ОРЫНДАЛДЫ",
     warmup_title:"ЖЫЛЫТУ", warmup_skip:"ӨТКІЗІП ЖІБЕРу", warmup_done:"✓ ЖЫЛЫТУ ОРЫНДАЛДЫ",
     warmup_hint:"Жылыту үшін кардио — міндетті емес", warmup_badge:"🏃 ЖЫЛЫТУ",
     ready_wk_kicker:"ЖАТТЫҒУ ЖИНАЛДЫ", ready_wk_hint:"Құрамы жаттығу тарихыңыз бойынша таңдалды", ready_wk_change:"Құрамын өзгерту",
@@ -2943,7 +2954,7 @@ const T = {
     enter_goal:"МАҚСАТЫҢЫЗ НЕ?",
     hello_name:"СӘЛЕМ! АТЫҢЫЗ КІМ?",
     name_hint:"Атыңыз қосымшада көрсетіледі",
-    sets_label:"ЖОЛДАС",
+    sets_label:"ТӘСІЛДЕР",
     reps_label2:"РЕТ",
     exercises_label:"ЖАТТЫҒУЛАР",
     minutes_label:"МИНУТ",
@@ -3123,7 +3134,7 @@ const T = {
     greet_streak:["КЕРЕМЕТ КЕТІП БАРАСЫҢ","СЕРИЯ ҮЗІЛМЕЙДІ","БӘСЕҢДЕМЕЙСІҢ","МІНЕ БҰЛ ТӘРТІП"],
     greet_today:["БҮГІН ОРЫНДАЛДЫ","КЕРЕМЕТ ЖҰМЫС","ІС БІТТІ","ЖАРАЙСЫҢ"],
     greet_normal:["СӘЛЕМ","КӨРГЕНІМЕ ҚУАНЫШТЫМЫН","КЕТТІК","ЖҰМЫСҚА ДАЙЫН"],
-    home_load_error:"Жүктеу мүмкін болмады. Байланысты тексеріңіз.", retry:"ҚАЙТАЛАУ", loading:"ЖҮКТЕЛУДЕ",
+    home_load_error:"Жүктеу мүмкін болмады. Байланысты тексеріңіз.", retry:"ҚАЙТАЛАУ",
     home_k_profile:"Профиль қажет", home_k_resume:"Аяқталмаған", home_k_planned:"Бүгінге жоспарланған", home_k_suggest:"Жаттықтырушы ұсынады",
     home_days_streak:"күн қатарынан", home_of:"ішінен", home_this_week:"осы аптада", home_sport:"спорт",
     home_min:"мин", home_exercises:"жаттығу", home_other_option:"Басқа нұсқа",
@@ -3204,7 +3215,7 @@ const T = {
     add30s:"+30 секунд",
     minus15s:"−15 секунд",
     rest_5_10:"5–10 минут",
-    sets_short2:"жолдас",
+    sets_short2:"тәсіл",
     reps_short2:"РЕТ",
     pts_short:"балл.",
     pts_label:"баллдар",
@@ -3247,7 +3258,7 @@ const T = {
     delete_btn:"ЖОЮ",
     error_label2:"ҚАТЕ",
     failed_load2:"ЖҮКТЕУ МҮМКІН ЕМЕС",
-    points_short:"ЖОЛДАС",
+    points_short:"ТӘСІЛДЕР",
     order_section:"ТӘРТІП",
     meal_section:"АС ТҮРІ",
     allergy_section:"АЛЛЕРГИЯЛАР",
@@ -3384,7 +3395,7 @@ const T = {
     open_telegram:"Telegram арқылы ашыңыз.",
     failed_load:"Жүктеу мүмкін емес",
     failed_recognize:"Танып болмады. Басқа фото байқаңыз.",
-    limit_exceeded:"Күндік лимит таусылды. Ертең байқаңыз.",
+    limit_exceeded:"Күндік лимит таусылды. Ертең байқаңыз.",ai_unavailable:"AI-жаттықтырушы уақытша қолжетімсіз. Сәл кейінірек қайталап көр — сұраулар лимиті жұмсалмады.",last_time:"Өткен жолы",day_today_l:"бүгін",day_yesterday:"кеше",days_ago_n:"{n} күн бұрын",set_save_failed:"Тәсіл сақталмады — байланысты тексеріп, қайта бас",
     specify_name:"Атауды енгізіңіз",
     specify_name_cal:"Атау мен калорияларды енгізіңіз",
     delete_confirm:"Сабақты жоюды растайсыз ба?",
@@ -3407,7 +3418,7 @@ const T = {
     name_label:"АТЫ",
     name_req:"Аты *",
     exercise_group:"Бұлшықет тобы",
-    sets_num:"Жолдас",
+    sets_num:"Тәсілдер",
     reps_num:"Рет",
     all_btn:"БАРЛЫҒЫ",
     knowledge_base:"БІЛІМ БАЗАСЫ",
@@ -3431,7 +3442,7 @@ const T = {
     imt_label:"ДСИ",
     workout_done2:"Жаттығу аяқталды",
     workout_type:"Жаттығу",
-    sets_short:"жолдас",
+    sets_short:"тәсіл",
     reps_done:"орындалды",
     rpe_label:"RPE",
     warmup_duration:"5–10 минут",
@@ -3846,6 +3857,19 @@ function utcToLocal(iso) {
   if (!iso) return null;
   const d = new Date(iso);
   return isNaN(d.getTime()) ? null : new Date(d.getTime() + 5 * 3600000);
+}
+
+/** Подпись дня прошлой тренировки: «сегодня», «вчера», «3 дн. назад», «12 окт.».
+ *  Раньше на экран подхода шла сырая отметка из базы — «2026-09-11 17:23:10.157706». */
+function fmtDayAgo(iso) {
+  const d = utcToLocal(iso);
+  if (!d) return "";
+  const [y, m, dd] = localToday().split("-").map(Number);
+  const days = Math.round((Date.UTC(y, m - 1, dd) - Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())) / 86400000);
+  if (days === 0) return t("day_today_l");
+  if (days === 1) return t("day_yesterday");
+  if (days > 1 && days < 7) return t("days_ago_n").replace("{n}", days);
+  return d.toLocaleDateString(dateLocale(), { day: "numeric", month: "short" });
 }
 
 function tField(obj, field) {
@@ -5762,6 +5786,106 @@ function restSecFor(ex){
   return 90;                         // руки, пресс, ягодицы
 }
 
+// ── Фото и техника упражнения на экране подхода ──────────────────────────────
+/** Фото упражнения из каталога на месте пустого низа экрана. Тап — шторка
+ *  с видео и техникой. Адрес фото бывает, а файла нет (папку в R2 заводит
+ *  и загрузка одного видео) — тогда вместо битой картинки компактная строка
+ *  «Техника», как EventMediaView в AiEvent: нейтральная замена, не пустая рамка. */
+function ExerciseMediaCard({ex,onOpen}){
+  const [failed,setFailed]=useState(false);
+  useEffect(()=>{setFailed(false);},[ex?.photo_url]);
+  if(!ex)return null;
+  const hasVideo=!!ex.video_url;
+  const hasText=!!(ex.technique||ex.description);
+  const showPhoto=!!ex.photo_url&&!failed;
+  if(!showPhoto&&!hasVideo&&!hasText)return null;
+  const label=(
+    <span style={{display:"inline-flex",alignItems:"center",gap:6,fontSize:11,fontWeight:700,letterSpacing:1,fontFamily:"monospace",color:C.accent}}>
+      <span aria-hidden="true">{hasVideo?"▶":"ⓘ"}</span>{t("technique_label")}
+    </span>
+  );
+  if(!showPhoto)return(
+    <button type="button" onClick={onOpen}
+      style={{width:"100%",display:"flex",alignItems:"center",gap:10,background:C.card,border:`0.5px solid ${C.border}`,borderRadius:12,padding:"12px 14px",marginBottom:10,cursor:"pointer",textAlign:"left"}}>
+      {ex.group_icon_url
+        ?<img src={ex.group_icon_url} alt="" style={{width:28,height:28,objectFit:"cover",borderRadius:6}} onError={e=>{e.currentTarget.style.display="none";}}/>
+        :<span style={{fontSize:20}} aria-hidden="true">{ex.group_emoji||"🏋️"}</span>}
+      <span style={{flex:1}}>{label}</span>
+      <span style={{color:C.muted,fontSize:18}} aria-hidden="true">›</span>
+    </button>
+  );
+  return(
+    <button type="button" onClick={onOpen} aria-label={`${t("technique_label")}: ${tField(ex,"name")}`}
+      style={{position:"relative",display:"block",width:"100%",padding:0,border:`0.5px solid ${C.border}`,borderRadius:14,overflow:"hidden",background:C.card,marginBottom:10,cursor:"pointer",aspectRatio:"16 / 10",maxHeight:240}}>
+      <img src={ex.photo_url} alt="" decoding="async" onError={()=>setFailed(true)}
+        style={{width:"100%",height:"100%",objectFit:"cover",display:"block"}}/>
+      <span style={{position:"absolute",left:0,right:0,bottom:0,padding:"28px 14px 12px",background:"linear-gradient(transparent, rgba(0,0,0,0.78))",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        {label}
+        <span style={{color:C.text,fontSize:18}} aria-hidden="true">›</span>
+      </span>
+    </button>
+  );
+}
+
+/** Шторка с видео, описанием и техникой поверх экрана подхода — человек смотрит,
+ *  как делать, и возвращается к вводу, не теряя место. Закрывается крестиком,
+ *  тапом по фону, Escape и системной кнопкой «Назад» Telegram: без неё «Назад»
+ *  на Android закрыл бы всё приложение посреди тренировки. Таймер отдыха
+ *  (zIndex 199) остаётся поверх шторки. */
+function ExerciseInfoSheet({ex,onClose}){
+  const closeRef=useRef(null);
+  const onCloseRef=useRef(onClose);
+  onCloseRef.current=onClose;
+  const [videoFailed,setVideoFailed]=useState(false);
+  const [photoFailed,setPhotoFailed]=useState(false);
+  useEffect(()=>{
+    const prevFocus=document.activeElement;
+    try{closeRef.current?.focus({preventScroll:true});}catch{}
+    const onKey=e=>{if(e.key==="Escape")onCloseRef.current();};
+    document.addEventListener("keydown",onKey);
+    const prevOverflow=document.body.style.overflow;
+    document.body.style.overflow="hidden";
+    const bb=tg?.BackButton;
+    let bbOk=false;
+    try{bbOk=!!bb&&!!tg?.isVersionAtLeast?.("6.1");}catch{}
+    const onBack=()=>onCloseRef.current();
+    if(bbOk){try{bb.onClick(onBack);bb.show();}catch{}}
+    return()=>{
+      document.removeEventListener("keydown",onKey);
+      document.body.style.overflow=prevOverflow;
+      if(bbOk){try{bb.offClick(onBack);bb.hide();}catch{}}
+      try{prevFocus?.focus?.({preventScroll:true});}catch{}
+    };
+  },[]);
+  if(!ex)return null;
+  const desc=tField(ex,"description"), tech=tField(ex,"technique");
+  return(
+    <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:150,background:"rgba(0,0,0,0.6)",display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
+      <div role="dialog" aria-modal="true" aria-labelledby="ex-sheet-title" onClick={e=>e.stopPropagation()}
+        style={{width:"100%",maxWidth:560,maxHeight:"88vh",overflowY:"auto",WebkitOverflowScrolling:"touch",background:C.surface,borderRadius:"18px 18px 0 0",borderTop:`0.5px solid ${C.border}`,padding:"8px 16px calc(20px + env(safe-area-inset-bottom, 0px))",boxSizing:"border-box"}}>
+        <div aria-hidden="true" style={{width:36,height:4,borderRadius:2,background:C.border,margin:"0 auto 10px"}}/>
+        <div style={{display:"flex",alignItems:"flex-start",gap:10,marginBottom:12}}>
+          <div style={{flex:1,minWidth:0}}>
+            <Kicker>{tGroup(ex)?.toUpperCase()}</Kicker>
+            <div id="ex-sheet-title" style={{fontSize:18,fontWeight:700,color:C.text,lineHeight:1.3}}>{tField(ex,"name")}</div>
+          </div>
+          <button ref={closeRef} type="button" onClick={onClose} aria-label={t("close")}
+            style={{width:44,height:44,flexShrink:0,borderRadius:12,background:C.card,border:`0.5px solid ${C.border}`,color:C.text,fontSize:18,cursor:"pointer"}}>✕</button>
+        </div>
+        {ex.video_url&&!videoFailed
+          ?<video src={ex.video_url} poster={(!photoFailed&&ex.photo_url)||undefined} autoPlay loop muted playsInline preload="metadata"
+              onError={()=>setVideoFailed(true)}
+              style={{width:"100%",borderRadius:12,marginBottom:12,objectFit:"cover",maxHeight:260,background:C.card,display:"block"}}/>
+          :ex.photo_url&&!photoFailed&&<img src={ex.photo_url} alt={tField(ex,"name")} onError={()=>setPhotoFailed(true)}
+              style={{width:"100%",borderRadius:12,marginBottom:12,objectFit:"cover",maxHeight:260,display:"block"}}/>}
+        {desc&&<Card style={{marginBottom:10}}><Kicker>{t("description_label")}</Kicker><div style={{fontSize:14,color:C.text,lineHeight:1.6,marginTop:6}}>{desc}</div></Card>}
+        {tech&&<Card style={{marginBottom:10}}><Kicker>{t("technique_label")}</Kicker><div style={{fontSize:14,color:C.text,lineHeight:1.8,marginTop:6,whiteSpace:"pre-wrap"}}>{tech}</div></Card>}
+        {ex.equipment&&<Card><Kicker>{t("equipment_label")}</Kicker><div style={{fontSize:14,color:C.text,marginTop:4}}>{tEquip(ex.equipment)}</div></Card>}
+      </div>
+    </div>
+  );
+}
+
 function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscleGroups,onBack,onFinish,onFinishNav=null,onNav=null,preselectedExIds=[],preselectedGroupIds=[],plannedWorkoutId=null,exerciseTips={}}){
   const STEP={MD:-1,SG:0,SE:1,WU:2,OR:3,LG:4,FN:5}; // MD=выбор режима
   // Если с момента последней записи подхода прошло больше 3 часов — тренировка считается
@@ -5803,8 +5927,17 @@ function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscle
   const [curIdx,setCurIdx]=useState(_useSaved?_sv.curIdx:0);
   const [exTips,setExTips]=useState(_useSaved?(_sv.exerciseTips||{}):(exerciseTips||{}));
   const [lastSets,setLastSets]=useState({}); // {exerciseId: {found, date, sets:[{weight,reps}]}} — fallback когда нет совета AI
+  const [infoEx,setInfoEx]=useState(null);   // упражнение, чья техника открыта в шторке
+  const [logErr,setLogErr]=useState(null);   // подход не сохранился на сервере
 
-  useEffect(()=>{setPrefillFrom(null);},[curIdx]);
+  // Сменилось упражнение (стрелки, точки, замена на месте) — поля чистые.
+  // Иначе на следующем упражнении стояли цифры предыдущего, и подстановка из
+  // его «прошлого раза» не срабатывала: она не трогает уже заполненные поля.
+  const curExId=selExs[curIdx]?.id;
+  useEffect(()=>{
+    setPrefillFrom(null);setLogErr(null);
+    setLocalSet({reps:"",weight:"",time:"",distance:""});
+  },[curExId]);
 
   useEffect(()=>{
     const curEx=selExs[curIdx];
@@ -6040,20 +6173,32 @@ function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscle
   async function startWorkout(){
     try{
       const r=await fetch(`${API}/workout/start/${tgId}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({exercise_ids:selExs.map(e=>e.id)})});
-      const d=await r.json();setWorkoutId(d.workout_id);
+      // Без проверки экран подходов открывался и при отказе сервера, без id
+      // тренировки — и ни один подход потом не сохранялся.
+      if(!r.ok)throw new Error(`start HTTP ${r.status}`);
+      const d=await r.json();
+      if(!d?.workout_id)throw new Error("no workout_id");
+      setWorkoutId(d.workout_id);
       const init={};selExs.forEach(e=>{init[e.id]=[];});setSets(init);setStep(STEP.LG);
     }catch{alert(t("error_launch"));}
   }
   async function doLog(){
-    const ex=selExs[curIdx];if(!ex||!workoutId)return;
+    const ex=selExs[curIdx];if(!ex)return;
+    // Тренировка не заведена на сервере — подход сохранить некуда. Раньше здесь
+    // был тихий return, и кнопка показывала успех.
+    if(!workoutId)throw new Error("no workout id");
     const done=(sets[ex.id]||[]).length;
     // Длительность отдыха считаем ДО отправки и передаём вместе с подходом:
     // отсчёт ведёт сервер и сам пришлёт уведомление, когда время выйдет.
     // Таймер в приложении остаётся как визуальный, но больше не единственный —
     // раньше он просто вставал, стоило заблокировать телефон.
     const rs=lastSets[ex.id]?.rest_sec||restSecFor(ex);
-    await fetch(`${API}/workout/${workoutId}/set?tg_id=${tgId}`,{method:"POST",headers:{"Content-Type":"application/json"},
+    const res=await fetch(`${API}/workout/${workoutId}/set?tg_id=${tgId}`,{method:"POST",headers:{"Content-Type":"application/json"},
       body:JSON.stringify({exercise_id:ex.id,exercise_name:ex.name,set_number:done+1,reps:parseInt(localSet.reps)||null,weight:parseFloat(localSet.weight)||null,duration_sec:parseInt(localSet.time)||null,distance_km:parseFloat(localSet.distance)||null,rest_sec:rs>0?rs:null})});
+    // Раньше ответ не проверялся: при ошибке сервера подход оставался только
+    // на экране, человек шёл дальше, а при завершении тренировки его не было.
+    // Теперь цифры остаются в полях, и можно нажать ещё раз.
+    if(!res.ok)throw new Error(`set HTTP ${res.status}`);
     setSets(p=>({...p,[ex.id]:[...(p[ex.id]||[]),{...localSet}]}));
     setLastSetAt(Date.now());
     setLocalSet({reps:"",weight:"",time:"",distance:""});
@@ -6113,6 +6258,7 @@ ${exList}
       // упражнений, которого никто не просил, вместо связной оценки.
       const res=await fetch(`${API}/ai/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:q,tg_id:tgId,skip_limit:true,mode:"review"})});
       if(res.status===429){setAiReview("__limit__");return;}
+      if(res.status===503){setAiReview("__unavailable__");return;}
       if(!res.ok){setAiReview("__error__");return;}
       const d=await res.json();
       const reviewText=d.answer||"__error__";
@@ -6197,7 +6343,7 @@ ${exList}
             <div style={{color:C.muted,fontSize:24,marginTop:8}}>◌</div>
           </div>
         </Card>
-      ):aiReview&&aiReview!=="__limit__"&&aiReview!=="__error__"?(
+      ):aiReview&&aiReview!=="__limit__"&&aiReview!=="__error__"&&aiReview!=="__unavailable__"?(
         <Card accent style={{marginBottom:16}}>
           <Kicker>{t("ai_review_title")}</Kicker>
           <div style={{fontSize:14,color:C.text,lineHeight:1.7,marginTop:8,whiteSpace:"pre-wrap"}}>{aiReview}</div>
@@ -6212,6 +6358,12 @@ ${exList}
         <Card style={{marginBottom:16}}>
           <div style={{fontSize:13,color:C.muted,textAlign:"center",padding:"8px 0"}}>
             {t("ui_ne_udalos_poluchit_ocenku")}
+          </div>
+        </Card>
+      ):aiReview==="__unavailable__"?(
+        <Card style={{marginBottom:16}}>
+          <div style={{fontSize:13,color:C.muted,textAlign:"center",padding:"8px 0"}}>
+            {t("ai_unavailable")}
           </div>
         </Card>
       ):null}
@@ -6489,13 +6641,20 @@ ${exList}
     // Подсказка следующего веса (+2.5 кг от последнего подхода)
     const lastWeight=doneSets.length>0?parseFloat(doneSets[doneSets.length-1].weight||0):parseFloat(localSet.weight||0);
     const suggestWeight=lastWeight>0?Math.round((lastWeight+2.5)*4)/4:null;
+    // Фото, видео и технику берём из свежего каталога: состав тренировки,
+    // восстановленный из localStorage, хранит объекты на момент старта —
+    // со старым языком описания и без медиа, если их добавили позже.
+    const exMedia=(exercises||[]).find(e=>e.id===ex.id)||ex;
+    const lsCur=lastSets[ex.id];
+    const lastIdx=lsCur?.sets?.length?Math.min(doneSets.length,lsCur.sets.length-1):-1;
+    const lastAgo=lsCur?.date?fmtDayAgo(lsCur.date):"";
 
     return(
       <div style={{padding:"16px 16px 100px"}}>
         {/* Хедер */}
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
           <div style={{fontSize:11,color:C.muted,fontFamily:"monospace"}}>
-            {ex.group_icon_url?<img src={ex.group_icon_url} alt="" style={{width:16,height:16,objectFit:"cover",borderRadius:3,verticalAlign:"middle",marginRight:4}}/>:ex.group_emoji+" "}{ex.group_name?.toUpperCase()}
+            {ex.group_icon_url?<img src={ex.group_icon_url} alt="" style={{width:16,height:16,objectFit:"cover",borderRadius:3,verticalAlign:"middle",marginRight:4}}/>:ex.group_emoji+" "}{tGroup(ex)?.toUpperCase()}
           </div>
           <button onClick={finish} style={{background:"none",border:`0.5px solid ${C.danger}`,borderRadius:8,padding:"5px 10px",color:C.danger,fontSize:11,fontFamily:"monospace",cursor:"pointer"}}>
             {t("finish_workout")}
@@ -6545,20 +6704,47 @@ ${exList}
           </>
         )}
 
+        {/* Совет AI-тренера по этому упражнению — рядом с вводом, а не под кнопками */}
+        {!lgReplaceMode&&exTips[ex.id]&&(
+          <Card style={{marginBottom:10,background:"rgba(200,255,0,0.06)",border:`0.5px solid ${C.accent}`}}>
+            <div style={{display:"flex",gap:8,alignItems:"flex-start"}}>
+              <div style={{fontSize:18}} aria-hidden="true">🤖</div>
+              <div style={{flex:1,fontSize:13,color:C.text,lineHeight:1.5}}>{exTips[ex.id]}</div>
+            </div>
+          </Card>
+        )}
+
+        {/* Прошлый раз — прямо над полями: с ним сверяются, когда вводят цифры.
+            Подход, который сейчас по счёту, выделен — его цифры и подставлены. */}
+        {!lgReplaceMode&&lsCur?.found&&lsCur.sets?.length>0&&(
+          <div style={{display:"flex",alignItems:"baseline",flexWrap:"wrap",gap:"4px 10px",fontSize:12,fontFamily:"monospace",color:C.muted,margin:"0 2px 8px"}}>
+            <span>{t("last_time")}{lastAgo?` · ${lastAgo}`:""}</span>
+            <span>
+              {lsCur.sets.map((s,i)=>(
+                <span key={i} style={{color:i===lastIdx&&prefillFrom?C.text:C.muted,fontWeight:i===lastIdx&&prefillFrom?700:400,marginRight:8,whiteSpace:"nowrap"}}>
+                  {s.weight>0?`${s.weight}×${s.reps}`:`${s.reps} ${t("u_povt")}`}
+                </span>
+              ))}
+            </span>
+          </div>
+        )}
+
         {/* Основной блок ввода — скрываем при режиме замены */}
+        {/* Поля сжимаются вместе с экраном: на 360px ширины кнопка «−» у веса
+            вылезала за край карточки — у полей была жёсткая ширина 80 и 60px. */}
         {!lgReplaceMode&&cType===null&&(
-          <Card accent style={{marginBottom:12,padding:"16px"}}>
-            <div style={{display:"flex",gap:16,alignItems:"flex-end",justifyContent:"center"}}>
+          <Card accent style={{marginBottom:12,padding:"16px 12px"}}>
+            <div style={{display:"flex",gap:10,alignItems:"flex-end",justifyContent:"center"}}>
 
               {/* Вес */}
-              <div style={{textAlign:"center",flex:1}}>
+              <div style={{textAlign:"center",flex:1,minWidth:0}}>
                 <div style={{fontSize:10,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("weight_kg")}</div>
-                <div style={{display:"flex",alignItems:"center",gap:8,justifyContent:"center"}}>
-                  <button onClick={()=>setLocalSet(p=>({...p,weight:String(Math.max(0,parseFloat(p.weight||0)-2.5))}))}
+                <div style={{display:"flex",alignItems:"center",gap:6,justifyContent:"center"}}>
+                  <button onClick={()=>{haptic.select();setLocalSet(p=>({...p,weight:String(Math.max(0,parseFloat(p.weight||0)-2.5))}));}}
                     style={{width:36,height:36,borderRadius:8,background:C.card,border:`0.5px solid ${C.border}`,color:C.muted,fontSize:16,cursor:"pointer",flexShrink:0}}>−</button>
-                  <input type="number" value={localSet.weight} onChange={e=>setLocalSet(p=>({...p,weight:e.target.value}))} placeholder="0"
-                    style={{background:"none",border:"none",color:C.accent,fontSize:32,fontFamily:"monospace",fontWeight:700,width:80,outline:"none",textAlign:"center"}}/>
-                  <button onClick={()=>setLocalSet(p=>({...p,weight:String(parseFloat(p.weight||0)+2.5)}))}
+                  <input type="number" value={localSet.weight} onChange={e=>setLocalSet(p=>({...p,weight:e.target.value}))} placeholder="0" aria-label={t("weight_kg")}
+                    style={{background:"none",border:"none",color:C.accent,fontSize:"clamp(22px, 6.6vw, 32px)",fontFamily:"monospace",fontWeight:700,flex:1,minWidth:0,width:"100%",padding:0,outline:"none",textAlign:"center"}}/>
+                  <button onClick={()=>{haptic.select();setLocalSet(p=>({...p,weight:String(parseFloat(p.weight||0)+2.5)}));}}
                     style={{width:36,height:36,borderRadius:8,background:C.card,border:`0.5px solid ${C.border}`,color:C.muted,fontSize:16,cursor:"pointer",flexShrink:0}}>+</button>
                 </div>
                 {suggestWeight&&doneSets.length===0&&(
@@ -6569,22 +6755,19 @@ ${exList}
                     </button>
                   </div>
                 )}
-                {prefillFrom&&doneSets.length===0&&(
-                  <div style={{fontSize:10,color:C.muted,marginTop:3}}>{t("prefill_from")} {prefillFrom}</div>
-                )}
               </div>
 
               <div style={{width:1,height:60,background:C.border,flexShrink:0}}/>
 
               {/* Повторения */}
-              <div style={{textAlign:"center",flex:1}}>
+              <div style={{textAlign:"center",flex:1,minWidth:0}}>
                 <div style={{fontSize:10,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("reps_label")}</div>
-                <div style={{display:"flex",alignItems:"center",gap:8,justifyContent:"center"}}>
-                  <button onClick={()=>setLocalSet(p=>({...p,reps:String(Math.max(1,parseInt(p.reps||0)-1))}))}
+                <div style={{display:"flex",alignItems:"center",gap:6,justifyContent:"center"}}>
+                  <button onClick={()=>{haptic.select();setLocalSet(p=>({...p,reps:String(Math.max(1,parseInt(p.reps||0)-1))}));}}
                     style={{width:36,height:36,borderRadius:8,background:C.card,border:`0.5px solid ${C.border}`,color:C.muted,fontSize:16,cursor:"pointer",flexShrink:0}}>−</button>
-                  <input type="number" value={localSet.reps} onChange={e=>setLocalSet(p=>({...p,reps:e.target.value}))} placeholder="0"
-                    style={{background:"none",border:"none",color:C.accent,fontSize:32,fontFamily:"monospace",fontWeight:700,width:60,outline:"none",textAlign:"center"}}/>
-                  <button onClick={()=>setLocalSet(p=>({...p,reps:String(parseInt(p.reps||0)+1)}))}
+                  <input type="number" inputMode="numeric" value={localSet.reps} onChange={e=>setLocalSet(p=>({...p,reps:e.target.value}))} placeholder="0" aria-label={t("reps_label")}
+                    style={{background:"none",border:"none",color:C.accent,fontSize:"clamp(22px, 6.6vw, 32px)",fontFamily:"monospace",fontWeight:700,flex:1,minWidth:0,width:"100%",padding:0,outline:"none",textAlign:"center"}}/>
+                  <button onClick={()=>{haptic.select();setLocalSet(p=>({...p,reps:String(parseInt(p.reps||0)+1)}));}}
                     style={{width:36,height:36,borderRadius:8,background:C.card,border:`0.5px solid ${C.border}`,color:C.muted,fontSize:16,cursor:"pointer",flexShrink:0}}>+</button>
                 </div>
               </div>
@@ -6637,17 +6820,23 @@ ${exList}
         {/* Главная кнопка */}
         <button onClick={async()=>{
           if(logBusy)return;
-          setLogBusy(true);
+          setLogBusy(true);setLogErr(null);
           try{
             await doLog();
+            haptic.notify("success");
             setShowTimer(true);
             setLocalSet({reps:"",weight:"",time:"",distance:""});
+          }catch(e){
+            console.warn("[set] не сохранён",e);
+            haptic.notify("error");
+            setLogErr(t("set_save_failed"));
           }finally{setLogBusy(false);}
         }}
           disabled={logBusy}
           style={{width:"100%",background:logBusy?"#8FB300":C.accent,border:"none",borderRadius:12,padding:"16px",color:C.bg,fontWeight:700,fontSize:16,cursor:logBusy?"not-allowed":"pointer",marginBottom:10,letterSpacing:0.5,opacity:logBusy?0.8:1,transition:"all 0.15s"}}>
           {logBusy?t("aw_sohranyaem"):t("set_done")}
         </button>
+        {logErr&&<div role="alert" style={{fontSize:12,color:C.danger,textAlign:"center",margin:"-2px 0 10px",lineHeight:1.4}}>{logErr}</div>}
 
         {/* Навигация между упражнениями */}
         <div style={{display:"flex",gap:10,marginBottom:10}}>
@@ -6659,13 +6848,26 @@ ${exList}
 
         {/* Точки-индикаторы */}
         <div style={{display:"flex",gap:6,justifyContent:"center",flexWrap:"wrap",marginBottom:8}}>
-          {selExs.map((e,i)=>(
-            <button key={e.id} onClick={()=>setCurIdx(i)}
-              style={{width:28,height:28,borderRadius:8,background:i===curIdx?C.accent:C.card,border:`0.5px solid ${i===curIdx?C.accent:C.border}`,color:i===curIdx?C.bg:C.muted,fontSize:11,fontFamily:"monospace",cursor:"pointer"}}>
-              {i+1}
-            </button>
-          ))}
+          {selExs.map((e,i)=>{
+            // Раньше подсвечивалась только текущая точка, и по ним нельзя было
+            // понять, что уже сделано. Теперь: все подходы — зелёная галочка,
+            // часть — зелёная рамка.
+            const cur=i===curIdx;
+            const nDone=(sets[e.id]||[]).length;
+            const full=nDone>=(parseInt(e.sets_recommended)||4);
+            const part=nDone>0&&!full;
+            return(
+              <button key={e.id} onClick={()=>{if(!cur){haptic.select();setCurIdx(i);}}}
+                aria-label={`${i+1}. ${tField(e,"name")}${full?" ✓":""}`} aria-current={cur?"step":undefined}
+                style={{width:32,height:32,borderRadius:8,background:cur?C.accent:full?"rgba(0,204,102,0.15)":C.card,border:`0.5px solid ${cur?C.accent:(full||part)?C.success:C.border}`,color:cur?C.bg:full?C.success:C.muted,fontSize:11,fontFamily:"monospace",fontWeight:full?700:400,cursor:"pointer"}}>
+                {full&&!cur?"✓":i+1}
+              </button>
+            );
+          })}
         </div>
+
+        {/* Фото и техника упражнения из каталога */}
+        {!lgReplaceMode&&<ExerciseMediaCard key={exMedia.id} ex={exMedia} onOpen={()=>{haptic.impact("light");setInfoEx(exMedia);}}/>}
 
         {/* Добавить упражнение во время тренировки */}
         <AddExerciseDuringWorkout
@@ -6673,37 +6875,18 @@ ${exList}
           muscleGroups={muscleGroups}
           tgId={tgId}
           onAdd={ex=>{
-            if(!selExs.find(e=>e.id===ex.id)){
-              setSelExs(p=>[...p,{...ex,order:p.length+1}]);
-              setSets(p=>({...p,[ex.id]:[]}));
-            }
+            // Уже есть в тренировке — переходим к нему. Раньше индекс уезжал
+            // за конец списка, и экран зависал на «ЗАГРУЗКА».
+            const at=selExs.findIndex(e=>e.id===ex.id);
+            if(at>=0){setCurIdx(at);return;}
+            setSelExs(p=>[...p,{...ex,order:p.length+1}]);
+            setSets(p=>({...p,[ex.id]:[]}));
             setCurIdx(selExs.length);
           }}
         />
 
-        {/* Совет AI-тренера по текущему упражнению — только если план создавал AI и совет был дан именно на это упражнение */}
-        {exTips[ex.id]?(
-          <Card style={{marginBottom:10,background:"rgba(200,255,0,0.06)",border:`0.5px solid ${C.accent}`}}>
-            <div style={{display:"flex",gap:8,alignItems:"flex-start"}}>
-              <div style={{fontSize:18}}>🤖</div>
-              <div style={{flex:1,fontSize:13,color:C.text,lineHeight:1.5}}>{exTips[ex.id]}</div>
-            </div>
-          </Card>
-        ):lastSets[ex.id]?.found&&(
-          <Card style={{marginBottom:10}}>
-            <div style={{display:"flex",gap:8,alignItems:"flex-start"}}>
-              <div style={{fontSize:18}}>📊</div>
-              <div style={{flex:1}}>
-                <div style={{fontSize:11,color:C.muted,marginBottom:4,fontFamily:"monospace"}}>
-                  {t("ui_posledniy_raz")}{lastSets[ex.id].date})
-                </div>
-                <div style={{fontSize:13,color:C.text}}>
-                  {lastSets[ex.id].sets.map((s,i)=>(s.weight>0?`${s.weight}${t("home_kg")}×${s.reps}`:`${s.reps}${t("u_povt")}`)).join(", ")}
-                </div>
-              </div>
-            </div>
-          </Card>
-        )}
+        {/* Шторка с техникой */}
+        {infoEx&&<ExerciseInfoSheet ex={infoEx} onClose={()=>setInfoEx(null)}/>}
 
         {/* Таймер отдыха */}
         {showTimer&&<RestTimer autoStart={timerAuto}
@@ -7789,6 +7972,8 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
               setStreamText("");
               if(ev.status===429){setAnswer(t("limit_exceeded"));return;}
               if(ev.status===451){setAiBlocked(true);return;}
+              // Anthropic недоступен: повтор обычным запросом упрётся в то же самое
+              if(ev.status===503&&!gotAnything){setAnswer(t("ai_unavailable"));return;}
               throw new Error(`stream error ${ev.status}`);
             }
           }
@@ -7811,6 +7996,7 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
           headers:{"Content-Type":"application/json"},body});
         if(res.status===429){setAnswer(t("limit_exceeded"));return;}
         if(res.status===451){setAiBlocked(true);return;}
+        if(res.status===503){setAnswer(t("ai_unavailable"));return;}
         if(!res.ok){
           const err=await res.text().catch(()=>"");
           setAnswer(t("err_server_retry").replace("{code}",res.status+(err?" — "+err.slice(0,100):"")));
@@ -7980,7 +8166,7 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
               el.style.height=Math.min(el.scrollHeight,120)+"px";
             }}
             onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();ask(q);if(qTaRef.current){qTaRef.current.style.height="auto";}}}}
-            placeholder={t("ai_sprosi_chto_ugodno")} style={{flex:1,background:"none",border:"none",padding:"10px 14px",color:C.text,fontSize:13,fontFamily:"monospace",outline:"none",resize:"none",maxHeight:120,lineHeight:1.4,fontFamily:"monospace"}}/>
+            placeholder={t("ai_sprosi_chto_ugodno")} style={{flex:1,background:"none",border:"none",padding:"10px 14px",color:C.text,fontSize:13,fontFamily:"monospace",outline:"none",resize:"none",maxHeight:120,lineHeight:1.4}}/>
           <button onClick={()=>{ask(q);if(qTaRef.current){qTaRef.current.style.height="auto";}}} disabled={loading||!q.trim()}
             style={{background:C.accent,border:"none",borderRadius:"0 8px 8px 0",padding:"10px 16px",color:C.bg,fontWeight:700,fontSize:14,cursor:"pointer",opacity:loading||!q.trim()?0.5:1,alignSelf:"stretch"}}>→</button>
         </div>
@@ -8155,7 +8341,7 @@ function FoodVisionScreen({tgId,onBack,mealType}){
         body:JSON.stringify({image_base64:photo,tg_id:tgId,save:false})});
       if(!res.ok)throw new Error(res.status);
       setResult(await res.json());
-    }catch{setError(t("failed_recognize"));}
+    }catch(e){setError(e?.message==="503"?t("ai_unavailable"):t("failed_recognize"));}
     finally{setLoading(false);}
   }
 
@@ -8192,7 +8378,7 @@ function FoodVisionScreen({tgId,onBack,mealType}){
       const newResult=await res.json();
       setResult(newResult);
       setEditing(false);setEditText("");
-    }catch{setError(t("fv_ne_udalos_pereschitat_poprob"));}
+    }catch(e){setError(e?.message==="503"?t("ai_unavailable"):t("fv_ne_udalos_pereschitat_poprob"));}
     finally{setRecalculating(false);}
   }
 
@@ -8366,6 +8552,7 @@ function NutritionScreen({tgId,onBack,onNav}){
       // mode:"chat" — вопрос про питание. Без него слово «план» в вопросе («составь
       // план питания») включало схему тренировочного плана и портило ответ.
       const res=await fetch(`${API}/ai/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({tg_id:tgId,question,mode:"chat"})});
+      if(res.status===503){setAiAnswer(t("ai_unavailable"));return;}
       const d=await res.json();
       if(res.status===429){setAiAnswer(t("nut_limit_ai_zaprosov_na"));}
       else{setAiAnswer(d.answer||t("no_answer"));}
@@ -8393,6 +8580,7 @@ function NutritionScreen({tgId,onBack,onNav}){
       const res=await fetch(`${API}/food/recalc`,{method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({description:editLogText,weight_g:editLogWeight||300})});
+      if(res.status===503)throw new Error(t("ai_unavailable"));
       if(!res.ok)throw new Error(`recalc HTTP ${res.status}`);
       const r=await res.json();
       const putRes=await fetch(`${API}/nutrition/${tgId}/${logId}`,{method:"PUT",
