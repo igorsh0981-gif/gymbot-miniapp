@@ -569,6 +569,20 @@ await scenario("43_home_premium_entry", VIEWPORTS[1], { tab: "menu", screen: nul
   await page.getByText("GymBot Premium").waitFor({ timeout: 4000 });
   return { entry: 1, opened: 1 };
 });
+await scenario("44_premium_terms", VIEWPORTS[0], { tab: "menu", screen: "premium", net: { setMode: "ok", setBodies: [], counts: {}, premium: PREMIUM } }, async (page, net) => {
+  await page.getByText("GymBot Premium").waitFor({ timeout: 5000 });
+  await page.getByText(/Условия Premium, отмена и возврат/).click();
+  await page.getByText("3. Premium").waitFor({ timeout: 4000 });
+  return { prices: await page.getByText(/месяц стоит 199 ⭐, год — 1290 ⭐/).count(),
+           trial: await page.getByText(/Пробный период — 7 дн\. бесплатно/).count(),
+           refund: await page.getByText(/\/paysupport/).count() > 0 ? 1 : 0,
+           cancel: await page.getByText(/Настройки → Мои звёзды/).count() > 0 ? 1 : 0 };
+});
+await scenario("45_more_terms", VIEWPORTS[1], { tab: "menu", screen: "more", net: { setMode: "ok", setBodies: [], counts: {}, premium: PREMIUM } }, async (page, net) => {
+  await page.getByText("Правила использования").first().click();
+  await page.getByText("1. Общие положения").waitFor({ timeout: 4000 });
+  return { opened: 1, general: await page.getByText(/не являются медицинским назначением/).count() };
+});
 
 await browser.close();
 fs.writeFileSync(path.join(OUT, "results.json"), JSON.stringify(results, null, 2));

@@ -69,4 +69,7 @@ export const CHECKS = {
   "41_workout_detail_share_old_client": r => all(eq("запросы", r.share, ["send:555"]), eq("методы Telegram", (r.calls || []).length, 0)),
   "43_home_premium_entry": r => all(eq("пункт на главной", r.entry, 1), eq("экран Premium", r.opened, 1)),
   "42_story_on_desktop_goes_to_bot": r => all(eq("запросы", r.share, ["send:555"]), eq("методы Telegram", (r.calls || []).length, 0)),
+  // правила использования: раздел Premium с ценами из настроек, вход из «Сервисов»
+  "44_premium_terms": r => all(eq("цены", r.prices, 1), eq("пробный", r.trial, 1), eq("возврат", r.refund, 1), eq("отмена", r.cancel, 1)),
+  "45_more_terms": r => all(eq("открылись", r.opened, 1), eq("общие положения", r.general, 1)),
 };
