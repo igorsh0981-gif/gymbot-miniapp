@@ -257,6 +257,12 @@ async function setup(page, { lang = "ru", ls = null, setFails = false, curIdx = 
         return json(route, { ok: true, already: false, team: (net.social?.teams || [])[0] });
       }
       if (p === `/social/${TG_ID}/feed`) return json(route, net.feed || { items: [], next_before: null });
+      const nm = p.match(/^\/social\/\d+\/friends\/(\d+)\/nudge$/);
+      if (nm) {
+        (net.nudges = net.nudges || []).push({ id: +nm[1], text: JSON.parse(req.postData() || "{}").text });
+        if (net.nudgeErr) return json(route, { detail: { code: net.nudgeErr } }, net.nudgeErr === "no_links" ? 422 : 429);
+        return json(route, { ok: true, delivered: !net.nudgeUndelivered, next_at: "2026-10-26T10:00:00" });
+      }
       const lm = p.match(/^\/social\/\d+\/feed\/(\d+)\/like$/);
       if (lm) { (net.likes = net.likes || []).push(+lm[1]); return json(route, { ok: true, liked: true, likes: 3 }); }
       if (p === `/programs/${TG_ID}`) return json(route, net.programs || { programs: [], active: null });
@@ -732,6 +738,12 @@ const TEAM = { id: 7, name: "Зал №1", code: "TEAM0007", invite_link: "https
            { id: 3, name: "Борис", is_me: false, is_owner: false, week: 1, last_week: 2, place: 3 } ] };
 const SOCIAL = { code: "IGOR0001", invite_link: "https://t.me/GYMASH_bot/gymapp?startapp=fr_IGOR0001", share_workouts: true,
   friends: [ { id: 2, name: "Анна", week: 4, last_workout_at: "2026-10-24T08:00:00" } ], teams: [TEAM] };
+const SOCIAL_NUDGE = { code: "IGOR0001", invite_link: "https://t.me/GYMASH_bot/gymapp?startapp=fr_IGOR0001", share_workouts: true, teams: [],
+  friends: [
+    { id: 2, name: "Анна", week: 4, last_workout_at: "2026-10-24T08:00:00", idle_days: 0, inactive: false, can_nudge: false, nudged_at: null },
+    { id: 3, name: "Борис", week: 0, last_workout_at: "2026-10-19T08:00:00", idle_days: 5, inactive: true, can_nudge: true, nudged_at: null },
+    { id: 5, name: "Вика", week: null, last_workout_at: null, idle_days: null, inactive: null, can_nudge: true, nudged_at: null },
+    { id: 6, name: "Гоша", week: 0, last_workout_at: null, idle_days: null, inactive: true, can_nudge: false, nudged_at: "2026-10-24T20:00:00" } ] };
 const FEED = { next_before: null, items: [
   { workout_id: 901, user_id: 2, is_me: false, name: "Анна", date: "2026-10-24T08:00:00", duration_min: 50, volume: 4200,
     exercises: ["Жим штанги лёжа", "Приседания со штангой"], exercises_count: 5, sets: 15,
@@ -764,12 +776,12 @@ await scenario("57_team_join_board", VIEWPORTS[1], { tab: "menu", screen: "socia
 const WN_NET = () => ({ setMode: "ok", setBodies: [], counts: {}, home: HOME, premium: PREMIUM, wn: { seen: null, new_user: false } });
 await scenario("58_whats_new_tour", VIEWPORTS[1], { tab: "menu", screen: null, net: WN_NET() }, async (page, net) => {
   await page.getByRole("dialog").waitFor({ timeout: 5000 });
-  const first = await page.getByText("ЧТО НОВОГО · 1/5").count();
+  const first = await page.getByText("ЧТО НОВОГО · 1/6").count();
   const title1 = await page.locator("#wn-title").textContent();
   const levels = await page.getByText("от «Старт» до «Элита»", { exact: false }).count();
   const bb = await page.evaluate(() => window.Telegram.WebApp.BackButton.isVisible);
   const titles = [title1];
-  for (let k = 0; k < 4; k++) { await page.getByRole("button", { name: "ДАЛЕЕ" }).click(); await page.waitForTimeout(120); titles.push(await page.locator("#wn-title").textContent()); }
+  for (let k = 0; k < 5; k++) { await page.getByRole("button", { name: "ДАЛЕЕ" }).click(); await page.waitForTimeout(120); titles.push(await page.locator("#wn-title").textContent()); }
   const trialCta = await page.getByRole("button", { name: /Попробовать 7 дн\. бесплатно/i }).count();
   const perks = await page.getByText("До 30 вопросов AI-тренеру в день").count();
   await page.screenshot({ path: path.join(OUT, "58b_whats_new_premium.png") });
@@ -791,7 +803,7 @@ await scenario("59_whats_new_cta_opens_feature", VIEWPORTS[0], { tab: "menu", sc
 });
 await scenario("60_whats_new_swipe_and_back", VIEWPORTS[2], { tab: "menu", screen: null, net: { ...WN_NET(), wn: { seen: "2026-01-01", new_user: true } } }, async (page, net) => {
   await page.getByRole("dialog").waitFor({ timeout: 5000 });
-  const kicker = await page.getByText("ПОЛЕЗНО ЗНАТЬ · 1/5").count();
+  const kicker = await page.getByText("ПОЛЕЗНО ЗНАТЬ · 1/6").count();
   const box = await page.getByRole("dialog").boundingBox();
   const swipe = async (from, to) => {
     await page.dispatchEvent('[role="dialog"]', "touchstart", { touches: [{ identifier: 1, clientX: from, clientY: 400 }], changedTouches: [{ identifier: 1, clientX: from, clientY: 400 }] });
@@ -799,14 +811,14 @@ await scenario("60_whats_new_swipe_and_back", VIEWPORTS[2], { tab: "menu", scree
     await page.waitForTimeout(150);
   };
   await swipe(box.width - 40, 60);
-  const afterLeft = await page.getByText("ПОЛЕЗНО ЗНАТЬ · 2/5").count();
+  const afterLeft = await page.getByText("ПОЛЕЗНО ЗНАТЬ · 2/6").count();
   await swipe(60, box.width - 40);
-  const afterRight = await page.getByText("ПОЛЕЗНО ЗНАТЬ · 1/5").count();
+  const afterRight = await page.getByText("ПОЛЕЗНО ЗНАТЬ · 1/6").count();
   await page.evaluate(() => window.Telegram.WebApp.BackButton._h.forEach(f => f()));
   await page.waitForTimeout(300);
   return { kicker, afterLeft, afterRight, dialogAfterBack: await page.getByRole("dialog").count(), posts: net.wnPosts || [] };
 });
-await scenario("61_whats_new_not_again", VIEWPORTS[1], { tab: "menu", screen: null, ls: { gymbot_wn_seen_123456789: "2026-10-25" }, net: WN_NET() }, async (page, net) => {
+await scenario("61_whats_new_not_again", VIEWPORTS[1], { tab: "menu", screen: null, ls: { gymbot_wn_seen_123456789: "2026-10-25b" }, net: WN_NET() }, async (page, net) => {
   await page.waitForTimeout(800);
   return { gets: net.wnGets || 0, dialog: await page.getByRole("dialog").count() };
 });
@@ -817,11 +829,57 @@ await scenario("62_whats_new_not_over_deeplink", VIEWPORTS[1], { tab: "menu", sc
 await scenario("63_whats_new_from_more_uz", VIEWPORTS[0], { lang: "uz", tab: "menu", screen: "more", net: { ...WN_NET(), wn: { seen: "2099-01-01", new_user: false } } }, async (page, net) => {
   await page.getByText("Yangiliklar", { exact: true }).click();
   await page.getByRole("dialog").waitFor({ timeout: 4000 });
-  const kicker = await page.getByText("YANGILIKLAR · 1/5").count();
+  const kicker = await page.getByText("YANGILIKLAR · 1/6").count();
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   await page.getByRole("button", { name: "MENING DARAJAM" }).click();
   await page.waitForTimeout(400);
   return { kicker, overflow, dialog: await page.getByRole("dialog").count(), strengthReq: net.counts["GET /strength/{tg}"] || 0, posts: net.wnPosts || [] };
+});
+
+// ── «Что нового»: видел прошлую подборку — только новый слайд ──
+await scenario("64_whats_new_only_new", VIEWPORTS[1], { tab: "menu", screen: null, net: { ...WN_NET(), wn: { seen: "2026-10-25", new_user: false }, social: SOCIAL_NUDGE, feed: FEED } }, async (page, net) => {
+  await page.getByRole("dialog").waitFor({ timeout: 5000 });
+  const only = await page.getByText("ЧТО НОВОГО · 1/1").count();
+  const title = await page.locator("#wn-title").textContent();
+  await page.screenshot({ path: path.join(OUT, "64b_whats_new_nudge.png") });
+  await page.getByRole("button", { name: "Открыть друзей" }).click();
+  await page.getByText("Борис").waitFor({ timeout: 4000 });
+  return { only, title, posts: net.wnPosts || [], friendsTab: await page.getByRole("button", { name: /Напомнить/ }).count() > 0 ? 1 : 0 };
+});
+// ── Друзья: напомнить тому, кто не тренируется ──
+await scenario("65_friend_nudge", VIEWPORTS[0], { tab: "menu", screen: "social", params: { tab: "friends" }, net: { setMode: "ok", setBodies: [], counts: {}, social: SOCIAL_NUDGE, feed: FEED } }, async (page, net) => {
+  await page.getByText("Борис").waitFor({ timeout: 5000 });
+  const idle = await page.getByText("не тренируется 5 дн.").count();
+  const long = await page.getByText("давно не тренировался").count();
+  const buttons = await page.getByRole("button", { name: /Напомнить/ }).count();
+  const done = await page.getByText("✓ Напомнили").count();
+  await page.screenshot({ path: path.join(OUT, "65a_friends_list_360x740.png") });
+  await page.getByRole("button", { name: /Напомнить/ }).first().click();
+  await page.getByRole("dialog").waitFor();
+  const to = await page.getByText("Кому: Борис").count();
+  await page.getByRole("button", { name: "Давно тебя не видно — сходим потренироваться?" }).click();
+  await page.locator("textarea").fill("Борис, давно тебя не видно — в субботу в зал? 💪");
+  await page.screenshot({ path: path.join(OUT, "65b_nudge_sheet_360x740.png") });
+  await page.getByRole("button", { name: "Отправить" }).click();
+  await page.getByText("Напоминание отправлено: Борис").waitFor({ timeout: 4000 });
+  return { idle, long, buttons, done, to, nudges: net.nudges || [], dialogAfter: await page.getByRole("dialog").count() };
+});
+await scenario("66_friend_nudge_errors", VIEWPORTS[1], { tab: "menu", screen: "social", params: { tab: "friends" }, net: { setMode: "ok", setBodies: [], counts: {}, social: SOCIAL_NUDGE, feed: FEED, nudgeErr: "no_links" } }, async (page, net) => {
+  await page.getByText("Борис").waitFor({ timeout: 5000 });
+  await page.getByRole("button", { name: /Напомнить/ }).first().click();
+  await page.locator("textarea").fill("заходи t.me/somebot");
+  await page.getByRole("button", { name: "Отправить" }).click();
+  await page.getByText("Без ссылок и @упоминаний, пожалуйста").waitFor({ timeout: 4000 });
+  const stillOpen = await page.getByRole("dialog").count();
+  await page.locator("textarea").fill("   ");
+  const disabled = await page.getByRole("button", { name: "Отправить" }).isDisabled();
+  await page.evaluate(() => window.Telegram.WebApp.BackButton._h.forEach(f => f()));
+  await page.waitForTimeout(200);
+  net.nudgeErr = null; net.nudgeUndelivered = true;
+  await page.getByRole("button", { name: /Напомнить/ }).nth(1).click();
+  await page.getByRole("button", { name: "Отправить" }).click();
+  await page.getByText("Не доставлено: Вика остановил(а) бота GymBot").waitFor({ timeout: 4000 });
+  return { stillOpen, disabled, nudges: (net.nudges || []).map(n => n.id) };
 });
 
 await browser.close();
