@@ -9824,8 +9824,9 @@ function PremiumScreen({tgId,onBack}){
       if(!r.ok)throw new Error(r.status);
       const {url}=await r.json();
       const prevUntil=p?.until||null;
-      if(tg?.openInvoice){
-        handedOff=true;
+      if(tg?.openInvoice&&tgAtLeast("6.1")){
+        // handedOff — только после вызова: openInvoice может бросить сразу
+        // (неверная ссылка), и тогда кнопки остались бы заблокированными.
         tg.openInvoice(url,async(status)=>{
           try{
             if(status==="paid"){
@@ -9836,6 +9837,7 @@ function PremiumScreen({tgId,onBack}){
             }else if(status==="failed"){setMsg({text:t("premium_failed")});}
           }finally{setBusy(null);}
         });
+        handedOff=true;
         return;
       }
       if(tg?.openTelegramLink)tg.openTelegramLink(url);else window.open(url,"_blank");
@@ -9948,7 +9950,10 @@ function ShareWorkout({tgId,workoutId,style={}}){
     if(busy)return;
     setBusy("story");setNote(null);
     try{
-      if(!(tg?.shareToStory&&tgAtLeast("7.8"))){await sendToBot();return;}
+      // Истории публикуются только с телефона: Telegram Desktop и веб сообщают
+      // новую версию, но shareToStory там молча ничего не делает.
+      const mobile=/^(ios|android)/.test(tg?.platform||"");
+      if(!(tg?.shareToStory&&tgAtLeast("7.8")&&mobile)){await sendToBot();return;}
       const r=await fetch(`${API}/share/${tgId}/workout/${workoutId}`,{method:"POST"});
       if(!r.ok)throw new Error(r.status);
       const d=await r.json();

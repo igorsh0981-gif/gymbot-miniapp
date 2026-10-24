@@ -558,6 +558,11 @@ await scenario("41_workout_detail_share_old_client", VIEWPORTS[1], { tab: "menu"
   await page.getByText(/Карточка в чате с ботом/).waitFor({ timeout: 4000 });
   return { share: net.share || [], calls: await page.evaluate(() => window.__tgCalls || []) };
 });
+await scenario("42_story_on_desktop_goes_to_bot", VIEWPORTS[1], { tab: "menu", screen: "workout_detail", params: { workoutId: 555 }, platform: "tdesktop" }, async (page, net) => {
+  await page.getByRole("button", { name: /в историю/i }).click();
+  await page.getByText(/Карточка в чате с ботом/).waitFor({ timeout: 4000 });
+  return { share: net.share || [], calls: await page.evaluate(() => window.__tgCalls || []) };
+});
 
 await browser.close();
 fs.writeFileSync(path.join(OUT, "results.json"), JSON.stringify(results, null, 2));
