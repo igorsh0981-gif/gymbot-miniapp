@@ -4805,9 +4805,11 @@ function MenuScreen({user,onNav,activeWorkout=false}){
       <Btn accent full onClick={cardAction}>{card.cta}</Btn>
       {card.state==="resume"&&<Btn full onClick={()=>{
         if(!window.confirm(t("home_close_confirm")))return;
-        // Пустую тренировку сервер удаляет; подходы из очереди тогда пропали бы
+        // Пустую тренировку сервер удаляет; подходы из очереди тогда пропали бы.
+        // Если после попытки отправить они всё ещё в очереди (или отложены после
+        // сбоев) — говорим серверу: он не удалит, а отложит до их прихода.
         (sqPending()>0?sqFlush():Promise.resolve(true))
-          .then(()=>fetch(`${API}/workout/${tgId}/close-active`,{method:"POST"}))
+          .then(()=>fetch(`${API}/workout/${tgId}/close-active${card.workout_id&&sqUnsentSets(card.workout_id)>0?"?has_unsent=true":""}`,{method:"POST"}))
           .then(()=>apiGet(`${API}/home/${tgId}`,{force:true}))
           .then(d=>setHome(d))
           .catch(()=>window.alert(t("home_load_error")));
