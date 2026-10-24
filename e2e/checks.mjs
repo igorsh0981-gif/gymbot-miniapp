@@ -67,5 +67,6 @@ export const CHECKS = {
                                  [["https://api.test/api/share/img/77.story.ru.1.x.jpg", "Грудь 💪 t.me/GYMASH_bot"]]),
                               eq("чат", (r.calls || []).filter(c => c[0] === "shareMessage").map(c => c[1]), ["prep-1"])),
   "41_workout_detail_share_old_client": r => all(eq("запросы", r.share, ["send:555"]), eq("методы Telegram", (r.calls || []).length, 0)),
+  "43_home_premium_entry": r => all(eq("пункт на главной", r.entry, 1), eq("экран Premium", r.opened, 1)),
   "42_story_on_desktop_goes_to_bot": r => all(eq("запросы", r.share, ["send:555"]), eq("методы Telegram", (r.calls || []).length, 0)),
 };

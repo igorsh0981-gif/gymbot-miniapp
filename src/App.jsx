@@ -4711,6 +4711,7 @@ function _cachedHome(tgId){
 }
 
 function MenuScreen({user,onNav,activeWorkout=false}){
+  const [prem]=usePremium(user?.telegram_id);
   const tgId=user?.telegram_id;
   const [home,setHome]=useState(()=>_cachedHome(tgId));
   const [failed,setFailed]=useState(false);
@@ -4865,6 +4866,15 @@ function MenuScreen({user,onNav,activeWorkout=false}){
         </div>
       </Card>)}
     </div>
+    {prem?.visible&&<Card accent onClick={()=>onNav("premium")} pad="13px 14px" style={{marginTop:8}}>
+      <div style={{display:"flex",alignItems:"center",gap:9}}>
+        <span style={{fontSize:17}}>⭐</span>
+        <span style={{fontSize:14,color:C.text,fontWeight:600}}>{t("premium_menu")}</span>
+        <span style={{marginLeft:"auto",fontSize:12,color:C.accent,fontFamily:"monospace",textAlign:"right"}}>
+          {prem.active?(prem.until?fmtDay(prem.until):"✓"):t("premium_nudge_ai").replace("{n}",prem.perks?.ai_premium)}
+        </span>
+      </div>
+    </Card>}
 
   </div>;
 }
