@@ -93,4 +93,17 @@ export const CHECKS = {
   "55_social_accept_invite": r => all(eq("принят код", r.accepts, ["ANNA0002"]), eq("друг в списке", r.friendRow, 1), eq("приватность", r.privacy, 1)),
   "56_social_feed_like": r => all(eq("отметка", r.likes, [901]), eq("ещё упражнения", r.more, 1), eq("сводка", r.meta, 1), eq("свои — «Вы»", r.you > 0 ? 1 : 0, 1)),
   "57_team_join_board": r => all(eq("вступление", r.joins, ["TEAM0007"]), eq("владелец", r.owner, 1), eq("позвать", r.invite, 1)),
+  // «Что нового»: 5 слайдов (с Premium), кнопки «Далее»/«Готово», отметка на сервере и в телефоне, Назад Telegram закрывает,
+  // кнопка слайда открывает функцию, второй раз не спрашиваем, поверх ссылки не показываем, пункт в «Сервисах»
+  "58_whats_new_tour": r => all(eq("первый слайд", r.first, 1), eq("уровни", r.levels, 1), eq("Назад Telegram", r.bb, true),
+                                eq("слайды", r.titles, ["Силовые ранги", "Плов, лагман, самса", "Программы тренировок", "Друзья и команды", "GymBot Premium"]),
+                                eq("пробный", r.trialCta, 1), eq("лимиты", r.perks, 1), eq("закрыта", r.dialogAfter, 0),
+                                eq("отметка", r.posts, ["2026-10-25"]), eq("в телефоне", r.ls, "2026-10-25"), eq("Назад скрыта", r.bbAfter, false)),
+  "59_whats_new_cta_opens_feature": r => all(eq("отметка", r.posts, ["2026-10-25"]), eq("закрыта", r.dialog, 0), eq("экран программ", r.programs > 0 ? 1 : 0, 1), eq("запрос программ", r.programsReq > 0 ? 1 : 0, 1)),
+  "60_whats_new_swipe_and_back": r => all(eq("новичку", r.kicker, 1), eq("свайп влево", r.afterLeft, 1), eq("свайп вправо", r.afterRight, 1),
+                                         eq("Назад закрыла", r.dialogAfterBack, 0), eq("отметка", r.posts, ["2026-10-25"])),
+  "61_whats_new_not_again": r => all(eq("запросов", r.gets, 0), eq("не показана", r.dialog, 0)),
+  "62_whats_new_not_over_deeplink": r => all(eq("запросов", r.gets, 0), eq("не показана", r.dialog, 0), eq("открылся Premium", r.premium, 1)),
+  "63_whats_new_from_more_uz": r => all(eq("узбекский", r.kicker, 1), eq("без прокрутки вбок", r.overflow, false), eq("закрыта", r.dialog, 0),
+                                       eq("ранги открылись", r.strengthReq > 0 ? 1 : 0, 1), eq("отметка", r.posts, ["2026-10-25"])),
 };
