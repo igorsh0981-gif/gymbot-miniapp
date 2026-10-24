@@ -255,7 +255,8 @@ const API_TTL = [
   [/\/custom-exercises\//,   5 * 60 * 1000],
   [/\/home\/\d+\/alternatives/, 3 * 60 * 1000],
   [/\/home\/\d+$/,           2 * 60 * 1000],
-  [/\/strength\/\d+$/,       5 * 60 * 1000],   // силовые ранги: сбрасываются после тренировки и смены веса
+  [/\/strength\/\d+$/,       5 * 60 * 1000],
+  [/\/programs\/\d+/,        2 * 60 * 1000],   // программы: сброс после тренировки и старта/стопа   // силовые ранги: сбрасываются после тренировки и смены веса
   [/\/planned\/\d+$/,        2 * 60 * 1000],
   [/\/user\/\d+$/,           2 * 60 * 1000],
   [/\/user\/\d+\/supplements/, 5 * 60 * 1000],
@@ -315,7 +316,7 @@ function invalidateApi(...parts){
 // Какие записи устаревают после какого события. Один словарь вместо россыпи
 // ручных сбросов по экранам — иначе про половину мест забудешь.
 const API_EVENTS = {
-  workout_finished: ["/home","/planned","/workouts","/progress","/achievements","/user/","/strength/"],
+  workout_finished: ["/home","/planned","/workouts","/progress","/achievements","/user/","/strength/","/programs/"],
   workout_started:  ["/home","/planned"],
   planned_changed:  ["/planned","/home"],
   food_logged:      ["/home","/nutrition"],
@@ -475,12 +476,13 @@ const T = {
     workout_closed_elsewhere:"Прошлая тренировка уже завершена — на другом устройстве или автоматически. Можно начать новую.",
     finish_workout:"ЗАВЕРШИТЬ", workout_empty_note:"Ни одного подхода не записано — тренировка не засчитана и в историю не попала.", set_done:"✓ ПОДХОД ВЫПОЛНЕН", set_done_label:"ПОДХОД ВЫПОЛНЕН",
     premium_menu:"Premium", premium_kicker:"PREMIUM", premium_title:"GymBot Premium", premium_lead:"Больше вопросов тренеру и распознаваний еды — и поддержка развития GymBot.", premium_active_until:"Premium активен до {date}", premium_trial_until:"Пробный Premium до {date}", premium_manual:"Premium активен", premium_perk_ai:"{n} вопросов тренеру в день", premium_perk_food:"{n} фото еды в день", premium_perk_now:"без Premium — {n}", premium_perk_support:"Новые функции быстрее: вы поддерживаете развитие приложения", premium_month:"Месяц", premium_year:"Год", premium_month_note:"продлевается каждые 30 дней, выключить можно в любой момент", premium_year_note:"разовая оплата на 365 дней", premium_save:"выгода {n}%", premium_buy:"Оформить за {n} ⭐", premium_extend:"Продлить за {n} ⭐", premium_trial_btn:"Попробовать {n} дн. бесплатно", premium_renews:"Подписка продлится {date}", premium_renew_off:"Автопродление выключено — Premium до {date}", premium_cancel_btn:"Выключить автопродление", premium_resume_btn:"Включить автопродление", premium_paid_wait:"Оплата прошла — включаем Premium…", premium_paid_ok:"Premium включён до {date}. Спасибо!", premium_paid_late:"Оплата прошла. Premium включится в течение нескольких минут — бот пришлёт сообщение.", premium_failed:"Оплата не прошла. Попробуйте ещё раз.", premium_error:"Не получилось открыть оплату. Попробуйте позже.", premium_already_sub:"Подписка уже оформлена.", premium_note:"Оплата звёздами Telegram. Автопродление можно выключить здесь или в Telegram: Настройки → Мои звёзды. Вопросы по оплате — команда /paysupport в боте.", premium_nudge_ai:"С Premium — {n} вопросов тренеру в день", premium_nudge_food:"С Premium — {n} фото еды в день", premium_nudge_btn:"Подробнее", share_kicker:"ПОДЕЛИТЬСЯ", share_story:"В историю", share_chat:"В чат", share_preparing:"Готовлю карточку…", share_sent_bot:"Карточка в чате с ботом — перешлите её друзьям", share_error:"Не получилось подготовить карточку. Попробуйте ещё раз.",
+    prog_menu:"Программы тренировок", prog_kicker:"ПРОГРАММЫ", prog_title:"Программы тренировок", prog_lead:"Готовые планы на несколько недель: что делать в каждый день, сколько подходов и повторов.", prog_meta:"{d} трен. в неделю · {w} нед.", prog_active:"ВАША ПРОГРАММА", prog_progress:"Тренировка {n} из {t}", prog_next:"Следующая: {day}", prog_start_day:"Начать: {day}", prog_start:"Начать программу", prog_replace_confirm:"Сейчас идёт «{cur}». Начать новую программу вместо неё?", prog_stop:"Остановить программу", prog_stop_confirm:"Остановить программу? Сделанные тренировки останутся в истории.", prog_unlock:"Открыть с Premium", prog_tip:"СОВЕТ", prog_days:"ДНИ ПРОГРАММЫ", prog_rest_s:"отдых {n} с", prog_rest_m:"отдых {n} мин", prog_reps_max:"макс.", prog_sec:"с", prog_finished:"Программа пройдена! Выберите следующую.", prog_free:"Бесплатно", prog_week:"неделя {n}", prog_not_in_catalog:"нет в каталоге", prog_is_active:"Программа идёт", prog_all:"Все программы", prog_open:"Открыть",
     fcat_national:"Местная кухня", label_scan_btn:"Сканировать этикетку", fv_mode_dish:"Блюдо", fv_mode_label:"Этикетка", label_kicker:"СКАНЕР ЭТИКЕТОК", label_title:"Фото этикетки", label_hint:"Сфотографируйте таблицу пищевой ценности на упаковке — заполним КБЖУ на 100 г, а продукт сохраним в справочник.", label_photo_btn:"Сфотографировать этикетку", label_read_btn:"Распознать", label_reading:"ЧИТАЮ ЭТИКЕТКУ…", label_not_found:"На фото не видно таблицы пищевой ценности. Сфотографируйте её ближе и ровнее.", label_failed:"Не получилось прочитать этикетку. Попробуйте ещё раз.", label_name:"Название", label_brand:"Бренд", label_per100:"На 100 г", label_low_conf:"Проверьте цифры: часть могла прочитаться неточно.", label_portion:"Сколько съели, г", label_pack_portion:"порция с упаковки", label_save_log:"Записать в дневник", label_save_only:"Только сохранить в справочник", label_saved_only:"Продукт сохранён — его можно найти в поиске.", label_total:"Итого на {w} г", food_portion_approx:"порция ~{n} г",
     str_e1rm:"расч. максимум", str_menu:"Силовые ранги", str_kicker:"СИЛА", str_title:"Силовые ранги", str_overall:"Общий ранг", str_stronger:"Сильнее ~{n}% тренирующихся", str_basis:"Оценка по силовым нормативам для вашего пола, веса тела и возраста. Максимум считается по лучшему подходу до 12 повторов (формула Эпли).", str_missing:"Чтобы посчитать ранги, укажите в профиле пол и вес.", str_btn_profile:"Заполнить профиль", str_to_next:"До уровня «{lvl}»: +{n} {u}", str_top:"Высший уровень — поздравляем!", str_community:"Среди пользователей GymBot: сильнее {n}% из {m}", str_untracked:"Ещё без ранга", str_untracked_hint:"Сделайте подход в любом из этих упражнений — ранг появится сам.", str_all:"Все ранги", str_from:"лучший подход {w} кг × {r}", str_from_reps:"лучший подход — {r} повт.", str_reps:"повт.", str_on:"по {n} упр.", str_empty:"Пока нет подходов в базовых упражнениях — ранги появятся после первой тренировки с ними.", str_lvl_start:"Старт", str_lvl_beginner:"Новичок", str_lvl_novice:"Начинающий", str_lvl_intermediate:"Средний", str_lvl_advanced:"Продвинутый", str_lvl_elite:"Элита",
     terms_menu:"Правила использования", terms_kicker:"ДОКУМЕНТ", terms_title:"Правила использования", terms_updated:"Редакция от 24 октября 2026 года", terms_read:"Читать правила", terms_premium_link:"Условия Premium, отмена и возврат", terms_close:"Закрыть", terms_s_general_t:"1. Общие положения", terms_s_general_b:"GymBot — дневник тренировок и питания с AI-тренером в Telegram. Пользоваться им можно с 18 лет.\n\nСоветы AI-тренера, оценка калорий по фото и рекомендации по нагрузке — справочные и не являются медицинским назначением. Решения о тренировках, питании и добавках вы принимаете сами, с учётом своего здоровья. При заболеваниях и противопоказаниях посоветуйтесь с врачом.\n\nНельзя использовать приложение для спама, оскорблений и чужих данных. За это мы можем ограничить доступ.", terms_s_data_t:"2. Данные", terms_s_data_b:"Какие данные собираются и кому передаются, описано в согласиях. Их можно посмотреть в профиле; согласия на сведения о здоровье и на передачу данных AI-сервису можно отозвать в любой момент.", terms_s_prem_t:"3. Premium", terms_p_what:"Premium — платная часть приложения: больше вопросов AI-тренеру и распознаваний еды по фото в день, а также другие возможности, перечисленные на экране Premium. Текущие лимиты указаны там же. Состав Premium может расширяться.", terms_p_pay:"Оплата — только звёздами Telegram (Telegram Stars) внутри Telegram. Сейчас месяц стоит {pm} ⭐, год — {py} ⭐. Если цена изменится, уже оплаченный период не пересчитывается.", terms_p_pay_np:"Оплата — только звёздами Telegram (Telegram Stars) внутри Telegram. Актуальные цены указаны на экране Premium. Если цена изменится, уже оплаченный период не пересчитывается.", terms_p_month:"Месяц — это подписка: каждые 30 дней Telegram автоматически списывает ту же сумму, пока вы её не отмените. Отменить можно в любой момент — на экране Premium кнопкой «Выключить автопродление» или в Telegram: Настройки → Мои звёзды. После отмены Premium работает до конца оплаченного периода, новых списаний не будет.", terms_p_year:"Год — разовая оплата на 365 дней, без автопродления. Если при этом у вас действует месячная подписка, мы выключаем её, чтобы звёзды не списывались дважды.", terms_p_trial:"Пробный период — {n} дн. бесплатно, один раз на аккаунт. Он не продлевается сам и ничего не списывает.", terms_p_refund:"Возврат. Если звёзды списались, а Premium не включился, или списание прошло по ошибке либо дважды — напишите в поддержку командой /paysupport в боте и укажите дату оплаты. При возврате звёзды возвращаются на ваш счёт в Telegram, а дни Premium за этот платёж снимаются полностью. Возврат за уже использованное время рассматривается индивидуально.", terms_p_account:"Premium привязан к вашему аккаунту Telegram и не передаётся другим людям.", terms_s_support_t:"4. Поддержка", terms_s_support_b:"Вопросы и жалобы — в разделе «Поддержка» приложения, вопросы по оплате — командой /paysupport в боте. Отвечаем в чате с ботом.\n\nПравила могут меняться. О существенных изменениях сообщим в боте.",
     warmup_title:"РАЗМИНКА", warmup_skip:"ПРОПУСТИТЬ", warmup_done:"✓ РАЗМИНКА ВЫПОЛНЕНА",
     warmup_hint:"Кардио для разминки — опционально", warmup_badge:"🏃 РАЗМИНКА",
-    ready_wk_kicker:"ТРЕНИРОВКА СОБРАНА", ready_wk_hint:"Состав подобран по твоей истории", ready_wk_change:"Изменить состав",
+    ready_wk_kicker:"ТРЕНИРОВКА СОБРАНА", ready_wk_hint:"Состав подобран по твоей истории", ready_wk_program:"Состав — из вашей программы", ready_wk_change:"Изменить состав",
     rest_notify_title:"Сигнал об отдыхе", rest_notify_hint:"Бот пришлёт сообщение, когда отдых закончится. Телефон можно убрать — часы завибрируют.", rest_notify_on:"Включено", rest_notify_off:"Выключено",
     rest_offer_kicker:"ПОДСКАЗКА", rest_offer_title:"Убрать телефон во время тренировки?", rest_offer_text:"Бот может сам сигналить об окончании отдыха. Тогда телефон не нужно держать в руке — часы или браслет завибрируют.", rest_offer_yes:"Включить", rest_offer_no:"Не нужно",
     order_title:"ПОРЯДОК", order_hint:"↑↓ — перестановка · ↔ — замена",
@@ -1364,12 +1366,13 @@ const T = {
     workout_closed_elsewhere:"Your previous workout has already been finished — on another device or automatically. You can start a new one.",
     finish_workout:"FINISH", workout_empty_note:"No sets were logged, so this workout was not counted and is not in your history.", set_done:"✓ SET DONE", set_done_label:"SET DONE",
     premium_menu:"Premium", premium_kicker:"PREMIUM", premium_title:"GymBot Premium", premium_lead:"More coach questions and food recognitions — and you support GymBot's development.", premium_active_until:"Premium is active until {date}", premium_trial_until:"Premium trial until {date}", premium_manual:"Premium is active", premium_perk_ai:"{n} coach questions a day", premium_perk_food:"{n} food photos a day", premium_perk_now:"{n} without Premium", premium_perk_support:"New features sooner: you support the app's development", premium_month:"Month", premium_year:"Year", premium_month_note:"renews every 30 days, turn off any time", premium_year_note:"one-time payment for 365 days", premium_save:"save {n}%", premium_buy:"Get for {n} ⭐", premium_extend:"Extend for {n} ⭐", premium_trial_btn:"Try {n} days free", premium_renews:"Subscription renews on {date}", premium_renew_off:"Auto-renewal is off — Premium until {date}", premium_cancel_btn:"Turn off auto-renewal", premium_resume_btn:"Turn on auto-renewal", premium_paid_wait:"Payment received — turning Premium on…", premium_paid_ok:"Premium is on until {date}. Thank you!", premium_paid_late:"Payment received. Premium will turn on within a few minutes — the bot will message you.", premium_failed:"Payment failed. Please try again.", premium_error:"Couldn't open the payment. Please try later.", premium_already_sub:"You already have a subscription.", premium_note:"Paid with Telegram Stars. You can turn auto-renewal off here or in Telegram: Settings → My Stars. Payment questions — /paysupport in the bot.", premium_nudge_ai:"With Premium — {n} coach questions a day", premium_nudge_food:"With Premium — {n} food photos a day", premium_nudge_btn:"Learn more", share_kicker:"SHARE", share_story:"To story", share_chat:"To chat", share_preparing:"Preparing the card…", share_sent_bot:"The card is in your chat with the bot — forward it to friends", share_error:"Couldn't prepare the card. Please try again.",
+    prog_menu:"Training programs", prog_kicker:"PROGRAMS", prog_title:"Training programs", prog_lead:"Ready-made plans for several weeks: what to do each day, how many sets and reps.", prog_meta:"{d} workouts a week · {w} wk", prog_active:"YOUR PROGRAM", prog_progress:"Workout {n} of {t}", prog_next:"Next: {day}", prog_start_day:"Start: {day}", prog_start:"Start program", prog_replace_confirm:"You're on «{cur}». Start the new program instead?", prog_stop:"Stop program", prog_stop_confirm:"Stop the program? Completed workouts stay in your history.", prog_unlock:"Unlock with Premium", prog_tip:"TIP", prog_days:"PROGRAM DAYS", prog_rest_s:"rest {n} s", prog_rest_m:"rest {n} min", prog_reps_max:"max", prog_sec:"s", prog_finished:"Program complete! Choose the next one.", prog_free:"Free", prog_week:"week {n}", prog_not_in_catalog:"not in catalog", prog_is_active:"In progress", prog_all:"All programs", prog_open:"Open",
     fcat_national:"Local cuisine", label_scan_btn:"Scan a label", fv_mode_dish:"Dish", fv_mode_label:"Label", label_kicker:"LABEL SCANNER", label_title:"Label photo", label_hint:"Take a photo of the nutrition facts table on the package — we'll fill in the values per 100 g and save the product to the catalog.", label_photo_btn:"Photograph the label", label_read_btn:"Read label", label_reading:"READING THE LABEL…", label_not_found:"No nutrition table found in the photo. Take it closer and straighter.", label_failed:"Couldn't read the label. Please try again.", label_name:"Name", label_brand:"Brand", label_per100:"Per 100 g", label_low_conf:"Check the numbers: some may have been read inaccurately.", label_portion:"How much you ate, g", label_pack_portion:"package serving", label_save_log:"Add to diary", label_save_only:"Just save to catalog", label_saved_only:"Saved — you can find it in search.", label_total:"Total for {w} g", food_portion_approx:"serving ~{n} g",
     str_e1rm:"est. 1RM", str_menu:"Strength ranks", str_kicker:"STRENGTH", str_title:"Strength ranks", str_overall:"Overall rank", str_stronger:"Stronger than ~{n}% of lifters", str_basis:"Estimated from strength standards for your sex, body weight and age. The max is taken from your best set of up to 12 reps (Epley formula).", str_missing:"To calculate ranks, add your sex and weight in the profile.", str_btn_profile:"Complete profile", str_to_next:"To «{lvl}»: +{n} {u}", str_top:"Top level — congratulations!", str_community:"Among GymBot users: stronger than {n}% of {m}", str_untracked:"No rank yet", str_untracked_hint:"Do a set in any of these exercises and the rank will appear.", str_all:"All ranks", str_from:"best set {w} kg × {r}", str_from_reps:"best set — {r} reps", str_reps:"reps", str_on:"from {n} lifts", str_empty:"No sets in the main lifts yet — ranks will appear after your first workout with them.", str_lvl_start:"Start", str_lvl_beginner:"Beginner", str_lvl_novice:"Novice", str_lvl_intermediate:"Intermediate", str_lvl_advanced:"Advanced", str_lvl_elite:"Elite",
     terms_menu:"Terms of use", terms_kicker:"DOCUMENT", terms_title:"Terms of use", terms_updated:"Version of 24 October 2026", terms_read:"Read the terms", terms_premium_link:"Premium terms, cancellation and refunds", terms_close:"Close", terms_s_general_t:"1. General", terms_s_general_b:"GymBot is a training and nutrition log with an AI coach in Telegram. It is available from age 18.\n\nThe AI coach's advice, calorie estimates from photos and load recommendations are for reference only and are not medical prescriptions. You make your own decisions about training, nutrition and supplements, taking your health into account. If you have conditions or contraindications, consult a doctor.\n\nDo not use the app for spam, insults or other people's data. We may restrict access for this.", terms_s_data_t:"2. Data", terms_s_data_b:"What data is collected and who it is shared with is described in the consents. You can view them in your profile; consents for health data and for sharing data with the AI service can be withdrawn at any time.", terms_s_prem_t:"3. Premium", terms_p_what:"Premium is the paid part of the app: more AI coach questions and food photo recognitions per day, plus the other features listed on the Premium screen. Current limits are shown there. Premium may gain new features.", terms_p_pay:"Payment is made only with Telegram Stars inside Telegram. Currently a month costs {pm} ⭐ and a year {py} ⭐. If the price changes, an already paid period is not recalculated.", terms_p_pay_np:"Payment is made only with Telegram Stars inside Telegram. Current prices are shown on the Premium screen. If the price changes, an already paid period is not recalculated.", terms_p_month:"A month is a subscription: every 30 days Telegram automatically charges the same amount until you cancel. You can cancel any time — on the Premium screen with «Turn off auto-renewal» or in Telegram: Settings → My Stars. After cancelling, Premium works until the end of the paid period and there are no new charges.", terms_p_year:"A year is a one-time payment for 365 days with no auto-renewal. If you also have an active monthly subscription, we turn it off so you are not charged twice.", terms_p_trial:"The trial is {n} days free, once per account. It does not renew by itself and charges nothing.", terms_p_refund:"Refunds. If Stars were charged but Premium didn't turn on, or a charge was made by mistake or twice, contact support with /paysupport in the bot and mention the payment date. On refund, the Stars go back to your Telegram balance and the Premium days for that payment are removed in full. Refunds for time already used are reviewed case by case.", terms_p_account:"Premium is tied to your Telegram account and cannot be transferred to other people.", terms_s_support_t:"4. Support", terms_s_support_b:"Questions and complaints — in the app's «Support» section; payment questions — /paysupport in the bot. We reply in the chat with the bot.\n\nThese terms may change. We will announce significant changes in the bot.",
     warmup_title:"WARM UP", warmup_skip:"SKIP", warmup_done:"✓ WARM UP DONE",
     warmup_hint:"Cardio for warm-up — optional", warmup_badge:"🏃 WARM UP",
-    ready_wk_kicker:"WORKOUT READY", ready_wk_hint:"Built from your training history", ready_wk_change:"Change exercises",
+    ready_wk_kicker:"WORKOUT READY", ready_wk_hint:"Built from your training history", ready_wk_program:"From your program", ready_wk_change:"Change exercises",
     rest_notify_title:"Rest alert", rest_notify_hint:"The bot messages you when rest is over. Pocket your phone — your watch will buzz.", rest_notify_on:"On", rest_notify_off:"Off",
     rest_offer_kicker:"TIP", rest_offer_title:"Put the phone away during training?", rest_offer_text:"The bot can signal the end of each rest. No need to hold the phone — your watch or band will buzz.", rest_offer_yes:"Turn on", rest_offer_no:"No thanks",
     order_title:"ORDER", order_hint:"↑↓ — reorder · ↔ — replace",
@@ -2249,12 +2252,13 @@ const T = {
     workout_closed_elsewhere:"Oldingi mashq allaqachon yakunlangan — boshqa qurilmada yoki avtomatik. Yangisini boshlashingiz mumkin.",
     finish_workout:"TUGATISH", workout_empty_note:"Birorta ham yondashuv yozilmadi — mashg‘ulot hisobga olinmadi va tarixga tushmadi.", set_done:"✓ YONDASHUV BAJARILDI", set_done_label:"YONDASHUV BAJARILDI",
     premium_menu:"Premium", premium_kicker:"PREMIUM", premium_title:"GymBot Premium", premium_lead:"Murabbiyga ko'proq savol va ovqatni ko'proq aniqlash — hamda GymBot rivojini qo'llab-quvvatlash.", premium_active_until:"Premium {date} gacha faol", premium_trial_until:"Sinov Premium {date} gacha", premium_manual:"Premium faol", premium_perk_ai:"Kuniga {n} ta murabbiy savoli", premium_perk_food:"Kuniga {n} ta ovqat surati", premium_perk_now:"Premium'siz — {n}", premium_perk_support:"Yangi imkoniyatlar tezroq: siz ilova rivojini qo'llab-quvvatlaysiz", premium_month:"Oy", premium_year:"Yil", premium_month_note:"har 30 kunda yangilanadi, istalgan vaqtda o'chirish mumkin", premium_year_note:"365 kunga bir martalik to'lov", premium_save:"{n}% tejash", premium_buy:"{n} ⭐ ga olish", premium_extend:"{n} ⭐ ga uzaytirish", premium_trial_btn:"{n} kun bepul sinab ko'rish", premium_renews:"Obuna {date} da yangilanadi", premium_renew_off:"Avto-yangilash o'chirilgan — Premium {date} gacha", premium_cancel_btn:"Avto-yangilashni o'chirish", premium_resume_btn:"Avto-yangilashni yoqish", premium_paid_wait:"To'lov o'tdi — Premium yoqilmoqda…", premium_paid_ok:"Premium {date} gacha yoqildi. Rahmat!", premium_paid_late:"To'lov o'tdi. Premium bir necha daqiqada yoqiladi — bot xabar yuboradi.", premium_failed:"To'lov o'tmadi. Qaytadan urinib ko'ring.", premium_error:"To'lovni ochib bo'lmadi. Keyinroq urinib ko'ring.", premium_already_sub:"Obuna allaqachon rasmiylashtirilgan.", premium_note:"Telegram yulduzlari bilan to'lov. Avto-yangilashni shu yerda yoki Telegram'da o'chirish mumkin: Sozlamalar → Mening yulduzlarim. To'lov bo'yicha savollar — botda /paysupport buyrug'i.", premium_nudge_ai:"Premium bilan — kuniga {n} ta murabbiy savoli", premium_nudge_food:"Premium bilan — kuniga {n} ta ovqat surati", premium_nudge_btn:"Batafsil", share_kicker:"ULASHISH", share_story:"Hikoyaga", share_chat:"Chatga", share_preparing:"Kartochka tayyorlanmoqda…", share_sent_bot:"Kartochka bot bilan chatda — uni do'stlaringizga yuboring", share_error:"Kartochkani tayyorlab bo'lmadi. Qaytadan urinib ko'ring.",
+    prog_menu:"Mashg'ulot dasturlari", prog_kicker:"DASTURLAR", prog_title:"Mashg'ulot dasturlari", prog_lead:"Bir necha haftalik tayyor rejalar: har kuni nima qilish, nechta yondashuv va takror.", prog_meta:"haftasiga {d} mashg'ulot · {w} hafta", prog_active:"SIZNING DASTURINGIZ", prog_progress:"{t} tadan {n}-mashg'ulot", prog_next:"Keyingisi: {day}", prog_start_day:"Boshlash: {day}", prog_start:"Dasturni boshlash", prog_replace_confirm:"Hozir «{cur}» davom etmoqda. Uning o'rniga yangi dasturni boshlaysizmi?", prog_stop:"Dasturni to'xtatish", prog_stop_confirm:"Dasturni to'xtatasizmi? Bajarilgan mashg'ulotlar tarixda qoladi.", prog_unlock:"Premium bilan ochish", prog_tip:"MASLAHAT", prog_days:"DASTUR KUNLARI", prog_rest_s:"dam {n} s", prog_rest_m:"dam {n} daq", prog_reps_max:"maks.", prog_sec:"s", prog_finished:"Dastur tugadi! Keyingisini tanlang.", prog_free:"Bepul", prog_week:"{n}-hafta", prog_not_in_catalog:"katalogda yo'q", prog_is_active:"Davom etmoqda", prog_all:"Barcha dasturlar", prog_open:"Ochish",
     fcat_national:"Milliy taomlar", label_scan_btn:"Yorliqni skanerlash", fv_mode_dish:"Taom", fv_mode_label:"Yorliq", label_kicker:"YORLIQ SKANERI", label_title:"Yorliq surati", label_hint:"Qadoqdagi ozuqaviy qiymat jadvalini suratga oling — 100 g dagi KBJU ni to'ldiramiz va mahsulotni ma'lumotnomaga saqlaymiz.", label_photo_btn:"Yorliqni suratga olish", label_read_btn:"Aniqlash", label_reading:"YORLIQ O'QILMOQDA…", label_not_found:"Suratda ozuqaviy qiymat jadvali ko'rinmayapti. Uni yaqinroq va to'g'riroq suratga oling.", label_failed:"Yorliqni o'qib bo'lmadi. Qaytadan urinib ko'ring.", label_name:"Nomi", label_brand:"Brend", label_per100:"100 g da", label_low_conf:"Raqamlarni tekshiring: ba'zilari noaniq o'qilgan bo'lishi mumkin.", label_portion:"Qancha yedingiz, g", label_pack_portion:"qadoqdagi porsiya", label_save_log:"Kundalikka yozish", label_save_only:"Faqat ma'lumotnomaga saqlash", label_saved_only:"Saqlandi — uni qidiruvda topish mumkin.", label_total:"{w} g uchun jami", food_portion_approx:"porsiya ~{n} g",
     str_e1rm:"taxminiy maksimum", str_menu:"Kuch darajalari", str_kicker:"KUCH", str_title:"Kuch darajalari", str_overall:"Umumiy daraja", str_stronger:"Shug'ullanuvchilarning ~{n}% idan kuchliroq", str_basis:"Jinsingiz, tana vazningiz va yoshingiz uchun kuch me'yorlari bo'yicha baho. Maksimum 12 tagacha takrorli eng yaxshi yondashuv bo'yicha hisoblanadi (Epli formulasi).", str_missing:"Darajalarni hisoblash uchun profilda jins va vazningizni kiriting.", str_btn_profile:"Profilni to'ldirish", str_to_next:"«{lvl}» darajasigacha: +{n} {u}", str_top:"Eng yuqori daraja — tabriklaymiz!", str_community:"GymBot foydalanuvchilari orasida: {m} kishidan {n}% idan kuchliroq", str_untracked:"Hali darajasiz", str_untracked_hint:"Ushbu mashqlardan birida yondashuv bajaring — daraja o'zi paydo bo'ladi.", str_all:"Barcha darajalar", str_from:"eng yaxshi yondashuv {w} kg × {r}", str_from_reps:"eng yaxshi yondashuv — {r} takror", str_reps:"takror", str_on:"{n} ta mashq bo'yicha", str_empty:"Asosiy mashqlarda hali yondashuvlar yo'q — ular bilan birinchi mashg'ulotdan keyin darajalar paydo bo'ladi.", str_lvl_start:"Start", str_lvl_beginner:"Yangi boshlovchi", str_lvl_novice:"Boshlang'ich", str_lvl_intermediate:"O'rta", str_lvl_advanced:"Ilg'or", str_lvl_elite:"Elita",
     terms_menu:"Foydalanish qoidalari", terms_kicker:"HUJJAT", terms_title:"Foydalanish qoidalari", terms_updated:"2026-yil 24-oktabr tahriri", terms_read:"Qoidalarni o'qish", terms_premium_link:"Premium shartlari, bekor qilish va qaytarish", terms_close:"Yopish", terms_s_general_t:"1. Umumiy qoidalar", terms_s_general_b:"GymBot — Telegram'dagi AI-murabbiyli mashg'ulot va ovqatlanish kundaligi. Undan 18 yoshdan foydalanish mumkin.\n\nAI-murabbiy maslahatlari, surat bo'yicha kaloriya bahosi va yuklama tavsiyalari ma'lumot uchun bo'lib, tibbiy tayinlov emas. Mashg'ulot, ovqatlanish va qo'shimchalar bo'yicha qarorni sog'lig'ingizni hisobga olib o'zingiz qabul qilasiz. Kasallik yoki qarshi ko'rsatmalar bo'lsa, shifokor bilan maslahatlashing.\n\nIlovadan spam, haqorat va boshqalarning ma'lumotlari uchun foydalanish mumkin emas. Buning uchun kirishni cheklashimiz mumkin.", terms_s_data_t:"2. Ma'lumotlar", terms_s_data_b:"Qanday ma'lumotlar yig'ilishi va kimga uzatilishi roziliklarda yozilgan. Ularni profilda ko'rish mumkin; sog'liq haqidagi ma'lumotlar va AI-xizmatga uzatish bo'yicha roziliklarni istalgan vaqtda qaytarib olish mumkin.", terms_s_prem_t:"3. Premium", terms_p_what:"Premium — ilovaning pullik qismi: kuniga AI-murabbiyga ko'proq savol va ovqatni surat bo'yicha ko'proq aniqlash, shuningdek Premium ekranida sanab o'tilgan boshqa imkoniyatlar. Joriy limitlar o'sha yerda ko'rsatilgan. Premium tarkibi kengayishi mumkin.", terms_p_pay:"To'lov — faqat Telegram yulduzlari (Telegram Stars) bilan, Telegram ichida. Hozir oy {pm} ⭐, yil — {py} ⭐ turadi. Narx o'zgarsa, allaqachon to'langan davr qayta hisoblanmaydi.", terms_p_pay_np:"To'lov — faqat Telegram yulduzlari (Telegram Stars) bilan, Telegram ichida. Joriy narxlar Premium ekranida ko'rsatilgan. Narx o'zgarsa, allaqachon to'langan davr qayta hisoblanmaydi.", terms_p_month:"Oy — bu obuna: har 30 kunda Telegram siz bekor qilmaguningizcha xuddi shu summani avtomatik yechadi. Istalgan vaqtda bekor qilish mumkin — Premium ekranida «Avto-yangilashni o'chirish» tugmasi bilan yoki Telegram'da: Sozlamalar → Mening yulduzlarim. Bekor qilingandan keyin Premium to'langan davr oxirigacha ishlaydi, yangi yechimlar bo'lmaydi.", terms_p_year:"Yil — 365 kunga bir martalik to'lov, avto-yangilashsiz. Agar bunda oylik obunangiz amalda bo'lsa, yulduzlar ikki marta yechilmasligi uchun uni o'chiramiz.", terms_p_trial:"Sinov davri — {n} kun bepul, har bir akkaunt uchun bir marta. U o'zi uzaytirilmaydi va hech narsa yechmaydi.", terms_p_refund:"Qaytarish. Agar yulduzlar yechilgan, lekin Premium yoqilmagan bo'lsa yoki yechim xato yoxud ikki marta bo'lgan bo'lsa — botda /paysupport buyrug'i bilan qo'llab-quvvatlashga yozing va to'lov sanasini ko'rsating. Qaytarishda yulduzlar Telegram hisobingizga qaytadi, bu to'lov uchun Premium kunlari to'liq olib tashlanadi. Foydalanilgan vaqt uchun qaytarish alohida ko'rib chiqiladi.", terms_p_account:"Premium Telegram akkauntingizga bog'langan va boshqa odamlarga o'tkazilmaydi.", terms_s_support_t:"4. Qo'llab-quvvatlash", terms_s_support_b:"Savol va shikoyatlar — ilovaning «Qo'llab-quvvatlash» bo'limida, to'lov bo'yicha savollar — botda /paysupport buyrug'i bilan. Bot bilan chatda javob beramiz.\n\nQoidalar o'zgarishi mumkin. Muhim o'zgarishlar haqida botda xabar beramiz.",
     warmup_title:"ISITISH", warmup_skip:"O'TKAZIB YUBORISH", warmup_done:"✓ ISITISH BAJARILDI",
     warmup_hint:"Isitish uchun kardio — ixtiyoriy", warmup_badge:"🏃 ISITISH",
-    ready_wk_kicker:"MASHG'ULOT TAYYOR", ready_wk_hint:"Tarkib mashg'ulot tarixingiz asosida tanlandi", ready_wk_change:"Tarkibni o'zgartirish",
+    ready_wk_kicker:"MASHG'ULOT TAYYOR", ready_wk_hint:"Tarkib mashg'ulot tarixingiz asosida tanlandi", ready_wk_program:"Tarkib — dasturingizdan", ready_wk_change:"Tarkibni o'zgartirish",
     rest_notify_title:"Dam olish signali", rest_notify_hint:"Dam olish tugaganda bot xabar yuboradi. Telefonni cho'ntakka soling — soat tebranadi.", rest_notify_on:"Yoqilgan", rest_notify_off:"O'chirilgan",
     rest_offer_kicker:"MASLAHAT", rest_offer_title:"Mashg'ulot paytida telefonni olib qo'yasizmi?", rest_offer_text:"Bot dam olish tugaganini o'zi bildiradi. Telefonni ushlab turish shart emas — soat yoki bilaguzuk tebranadi.", rest_offer_yes:"Yoqish", rest_offer_no:"Kerak emas",
     order_title:"TARTIB", order_hint:"↑↓ — qayta joylashtirish · ↔ — almashtirish",
@@ -3134,12 +3138,13 @@ const T = {
     workout_closed_elsewhere:"Алдыңғы жаттығу аяқталған — басқа құрылғыда немесе автоматты түрде. Жаңасын бастауға болады.",
     finish_workout:"АЯҚТАУ", workout_empty_note:"Бірде-бір тәсіл жазылмады — жаттығу есептелмеді және тарихқа түспеді.", set_done:"✓ ТӘСІЛ ОРЫНДАЛДЫ", set_done_label:"ТӘСІЛ ОРЫНДАЛДЫ",
     premium_menu:"Premium", premium_kicker:"PREMIUM", premium_title:"GymBot Premium", premium_lead:"Жаттықтырушыға көбірек сұрақ және тамақты көбірек тану — әрі GymBot дамуына қолдау.", premium_active_until:"Premium {date} дейін белсенді", premium_trial_until:"Сынақ Premium {date} дейін", premium_manual:"Premium белсенді", premium_perk_ai:"Күніне {n} жаттықтырушы сұрағы", premium_perk_food:"Күніне {n} тамақ суреті", premium_perk_now:"Premium-сыз — {n}", premium_perk_support:"Жаңа мүмкіндіктер тезірек: сіз қолданбаның дамуын қолдайсыз", premium_month:"Ай", premium_year:"Жыл", premium_month_note:"әр 30 күн сайын ұзартылады, кез келген уақытта өшіруге болады", premium_year_note:"365 күнге бір реттік төлем", premium_save:"{n}% үнем", premium_buy:"{n} ⭐ алу", premium_extend:"{n} ⭐ ұзарту", premium_trial_btn:"{n} күн тегін байқап көру", premium_renews:"Жазылым {date} ұзартылады", premium_renew_off:"Автоұзарту өшірулі — Premium {date} дейін", premium_cancel_btn:"Автоұзартуды өшіру", premium_resume_btn:"Автоұзартуды қосу", premium_paid_wait:"Төлем өтті — Premium қосылуда…", premium_paid_ok:"Premium {date} дейін қосылды. Рахмет!", premium_paid_late:"Төлем өтті. Premium бірнеше минутта қосылады — бот хабарлама жібереді.", premium_failed:"Төлем өтпеді. Қайта көріңіз.", premium_error:"Төлемді ашу мүмкін болмады. Кейінірек көріңіз.", premium_already_sub:"Жазылым бұрыннан бар.", premium_note:"Telegram жұлдыздарымен төлем. Автоұзартуды осында немесе Telegram-да өшіруге болады: Баптаулар → Менің жұлдыздарым. Төлем бойынша сұрақтар — боттағы /paysupport командасы.", premium_nudge_ai:"Premium-мен — күніне {n} жаттықтырушы сұрағы", premium_nudge_food:"Premium-мен — күніне {n} тамақ суреті", premium_nudge_btn:"Толығырақ", share_kicker:"БӨЛІСУ", share_story:"Тарихқа", share_chat:"Чатқа", share_preparing:"Карточка дайындалуда…", share_sent_bot:"Карточка ботпен чатта — оны достарыңызға жіберіңіз", share_error:"Карточканы дайындау мүмкін болмады. Қайта көріңіз.",
+    prog_menu:"Жаттығу бағдарламалары", prog_kicker:"БАҒДАРЛАМАЛАР", prog_title:"Жаттығу бағдарламалары", prog_lead:"Бірнеше аптаға дайын жоспарлар: әр күні не істеу керек, қанша тәсіл мен қайталау.", prog_meta:"аптасына {d} жаттығу · {w} апта", prog_active:"СІЗДІҢ БАҒДАРЛАМАҢЫЗ", prog_progress:"{t} жаттығудың {n}-сі", prog_next:"Келесісі: {day}", prog_start_day:"Бастау: {day}", prog_start:"Бағдарламаны бастау", prog_replace_confirm:"Қазір «{cur}» жүріп жатыр. Оның орнына жаңа бағдарламаны бастайсыз ба?", prog_stop:"Бағдарламаны тоқтату", prog_stop_confirm:"Бағдарламаны тоқтатасыз ба? Орындалған жаттығулар тарихта қалады.", prog_unlock:"Premium-мен ашу", prog_tip:"КЕҢЕС", prog_days:"БАҒДАРЛАМА КҮНДЕРІ", prog_rest_s:"демалыс {n} с", prog_rest_m:"демалыс {n} мин", prog_reps_max:"макс.", prog_sec:"с", prog_finished:"Бағдарлама аяқталды! Келесісін таңдаңыз.", prog_free:"Тегін", prog_week:"{n}-апта", prog_not_in_catalog:"каталогта жоқ", prog_is_active:"Жүріп жатыр", prog_all:"Барлық бағдарламалар", prog_open:"Ашу",
     fcat_national:"Ұлттық тағамдар", label_scan_btn:"Затбелгіні сканерлеу", fv_mode_dish:"Тағам", fv_mode_label:"Затбелгі", label_kicker:"ЗАТБЕЛГІ СКАНЕРІ", label_title:"Затбелгі суреті", label_hint:"Қаптамадағы тағамдық құндылық кестесін суретке түсіріңіз — 100 г-ға КБЖУ-ды толтырамыз, ал өнімді анықтамалыққа сақтаймыз.", label_photo_btn:"Затбелгіні суретке түсіру", label_read_btn:"Тану", label_reading:"ЗАТБЕЛГІ ОҚЫЛУДА…", label_not_found:"Суретте тағамдық құндылық кестесі көрінбейді. Оны жақынырақ және тігірек түсіріңіз.", label_failed:"Затбелгіні оқу мүмкін болмады. Қайта көріңіз.", label_name:"Атауы", label_brand:"Бренд", label_per100:"100 г-да", label_low_conf:"Сандарды тексеріңіз: кейбірі дәл оқылмаған болуы мүмкін.", label_portion:"Қанша жедіңіз, г", label_pack_portion:"қаптамадағы порция", label_save_log:"Күнделікке жазу", label_save_only:"Тек анықтамалыққа сақтау", label_saved_only:"Сақталды — оны іздеуден табуға болады.", label_total:"{w} г үшін барлығы", food_portion_approx:"порция ~{n} г",
     str_e1rm:"есептік максимум", str_menu:"Күш деңгейлері", str_kicker:"КҮШ", str_title:"Күш деңгейлері", str_overall:"Жалпы деңгей", str_stronger:"Жаттығатындардың ~{n}%-нан күштірек", str_basis:"Жынысыңыз, дене салмағыңыз және жасыңыз үшін күш нормативтері бойынша баға. Максимум 12 қайталауға дейінгі ең үздік тәсіл бойынша есептеледі (Эпли формуласы).", str_missing:"Деңгейлерді есептеу үшін профильде жынысыңыз бен салмағыңызды көрсетіңіз.", str_btn_profile:"Профильді толтыру", str_to_next:"«{lvl}» деңгейіне дейін: +{n} {u}", str_top:"Ең жоғары деңгей — құттықтаймыз!", str_community:"GymBot пайдаланушылары арасында: {m} адамның {n}%-нан күштірек", str_untracked:"Әзірге деңгейсіз", str_untracked_hint:"Осы жаттығулардың бірінде тәсіл жасаңыз — деңгей өзі пайда болады.", str_all:"Барлық деңгейлер", str_from:"ең үздік тәсіл {w} кг × {r}", str_from_reps:"ең үздік тәсіл — {r} қайт.", str_reps:"қайт.", str_on:"{n} жаттығу бойынша", str_empty:"Негізгі жаттығуларда әзірге тәсілдер жоқ — олармен алғашқы жаттығудан кейін деңгейлер пайда болады.", str_lvl_start:"Старт", str_lvl_beginner:"Жаңадан бастаушы", str_lvl_novice:"Бастауыш", str_lvl_intermediate:"Орташа", str_lvl_advanced:"Озық", str_lvl_elite:"Элита",
     terms_menu:"Пайдалану ережелері", terms_kicker:"ҚҰЖАТ", terms_title:"Пайдалану ережелері", terms_updated:"2026 жылғы 24 қазандағы редакция", terms_read:"Ережелерді оқу", terms_premium_link:"Premium шарттары, тоқтату және қайтару", terms_close:"Жабу", terms_s_general_t:"1. Жалпы ережелер", terms_s_general_b:"GymBot — Telegram-дағы AI-жаттықтырушысы бар жаттығу және тамақтану күнделігі. Оны 18 жастан пайдалануға болады.\n\nAI-жаттықтырушының кеңестері, сурет бойынша калория бағасы және жүктеме ұсыныстары анықтамалық сипатта және медициналық тағайындау емес. Жаттығу, тамақтану және қоспалар туралы шешімді денсаулығыңызды ескеріп, өзіңіз қабылдайсыз. Ауру немесе қарсы көрсетілімдер болса, дәрігермен кеңесіңіз.\n\nҚолданбаны спам, қорлау және бөгде адамдардың деректері үшін пайдалануға болмайды. Ол үшін қолжетімділікті шектеуіміз мүмкін.", terms_s_data_t:"2. Деректер", terms_s_data_b:"Қандай деректер жиналатыны және кімге берілетіні келісімдерде жазылған. Оларды профильде көруге болады; денсаулық туралы мәліметтерге және деректерді AI-сервиске беруге келісімдерді кез келген уақытта қайтарып алуға болады.", terms_s_prem_t:"3. Premium", terms_p_what:"Premium — қолданбаның ақылы бөлігі: күніне AI-жаттықтырушыға көбірек сұрақ және тамақты сурет бойынша көбірек тану, сондай-ақ Premium экранында көрсетілген басқа мүмкіндіктер. Ағымдағы лимиттер сонда көрсетілген. Premium құрамы кеңеюі мүмкін.", terms_p_pay:"Төлем — тек Telegram жұлдыздарымен (Telegram Stars), Telegram ішінде. Қазір ай {pm} ⭐, жыл — {py} ⭐ тұрады. Баға өзгерсе, төленген кезең қайта есептелмейді.", terms_p_pay_np:"Төлем — тек Telegram жұлдыздарымен (Telegram Stars), Telegram ішінде. Ағымдағы бағалар Premium экранында көрсетілген. Баға өзгерсе, төленген кезең қайта есептелмейді.", terms_p_month:"Ай — бұл жазылым: әр 30 күн сайын Telegram сіз тоқтатқанша сол соманы автоматты түрде алады. Кез келген уақытта тоқтатуға болады — Premium экранында «Автоұзартуды өшіру» батырмасымен немесе Telegram-да: Баптаулар → Менің жұлдыздарым. Тоқтатқаннан кейін Premium төленген кезеңнің соңына дейін жұмыс істейді, жаңа төлемдер болмайды.", terms_p_year:"Жыл — 365 күнге бір реттік төлем, автоұзартусыз. Егер бұл кезде айлық жазылымыңыз жұмыс істеп тұрса, жұлдыздар екі рет алынбауы үшін оны өшіреміз.", terms_p_trial:"Сынақ кезеңі — {n} күн тегін, әр аккаунтқа бір рет. Ол өздігінен ұзартылмайды және ештеңе алмайды.", terms_p_refund:"Қайтару. Егер жұлдыздар алынса, бірақ Premium қосылмаса, немесе төлем қателікпен не екі рет өтсе — боттағы /paysupport командасымен қолдауға жазып, төлем күнін көрсетіңіз. Қайтарғанда жұлдыздар Telegram шотыңызға қайтады, ал осы төлем үшін Premium күндері толық алынып тасталады. Пайдаланылған уақыт үшін қайтару жеке қаралады.", terms_p_account:"Premium Telegram аккаунтыңызға байланған және басқа адамдарға берілмейді.", terms_s_support_t:"4. Қолдау", terms_s_support_b:"Сұрақтар мен шағымдар — қолданбаның «Қолдау» бөлімінде, төлем бойынша сұрақтар — боттағы /paysupport командасымен. Ботпен чатта жауап береміз.\n\nЕрежелер өзгеруі мүмкін. Елеулі өзгерістер туралы ботта хабарлаймыз.",
     warmup_title:"ЖЫЛЫТУ", warmup_skip:"ӨТКІЗІП ЖІБЕРу", warmup_done:"✓ ЖЫЛЫТУ ОРЫНДАЛДЫ",
     warmup_hint:"Жылыту үшін кардио — міндетті емес", warmup_badge:"🏃 ЖЫЛЫТУ",
-    ready_wk_kicker:"ЖАТТЫҒУ ЖИНАЛДЫ", ready_wk_hint:"Құрамы жаттығу тарихыңыз бойынша таңдалды", ready_wk_change:"Құрамын өзгерту",
+    ready_wk_kicker:"ЖАТТЫҒУ ЖИНАЛДЫ", ready_wk_hint:"Құрамы жаттығу тарихыңыз бойынша таңдалды", ready_wk_program:"Құрамы — бағдарламаңыздан", ready_wk_change:"Құрамын өзгерту",
     rest_notify_title:"Демалыс сигналы", rest_notify_hint:"Демалыс біткенде бот хабар жібереді. Телефонды қалтаға салыңыз — сағат дірілдейді.", rest_notify_on:"Қосулы", rest_notify_off:"Өшірулі",
     rest_offer_kicker:"КЕҢЕС", rest_offer_title:"Жаттығу кезінде телефонды алып қоясыз ба?", rest_offer_text:"Бот демалыс аяқталғанын өзі білдіреді. Телефонды ұстап тұрудың қажеті жоқ — сағат немесе білезік дірілдейді.", rest_offer_yes:"Қосу", rest_offer_no:"Керек емес",
     order_title:"ТӘРТІП", order_hint:"↑↓ — қайта орналастыру · ↔ — ауыстыру",
@@ -4885,6 +4890,7 @@ function MenuScreen({user,onNav,activeWorkout=false}){
         </div>
       </Card>)}
     </div>
+    <ProgramHomeCard tgId={tgId} onNav={onNav}/>
     {prem?.visible&&<Card accent onClick={()=>onNav("premium")} pad="13px 14px" style={{marginTop:8}}>
       <div style={{display:"flex",alignItems:"center",gap:9}}>
         <Icon name="star" size={18} fill="currentColor"/>
@@ -4913,6 +4919,7 @@ function MoreScreen({user,onNav,onBack}){
       {label:t("terms_menu"),icon:"§",s:"terms"},
     ]},
     {title:t("more_training"),items:[
+      {label:t("prog_menu"),icon:"📋",s:"programs"},
       {label:t("str_menu"),icon:"⚡",s:"strength"},
       {label:t("menu_plan"),icon:"📅",s:"plan_workout"},
       {label:t("menu_rest_timer"),icon:"⏱",s:"rest_timer"},
@@ -6300,7 +6307,7 @@ function ExerciseInfoSheet({ex,onClose}){
   );
 }
 
-function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscleGroups,onBack,onFinish,onFinishNav=null,onNav=null,preselectedExIds=[],preselectedGroupIds=[],plannedWorkoutId=null,exerciseTips={}}){
+function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscleGroups,onBack,onFinish,onFinishNav=null,onNav=null,preselectedExIds=[],preselectedGroupIds=[],plannedWorkoutId=null,exerciseTips={},programDay=null}){
   const STEP={MD:-1,SG:0,SE:1,WU:2,OR:3,LG:4,FN:5}; // MD=выбор режима
   // Если с момента последней записи подхода прошло больше 3 часов — тренировка считается
   // брошенной, и таймер обнуляется. Иначе в базу попадали сессии на 20+ часов: человек
@@ -6662,7 +6669,7 @@ function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscle
 
   async function startWorkout(){
     try{
-      const r=await fetch(`${API}/workout/start/${tgId}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({exercise_ids:selExs.map(e=>e.id)})});
+      const r=await fetch(`${API}/workout/start/${tgId}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({exercise_ids:selExs.map(e=>e.id),program_day:programDay??null})});
       // Без проверки экран подходов открывался и при отказе сервера, без id
       // тренировки — и ни один подход потом не сохранялся.
       if(!r.ok)throw new Error(`start HTTP ${r.status}`);
@@ -7122,7 +7129,7 @@ ${exList}
           <Kicker>{t("ready_wk_kicker")}</Kicker>
           <Mono size={12} color={C.muted}>{selExs.length}</Mono>
         </div>
-        <div style={{fontSize:11,color:C.muted,marginTop:2}}>{t("ready_wk_hint")}</div>
+        <div style={{fontSize:11,color:C.muted,marginTop:2}}>{programDay!=null?t("ready_wk_program"):t("ready_wk_hint")}</div>
         <div style={{display:"flex",flexDirection:"column",gap:5,marginTop:10}}>
           {selExs.map((ex,i)=>(
             <div key={ex.id} style={{display:"flex",gap:8,alignItems:"center"}}>
@@ -8121,6 +8128,184 @@ function StrengthScreen({tgId,onBack,onNav}){
       </div>
     </div>}
   </div>;
+}
+
+// ── Программы тренировок ─────────────────────────────────────────────────────
+// Каталог и «моя программа» (programs.py). Тренировка из программы стартует с
+// program_day — сервер засчитывает её и двигает день по кругу.
+function fmtReps(r){
+  const s=String(r||"");
+  if(s==="max")return t("prog_reps_max");
+  const sec=s.match(/^(\d+)(?:-(\d+))?s$/);
+  if(sec)return `${sec[1]}${sec[2]?"–"+sec[2]:""} ${t("prog_sec")}`;
+  return s.replace("-","–");
+}
+function fmtRest(n){
+  if(!n)return "";
+  return n>=120?t("prog_rest_m").replace("{n}",String(Math.round(n/30)/2).replace(".",LANG_STORE.current==="en"?".":",")):t("prog_rest_s").replace("{n}",n);
+}
+function progTip(e){return `${e.sets} × ${fmtReps(e.reps)}${e.rest?" · "+fmtRest(e.rest):""}`;}
+function progMeta(p){return t("prog_meta").replace("{d}",p.days_per_week).replace("{w}",p.weeks);}
+
+function usePrograms(tgId){
+  const [d,setD]=useState(null);
+  const [failed,setFailed]=useState(false);
+  const load=(force=false)=>{
+    if(!tgId)return;
+    apiGet(`${API}/programs/${tgId}?lang=${LANG_STORE.current||"ru"}`,{force}).then(setD).catch(()=>setFailed(true));
+  };
+  useEffect(()=>{load();},[tgId]);
+  return [d,failed,load];
+}
+
+// Старт тренировки по дню программы: состав и подсказки «3 × 8–10 · отдых 90 с»
+function startProgramDay(onNav,day){
+  const exs=(day?.exercises||[]).filter(e=>e.exercise_id);
+  onNav("active_workout",{preselectedExIds:exs.map(e=>e.exercise_id),
+    exerciseTips:Object.fromEntries(exs.map(e=>[e.exercise_id,progTip(e)])),programDay:day.index});
+}
+
+function ProgramActiveCard({act,onOpen,onStart}){
+  const pct=act.total?Math.round(act.done/act.total*100):0;
+  return <Card accent style={{marginBottom:14}}>
+    <Kicker style={{margin:0}}>{t("prog_active")}</Kicker>
+    <div onClick={onOpen} style={{fontSize:17,fontWeight:700,color:C.text,marginTop:6,cursor:onOpen?"pointer":"default"}}>{act.title}</div>
+    <div style={{display:"flex",fontSize:12,color:C.muted,marginTop:4,fontFamily:"monospace"}}>
+      <span>{t("prog_progress").replace("{n}",Math.min(act.done+1,act.total)).replace("{t}",act.total)}</span>
+      {act.week&&<span style={{marginLeft:"auto"}}>{t("prog_week").replace("{n}",act.week)}</span>}
+    </div>
+    <div style={{marginTop:8}}><ProgressBar pct={pct}/></div>
+    {act.next_day_title&&<div style={{fontSize:13,color:C.text,marginTop:8}}>{t("prog_next").replace("{day}",act.next_day_title)}</div>}
+    {onStart&&<Btn accent full style={{marginTop:10}} onClick={onStart}>{t("prog_start_day").replace("{day}",act.next_day_title||"")}</Btn>}
+  </Card>;
+}
+
+function ProgramsScreen({tgId,onBack,onNav}){
+  const [d,failed]=usePrograms(tgId);
+  if(failed)return <div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/>
+    <div style={{fontSize:14,color:C.muted,marginTop:20}}>{t("home_load_error")}</div></div>;
+  if(!d)return <div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader text={t("loading")}/></div>;
+  const act=d.active&&!d.active.finished?d.active:null;
+  async function startNext(){
+    // следующий день берём из деталей: там состав с id упражнений
+    try{
+      const det=await apiGet(`${API}/programs/${tgId}/${act.slug}?lang=${LANG_STORE.current||"ru"}`);
+      startProgramDay(onNav,det.days[act.next_day]);
+    }catch{window.alert(t("home_load_error"));}
+  }
+  return <div style={{padding:"16px 16px 100px"}}>
+    <BackBtn onBack={onBack}/>
+    <Kicker>{t("prog_kicker")}</Kicker>
+    <Hero>{t("prog_title")}</Hero>
+    <div style={{fontSize:13,color:C.muted,lineHeight:1.55,marginTop:8,marginBottom:16}}>{t("prog_lead")}</div>
+    {d.active?.finished&&<Card accent style={{marginBottom:14}}><div style={{fontSize:14,color:C.accent}}>{t("prog_finished")}</div></Card>}
+    {act&&<ProgramActiveCard act={act} onOpen={()=>onNav("program_detail",{slug:act.slug})} onStart={startNext}/>}
+    {(d.programs||[]).map(p=><Card key={p.slug} onClick={()=>onNav("program_detail",{slug:p.slug})} style={{marginBottom:10}}>
+      <div style={{display:"flex",alignItems:"flex-start",gap:8}}>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{fontSize:15,fontWeight:700,color:C.text}}>{p.title}</div>
+          <div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginTop:3}}>{progMeta(p)} · {strLvl(p.level)}</div>
+        </div>
+        {act?.slug===p.slug?<span style={{fontSize:10,fontFamily:"monospace",color:C.bg,background:C.accent,borderRadius:6,padding:"2px 6px"}}>{t("prog_is_active")}</span>
+          :p.premium?<span style={{display:"flex",alignItems:"center",gap:3,fontSize:10,fontFamily:"monospace",color:C.accent,border:`1px solid ${C.accent}`,borderRadius:6,padding:"2px 6px"}}>
+            <Icon name="star" size={10} fill="currentColor"/>PREMIUM</span>
+          :<span style={{fontSize:10,fontFamily:"monospace",color:C.muted,border:`0.5px solid ${C.border}`,borderRadius:6,padding:"2px 6px"}}>{t("prog_free")}</span>}
+      </div>
+      <div style={{fontSize:12,color:C.muted,lineHeight:1.5,marginTop:8,display:"-webkit-box",WebkitLineClamp:2,WebkitBoxOrient:"vertical",overflow:"hidden"}}>{p.desc}</div>
+      <div style={{fontSize:11,color:C.muted,marginTop:6}}>{(p.day_titles||[]).join(" · ")}</div>
+    </Card>)}
+  </div>;
+}
+
+function ProgramDetailScreen({tgId,slug,onBack,onNav}){
+  const [d,setD]=useState(null);
+  const [failed,setFailed]=useState(false);
+  const [busy,setBusy]=useState(false);
+  const load=(force=false)=>apiGet(`${API}/programs/${tgId}/${slug}?lang=${LANG_STORE.current||"ru"}`,{force}).then(setD).catch(()=>setFailed(true));
+  useEffect(()=>{if(tgId&&slug)load();},[tgId,slug]);
+  if(failed)return <div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/>
+    <div style={{fontSize:14,color:C.muted,marginTop:20}}>{t("home_load_error")}</div></div>;
+  if(!d)return <div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader text={t("loading")}/></div>;
+  const act=d.active&&!d.active.finished?d.active:null;
+
+  async function start(){
+    if(busy)return;
+    try{
+      const list=await apiGet(`${API}/programs/${tgId}?lang=${LANG_STORE.current||"ru"}`);
+      const cur=list?.active&&!list.active.finished?list.active:null;
+      if(cur&&cur.slug!==slug&&!window.confirm(t("prog_replace_confirm").replace("{cur}",cur.title)))return;
+    }catch{}
+    setBusy(true);
+    try{
+      const r=await fetch(`${API}/programs/${tgId}/${slug}/start`,{method:"POST"});
+      if(r.status===403){onNav("premium");return;}
+      if(!r.ok)throw new Error(r.status);
+      invalidateApi("/programs/");haptic.notify("success");
+      await load(true);
+    }catch{window.alert(t("home_load_error"));}
+    finally{setBusy(false);}
+  }
+  async function stop(){
+    if(busy||!window.confirm(t("prog_stop_confirm")))return;
+    setBusy(true);
+    try{
+      await fetch(`${API}/programs/${tgId}/stop`,{method:"POST"});
+      invalidateApi("/programs/");await load(true);
+    }catch{}
+    finally{setBusy(false);}
+  }
+
+  return <div style={{padding:"16px 16px 100px"}}>
+    <BackBtn onBack={onBack}/>
+    <Kicker>{t("prog_kicker")}</Kicker>
+    <Hero style={{fontSize:24}}>{d.title}</Hero>
+    <div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginTop:6}}>{progMeta(d)} · {strLvl(d.level)}</div>
+    <div style={{fontSize:13,color:C.muted,lineHeight:1.6,marginTop:10,marginBottom:14}}>{d.desc}</div>
+    {act&&<ProgramActiveCard act={{...act,title:d.title,next_day_title:d.days[act.next_day]?.title}}
+      onStart={()=>startProgramDay(onNav,d.days[act.next_day])}/>}
+    {!act&&(d.locked
+      ?<Btn accent full style={{marginBottom:14}} onClick={()=>onNav("premium")}>{withStar?withStar(t("prog_unlock")):t("prog_unlock")}</Btn>
+      :<Btn accent full style={{marginBottom:14}} disabled={busy} onClick={start}>{busy?"…":t("prog_start")}</Btn>)}
+    {d.note&&<Card style={{marginBottom:14}} pad="12px 14px">
+      <Kicker style={{margin:0}}>{t("prog_tip")}</Kicker>
+      <div style={{fontSize:13,color:C.text,lineHeight:1.55,marginTop:6}}>{d.note}</div>
+    </Card>}
+    <Kicker>{t("prog_days")}</Kicker>
+    <div style={{display:"flex",flexDirection:"column",gap:8,marginTop:8}}>
+      {d.days.map(day=><Card key={day.index} pad="12px 14px" accent={act?.next_day===day.index}>
+        <div style={{fontSize:14,fontWeight:700,color:act?.next_day===day.index?C.accent:C.text,marginBottom:6}}>{day.title}</div>
+        {day.exercises.map((e,i)=><div key={i} style={{display:"flex",gap:8,fontSize:13,padding:"5px 0",borderTop:i?`0.5px solid ${C.border}`:"none"}}>
+          <span style={{flex:1,minWidth:0,color:e.exercise_id?C.text:C.muted}}>{trEx(e.name)}{!e.exercise_id&&<span style={{fontSize:10,marginLeft:6}}>({t("prog_not_in_catalog")})</span>}</span>
+          <span style={{fontFamily:"monospace",fontSize:12,color:C.accent,whiteSpace:"nowrap"}}>{e.sets} × {fmtReps(e.reps)}</span>
+        </div>)}
+      </Card>)}
+    </div>
+    {act&&<Btn full style={{marginTop:16}} disabled={busy} onClick={stop}>{t("prog_stop")}</Btn>}
+  </div>;
+}
+
+// На главном: идёт программа — карточка со следующим днём; нет — короткий вход в каталог
+function ProgramHomeCard({tgId,onNav}){
+  const [d]=usePrograms(tgId);
+  const act=d?.active&&!d.active.finished?d.active:null;
+  if(!d)return null;
+  if(!act)return <Card onClick={()=>onNav("programs")} pad="13px 14px" style={{marginTop:8}}>
+    <div style={{display:"flex",alignItems:"center",gap:9}}>
+      <span style={{fontSize:17}}>📋</span>
+      <span style={{fontSize:14,color:C.text}}>{t("prog_menu")}</span>
+      <span style={{marginLeft:"auto",color:C.muted,fontSize:16}}>›</span>
+    </div>
+  </Card>;
+  return <Card onClick={()=>onNav("programs")} pad="13px 14px" style={{marginTop:8}}>
+    <div style={{display:"flex",alignItems:"center",gap:9}}>
+      <span style={{fontSize:17}}>📋</span>
+      <div style={{flex:1,minWidth:0}}>
+        <div style={{fontSize:14,color:C.text,fontWeight:600,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{act.title}</div>
+        <div style={{fontSize:12,color:C.muted,marginTop:2}}>{t("prog_next").replace("{day}",act.next_day_title||"")} · {act.done}/{act.total}</div>
+      </div>
+      <span style={{color:C.accent,fontSize:16}}>›</span>
+    </div>
+  </Card>;
 }
 
 function ProgressScreen({stats,tgId,onNav}){
@@ -11240,7 +11425,7 @@ export default function App(){
     if(screen==="more")return <MoreScreen user={user} onNav={handleNav} onBack={goBack}/>;
     if(screen==="alternatives")return <AlternativesScreen tgId={tgId} onNav={handleNav} onBack={goBack}/>;
     if(screen==="training_prefs")return <TrainingPrefsScreen tgId={tgId} onBack={goBack}/>;
-    if(screen==="active_workout")return <ActiveWorkoutScreen tgId={tgId} user={user} onUserUpdated={loadUser} exercises={exercises} muscleGroups={muscleGroups} onBack={goBack} onFinish={()=>setWorkouts(null)} onFinishNav={()=>{setPlannedRefresh(r=>r+1);replace("workout",null,{});if(tgId)fetch(`${API}/workouts/${tgId}`).then(r=>r.json()).then(d=>setWorkouts(d.workouts||[])).catch(()=>setWorkouts([]));}} onNav={handleNav} preselectedExIds={p.preselectedExIds||[]} preselectedGroupIds={p.preselectedGroupIds||[]} plannedWorkoutId={p.plannedWorkoutId||null} exerciseTips={p.exerciseTips||{}}/>;
+    if(screen==="active_workout")return <ActiveWorkoutScreen tgId={tgId} user={user} onUserUpdated={loadUser} exercises={exercises} muscleGroups={muscleGroups} onBack={goBack} onFinish={()=>setWorkouts(null)} onFinishNav={()=>{setPlannedRefresh(r=>r+1);replace("workout",null,{});if(tgId)fetch(`${API}/workouts/${tgId}`).then(r=>r.json()).then(d=>setWorkouts(d.workouts||[])).catch(()=>setWorkouts([]));}} onNav={handleNav} preselectedExIds={p.preselectedExIds||[]} preselectedGroupIds={p.preselectedGroupIds||[]} plannedWorkoutId={p.plannedWorkoutId||null} exerciseTips={p.exerciseTips||{}} programDay={p.programDay??null}/>;
     if(screen==="workout_detail")return <WorkoutDetailScreen workoutId={p.workoutId} tgId={tgId} onBack={goBack}/>;
     if(screen==="my_workouts_detail")return <MyWorkoutsDetailScreen tgId={tgId} onBack={goBack} onNav={handleNav}/>;
     if(screen==="planned_detail")return <PlannedDetailScreen pwId={p.pwId} tgId={tgId} onBack={goBack} exercises={exercises} muscleGroups={muscleGroups} readOnly={p.readOnly||false} onNav={handleNav}/>;
@@ -11253,6 +11438,8 @@ export default function App(){
     if(screen==="premium")return <PremiumScreen tgId={tgId} onBack={goBack} onNav={handleNav}/>;
     if(screen==="terms")return <TermsScreen tgId={tgId} section={p.section} onBack={goBack}/>;
     if(screen==="strength")return <StrengthScreen tgId={tgId} onBack={goBack} onNav={handleNav}/>;
+    if(screen==="programs")return <ProgramsScreen tgId={tgId} onBack={goBack} onNav={handleNav}/>;
+    if(screen==="program_detail")return <ProgramDetailScreen tgId={tgId} slug={p.slug} onBack={goBack} onNav={handleNav}/>;
     if(screen==="achievements")return <AchievementsScreen tgId={tgId} onBack={goBack}/>;
     if(screen==="leaderboard")return <LeaderboardScreen tgId={tgId} onBack={goBack}/>;
     if(screen==="gamification")return <GamificationScreen tgId={tgId} onBack={goBack} user={user}/>;

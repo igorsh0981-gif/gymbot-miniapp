@@ -242,6 +242,17 @@ async function setup(page, { lang = "ru", setFails = false, curIdx = 0, tab = "w
         return json(route, { story_url: "https://api.test/api/share/img/77.story.ru.1.x.jpg", post_url: "https://api.test/p.jpg",
           thumb_url: "https://api.test/t.jpg", link: "https://t.me/GYMASH_bot?start=ref_ABC", caption: "💪", story_text: "Грудь 💪 t.me/GYMASH_bot", has_record: true });
       }
+      if (p === `/workout/start/${TG_ID}`) {
+        (net.starts = net.starts || []).push(JSON.parse(req.postData() || "{}"));
+        return json(route, { workout_id: 77 });
+      }
+      if (p === `/programs/${TG_ID}`) return json(route, net.programs || { programs: [], active: null });
+      if (p.startsWith(`/programs/${TG_ID}/`) && p.endsWith("/start") && req.method() === "POST") {
+        (net.progStart = net.progStart || []).push(p);
+        if (net.progLocked) return json(route, { detail: { code: "premium_required" } }, 403);
+        return json(route, { ok: true });
+      }
+      if (p.startsWith(`/programs/${TG_ID}/`)) return json(route, net.programDetail || {});
       if (p === `/strength/${TG_ID}`) return json(route, net.strength || { lifts: [], missing: [], keys: [], overall: null });
       if (p.startsWith("/custom-exercises")) return json(route, { exercises: [] });
       if (p.startsWith("/workout/") && p.endsWith("/state")) return json(route, { ok: true });
@@ -652,6 +663,49 @@ await scenario("51_food_search_national_uz", VIEWPORTS[1], { lang: "uz", tab: "m
   await page.getByText("Palov (osh)").waitFor({ timeout: 4000 });
   return { portion: await page.getByText("porsiya ~350 g").count(), scanBtn: await page.getByText(/Yorliqni skanerlash/).count(),
            query: (net.search || []).some(q => q.includes("category=national")) ? 1 : 0 };
+});
+const PROG_LIST = { active: { id: 5, slug: "fullbody_beginner", done: 3, total: 24, finished: false, next_day: 1, week: 2,
+    title: "Фулбади для начинающих", next_day_title: "День B" },
+  programs: [
+    { slug: "fullbody_beginner", title: "Фулбади для начинающих", desc: "Всё тело за тренировку.", level: "beginner", days_per_week: 3, weeks: 8,
+      premium: false, locked: false, total: 24, day_titles: ["День A", "День B"] },
+    { slug: "ppl", title: "Тяни-толкай-ноги", desc: "Шесть тренировок в неделю.", level: "intermediate", days_per_week: 6, weeks: 8,
+      premium: true, locked: true, total: 48, day_titles: ["Толкай", "Тяни", "Ноги"] },
+    { slug: "home_dumbbells", title: "Дома с гантелями", desc: "Пара гантелей.", level: "beginner", days_per_week: 3, weeks: 6,
+      premium: false, locked: false, total: 18, day_titles: ["Ноги и жимы", "Тяги и кор"] } ] };
+const PROG_DETAIL = { slug: "fullbody_beginner", title: "Фулбади для начинающих", desc: "Всё тело за тренировку.", level: "beginner",
+  days_per_week: 3, weeks: 8, total: 24, premium: false, locked: false, note: "Добавляйте вес.",
+  active: { id: 5, slug: "fullbody_beginner", done: 3, total: 24, finished: false, next_day: 1, week: 2 },
+  days: [
+    { index: 0, title: "День A", exercises: [{ name: "Жим штанги лёжа", sets: 3, reps: "8-10", rest: 120, exercise_id: 101 }] },
+    { index: 1, title: "День B", exercises: [{ name: "Жим штанги лёжа", sets: 3, reps: "10", rest: 90, exercise_id: 101 },
+                                            { name: "Планка", sets: 3, reps: "30-45s", rest: 60, exercise_id: null }] } ] };
+await scenario("52_programs_list", VIEWPORTS[1], { tab: "menu", screen: "programs", net: { setMode: "ok", setBodies: [], counts: {}, programs: PROG_LIST } }, async (page, net) => {
+  await page.getByText("ВАША ПРОГРАММА").waitFor({ timeout: 5000 });
+  const has = async re => (await page.getByText(re).count()) > 0 ? 1 : 0;
+  return { progress: await has(/Тренировка 4 из 24/), next: await has(/Следующая: День B/), premium: await has("PREMIUM"),
+           free: await has("Бесплатно"), meta: await has(/6 трен\. в неделю · 8 нед\./) };
+});
+await scenario("53_program_start_day", VIEWPORTS[1], { tab: "menu", screen: "program_detail", params: { slug: "fullbody_beginner" },
+  net: { setMode: "ok", setBodies: [], counts: {}, programs: PROG_LIST, programDetail: PROG_DETAIL } }, async (page, net) => {
+  await page.getByText("ДНИ ПРОГРАММЫ").waitFor({ timeout: 5000 });
+  const reps = (await page.getByText("3 × 30–45 с").count()) > 0 ? 1 : 0;
+  const missing = (await page.getByText(/нет в каталоге/).count()) > 0 ? 1 : 0;
+  await page.getByRole("button", { name: /Начать: День B/ }).click();
+  await page.waitForTimeout(800);
+  // экран тренировки с составом дня: начинаем
+  const hint = (await page.getByText("Состав — из вашей программы").count()) > 0 ? 1 : 0;
+  await page.getByRole("button", { name: /ПРОПУСТИТЬ/ }).last().click();   // разминку пропускаем
+  await page.getByRole("button", { name: /НАЧАТЬ ТРЕНИРОВКУ/ }).click();    // порядок — и старт
+  await page.waitForTimeout(800);
+  return { reps, missing, hint, start: (net.starts || [])[0] || null };
+});
+await scenario("54_program_locked", VIEWPORTS[1], { tab: "menu", screen: "program_detail", params: { slug: "ppl" },
+  net: { setMode: "ok", setBodies: [], counts: {}, premium: PREMIUM, programs: { programs: [], active: null },
+         programDetail: { ...PROG_DETAIL, slug: "ppl", title: "Тяни-толкай-ноги", locked: true, premium: true, active: null } } }, async (page, net) => {
+  await page.getByRole("button", { name: /Открыть с Premium/ }).click();
+  await page.getByText("GymBot Premium").waitFor({ timeout: 4000 });
+  return { toPremium: 1, starts: (net.progStart || []).length };
 });
 
 await browser.close();
