@@ -196,6 +196,25 @@ async function setup(page, { lang = "ru", setFails = false, curIdx = 0, tab = "w
       if (p === "/workout/77/ai-review") { (net.saved = net.saved || []).push(url.searchParams.get("review")); return json(route, { ok: true }); }
       if (p === "/workout/555") return json(route, { id: 555, date: "2026-10-23T20:00:00", status: "finished", total_volume: 600,
         exercises: [{ name: "Жим штанги лёжа", sets: [{ set_number: 1, weight: 60, reps: 10, rpe: null }] }] });
+      if (p === "/food/label") {
+        (net.label = net.label || []).push(1);
+        if (net.labelNot) return json(route, { ok: true, is_label: false, quota: { used: 2, limit: 10 } });
+        return json(route, { ok: true, is_label: true, name: "Йогурт питьевой", brand: "Musaffo", per100: { kcal: 70, protein: 3, fat: 2.5, carbs: 9, fiber: null },
+          serving_g: 250, category: "dairy", confidence: "high", note: null, quota: { used: 2, limit: 10 } });
+      }
+      if (p === "/food/label/save") {
+        (net.labelSave = net.labelSave || []).push(JSON.parse(req.postData() || "{}"));
+        return json(route, { ok: true, product_id: 9001, created: true, logged: { kcal: 175 } });
+      }
+      if (p === "/food/search") {
+        (net.search = net.search || []).push(url.search);
+        if (url.searchParams.get("category") === "national") return json(route, { total: 2, items: [
+          { id: 1, name: "Плов (ош)", name_en: "Plov (pilaf)", name_uz: "Palov (osh)", name_kz: "Палау", calories: 250, protein: 7, fat: 12.5, carbs: 27,
+            category: "national", serving_size_g: 350, dish_key: "plov", is_custom: false },
+          { id: 2, name: "Манты", name_en: "Manti (dumplings)", name_uz: "Manti", name_kz: "Манты", calories: 200, protein: 10, fat: 10, carbs: 18,
+            category: "national", serving_size_g: 250, dish_key: "manti", is_custom: false } ] });
+        return json(route, { total: 0, items: [] });
+      }
       if (p === "/food/analyze") {
         (net.analyze = net.analyze || []).push(1);
         if (net.foodLimit) return json(route, { detail: { code: "food_limit", used: 10, limit: 10 } }, 429);
@@ -610,6 +629,29 @@ await scenario("48_progress_strength_card", VIEWPORTS[1], { tab: "progress", scr
   await page.getByText(/Средний · /).first().click();
   await page.getByText("Общий ранг").waitFor({ timeout: 4000 });
   return { opened: 1, oldNorms: await page.getByText(/VS НОРМЫ/).count() };
+});
+await scenario("49_label_scan", VIEWPORTS[0], { tab: "menu", screen: "label_scan", params: { meal_type: "lunch" } }, async (page, net) => {
+  await page.locator('input[type="file"]').setInputFiles(path.join(ROOT, "fixtures/photo.jpg"));
+  await page.getByRole("button", { name: /Распознать/ }).click();
+  await page.getByText("На 100 г", { exact: true }).waitFor({ timeout: 5000 });
+  const nameVal = await page.locator("input").nth(1).inputValue();
+  const total = (await page.getByText(/Итого на 250 г/).count()) > 0 ? 1 : 0;   // порция с упаковки выбрана сама
+  await page.getByRole("button", { name: /Записать в дневник/ }).click();
+  await page.getByText(/Добавлено|✓/).first().waitFor({ timeout: 4000 }).catch(() => {});
+  await page.waitForTimeout(400);
+  return { label: (net.label || []).length, nameVal, total, save: (net.labelSave || [])[0] || null };
+});
+await scenario("50_label_not_found", VIEWPORTS[1], { tab: "menu", screen: "label_scan", net: { setMode: "ok", setBodies: [], counts: {}, labelNot: true } }, async (page, net) => {
+  await page.locator('input[type="file"]').setInputFiles(path.join(ROOT, "fixtures/photo.jpg"));
+  await page.getByRole("button", { name: /Распознать/ }).click();
+  await page.getByText(/не видно таблицы пищевой ценности/).waitFor({ timeout: 5000 });
+  return { msg: 1, saves: (net.labelSave || []).length };
+});
+await scenario("51_food_search_national_uz", VIEWPORTS[1], { lang: "uz", tab: "menu", screen: "food_search" }, async (page, net) => {
+  await page.getByText("Milliy taomlar").click();
+  await page.getByText("Palov (osh)").waitFor({ timeout: 4000 });
+  return { portion: await page.getByText("porsiya ~350 g").count(), scanBtn: await page.getByText(/Yorliqni skanerlash/).count(),
+           query: (net.search || []).some(q => q.includes("category=national")) ? 1 : 0 };
 });
 
 await browser.close();

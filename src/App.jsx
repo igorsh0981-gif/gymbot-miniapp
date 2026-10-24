@@ -475,6 +475,7 @@ const T = {
     workout_closed_elsewhere:"Прошлая тренировка уже завершена — на другом устройстве или автоматически. Можно начать новую.",
     finish_workout:"ЗАВЕРШИТЬ", workout_empty_note:"Ни одного подхода не записано — тренировка не засчитана и в историю не попала.", set_done:"✓ ПОДХОД ВЫПОЛНЕН", set_done_label:"ПОДХОД ВЫПОЛНЕН",
     premium_menu:"Premium", premium_kicker:"PREMIUM", premium_title:"GymBot Premium", premium_lead:"Больше вопросов тренеру и распознаваний еды — и поддержка развития GymBot.", premium_active_until:"Premium активен до {date}", premium_trial_until:"Пробный Premium до {date}", premium_manual:"Premium активен", premium_perk_ai:"{n} вопросов тренеру в день", premium_perk_food:"{n} фото еды в день", premium_perk_now:"без Premium — {n}", premium_perk_support:"Новые функции быстрее: вы поддерживаете развитие приложения", premium_month:"Месяц", premium_year:"Год", premium_month_note:"продлевается каждые 30 дней, выключить можно в любой момент", premium_year_note:"разовая оплата на 365 дней", premium_save:"выгода {n}%", premium_buy:"Оформить за {n} ⭐", premium_extend:"Продлить за {n} ⭐", premium_trial_btn:"Попробовать {n} дн. бесплатно", premium_renews:"Подписка продлится {date}", premium_renew_off:"Автопродление выключено — Premium до {date}", premium_cancel_btn:"Выключить автопродление", premium_resume_btn:"Включить автопродление", premium_paid_wait:"Оплата прошла — включаем Premium…", premium_paid_ok:"Premium включён до {date}. Спасибо!", premium_paid_late:"Оплата прошла. Premium включится в течение нескольких минут — бот пришлёт сообщение.", premium_failed:"Оплата не прошла. Попробуйте ещё раз.", premium_error:"Не получилось открыть оплату. Попробуйте позже.", premium_already_sub:"Подписка уже оформлена.", premium_note:"Оплата звёздами Telegram. Автопродление можно выключить здесь или в Telegram: Настройки → Мои звёзды. Вопросы по оплате — команда /paysupport в боте.", premium_nudge_ai:"С Premium — {n} вопросов тренеру в день", premium_nudge_food:"С Premium — {n} фото еды в день", premium_nudge_btn:"Подробнее", share_kicker:"ПОДЕЛИТЬСЯ", share_story:"В историю", share_chat:"В чат", share_preparing:"Готовлю карточку…", share_sent_bot:"Карточка в чате с ботом — перешлите её друзьям", share_error:"Не получилось подготовить карточку. Попробуйте ещё раз.",
+    fcat_national:"Местная кухня", label_scan_btn:"Сканировать этикетку", fv_mode_dish:"Блюдо", fv_mode_label:"Этикетка", label_kicker:"СКАНЕР ЭТИКЕТОК", label_title:"Фото этикетки", label_hint:"Сфотографируйте таблицу пищевой ценности на упаковке — заполним КБЖУ на 100 г, а продукт сохраним в справочник.", label_photo_btn:"Сфотографировать этикетку", label_read_btn:"Распознать", label_reading:"ЧИТАЮ ЭТИКЕТКУ…", label_not_found:"На фото не видно таблицы пищевой ценности. Сфотографируйте её ближе и ровнее.", label_failed:"Не получилось прочитать этикетку. Попробуйте ещё раз.", label_name:"Название", label_brand:"Бренд", label_per100:"На 100 г", label_low_conf:"Проверьте цифры: часть могла прочитаться неточно.", label_portion:"Сколько съели, г", label_pack_portion:"порция с упаковки", label_save_log:"Записать в дневник", label_save_only:"Только сохранить в справочник", label_saved_only:"Продукт сохранён — его можно найти в поиске.", label_total:"Итого на {w} г", food_portion_approx:"порция ~{n} г",
     str_e1rm:"расч. максимум", str_menu:"Силовые ранги", str_kicker:"СИЛА", str_title:"Силовые ранги", str_overall:"Общий ранг", str_stronger:"Сильнее ~{n}% тренирующихся", str_basis:"Оценка по силовым нормативам для вашего пола, веса тела и возраста. Максимум считается по лучшему подходу до 12 повторов (формула Эпли).", str_missing:"Чтобы посчитать ранги, укажите в профиле пол и вес.", str_btn_profile:"Заполнить профиль", str_to_next:"До уровня «{lvl}»: +{n} {u}", str_top:"Высший уровень — поздравляем!", str_community:"Среди пользователей GymBot: сильнее {n}% из {m}", str_untracked:"Ещё без ранга", str_untracked_hint:"Сделайте подход в любом из этих упражнений — ранг появится сам.", str_all:"Все ранги", str_from:"лучший подход {w} кг × {r}", str_from_reps:"лучший подход — {r} повт.", str_reps:"повт.", str_on:"по {n} упр.", str_empty:"Пока нет подходов в базовых упражнениях — ранги появятся после первой тренировки с ними.", str_lvl_start:"Старт", str_lvl_beginner:"Новичок", str_lvl_novice:"Начинающий", str_lvl_intermediate:"Средний", str_lvl_advanced:"Продвинутый", str_lvl_elite:"Элита",
     terms_menu:"Правила использования", terms_kicker:"ДОКУМЕНТ", terms_title:"Правила использования", terms_updated:"Редакция от 24 октября 2026 года", terms_read:"Читать правила", terms_premium_link:"Условия Premium, отмена и возврат", terms_close:"Закрыть", terms_s_general_t:"1. Общие положения", terms_s_general_b:"GymBot — дневник тренировок и питания с AI-тренером в Telegram. Пользоваться им можно с 18 лет.\n\nСоветы AI-тренера, оценка калорий по фото и рекомендации по нагрузке — справочные и не являются медицинским назначением. Решения о тренировках, питании и добавках вы принимаете сами, с учётом своего здоровья. При заболеваниях и противопоказаниях посоветуйтесь с врачом.\n\nНельзя использовать приложение для спама, оскорблений и чужих данных. За это мы можем ограничить доступ.", terms_s_data_t:"2. Данные", terms_s_data_b:"Какие данные собираются и кому передаются, описано в согласиях. Их можно посмотреть в профиле; согласия на сведения о здоровье и на передачу данных AI-сервису можно отозвать в любой момент.", terms_s_prem_t:"3. Premium", terms_p_what:"Premium — платная часть приложения: больше вопросов AI-тренеру и распознаваний еды по фото в день, а также другие возможности, перечисленные на экране Premium. Текущие лимиты указаны там же. Состав Premium может расширяться.", terms_p_pay:"Оплата — только звёздами Telegram (Telegram Stars) внутри Telegram. Сейчас месяц стоит {pm} ⭐, год — {py} ⭐. Если цена изменится, уже оплаченный период не пересчитывается.", terms_p_pay_np:"Оплата — только звёздами Telegram (Telegram Stars) внутри Telegram. Актуальные цены указаны на экране Premium. Если цена изменится, уже оплаченный период не пересчитывается.", terms_p_month:"Месяц — это подписка: каждые 30 дней Telegram автоматически списывает ту же сумму, пока вы её не отмените. Отменить можно в любой момент — на экране Premium кнопкой «Выключить автопродление» или в Telegram: Настройки → Мои звёзды. После отмены Premium работает до конца оплаченного периода, новых списаний не будет.", terms_p_year:"Год — разовая оплата на 365 дней, без автопродления. Если при этом у вас действует месячная подписка, мы выключаем её, чтобы звёзды не списывались дважды.", terms_p_trial:"Пробный период — {n} дн. бесплатно, один раз на аккаунт. Он не продлевается сам и ничего не списывает.", terms_p_refund:"Возврат. Если звёзды списались, а Premium не включился, или списание прошло по ошибке либо дважды — напишите в поддержку командой /paysupport в боте и укажите дату оплаты. При возврате звёзды возвращаются на ваш счёт в Telegram, а дни Premium за этот платёж снимаются полностью. Возврат за уже использованное время рассматривается индивидуально.", terms_p_account:"Premium привязан к вашему аккаунту Telegram и не передаётся другим людям.", terms_s_support_t:"4. Поддержка", terms_s_support_b:"Вопросы и жалобы — в разделе «Поддержка» приложения, вопросы по оплате — командой /paysupport в боте. Отвечаем в чате с ботом.\n\nПравила могут меняться. О существенных изменениях сообщим в боте.",
     warmup_title:"РАЗМИНКА", warmup_skip:"ПРОПУСТИТЬ", warmup_done:"✓ РАЗМИНКА ВЫПОЛНЕНА",
@@ -1363,6 +1364,7 @@ const T = {
     workout_closed_elsewhere:"Your previous workout has already been finished — on another device or automatically. You can start a new one.",
     finish_workout:"FINISH", workout_empty_note:"No sets were logged, so this workout was not counted and is not in your history.", set_done:"✓ SET DONE", set_done_label:"SET DONE",
     premium_menu:"Premium", premium_kicker:"PREMIUM", premium_title:"GymBot Premium", premium_lead:"More coach questions and food recognitions — and you support GymBot's development.", premium_active_until:"Premium is active until {date}", premium_trial_until:"Premium trial until {date}", premium_manual:"Premium is active", premium_perk_ai:"{n} coach questions a day", premium_perk_food:"{n} food photos a day", premium_perk_now:"{n} without Premium", premium_perk_support:"New features sooner: you support the app's development", premium_month:"Month", premium_year:"Year", premium_month_note:"renews every 30 days, turn off any time", premium_year_note:"one-time payment for 365 days", premium_save:"save {n}%", premium_buy:"Get for {n} ⭐", premium_extend:"Extend for {n} ⭐", premium_trial_btn:"Try {n} days free", premium_renews:"Subscription renews on {date}", premium_renew_off:"Auto-renewal is off — Premium until {date}", premium_cancel_btn:"Turn off auto-renewal", premium_resume_btn:"Turn on auto-renewal", premium_paid_wait:"Payment received — turning Premium on…", premium_paid_ok:"Premium is on until {date}. Thank you!", premium_paid_late:"Payment received. Premium will turn on within a few minutes — the bot will message you.", premium_failed:"Payment failed. Please try again.", premium_error:"Couldn't open the payment. Please try later.", premium_already_sub:"You already have a subscription.", premium_note:"Paid with Telegram Stars. You can turn auto-renewal off here or in Telegram: Settings → My Stars. Payment questions — /paysupport in the bot.", premium_nudge_ai:"With Premium — {n} coach questions a day", premium_nudge_food:"With Premium — {n} food photos a day", premium_nudge_btn:"Learn more", share_kicker:"SHARE", share_story:"To story", share_chat:"To chat", share_preparing:"Preparing the card…", share_sent_bot:"The card is in your chat with the bot — forward it to friends", share_error:"Couldn't prepare the card. Please try again.",
+    fcat_national:"Local cuisine", label_scan_btn:"Scan a label", fv_mode_dish:"Dish", fv_mode_label:"Label", label_kicker:"LABEL SCANNER", label_title:"Label photo", label_hint:"Take a photo of the nutrition facts table on the package — we'll fill in the values per 100 g and save the product to the catalog.", label_photo_btn:"Photograph the label", label_read_btn:"Read label", label_reading:"READING THE LABEL…", label_not_found:"No nutrition table found in the photo. Take it closer and straighter.", label_failed:"Couldn't read the label. Please try again.", label_name:"Name", label_brand:"Brand", label_per100:"Per 100 g", label_low_conf:"Check the numbers: some may have been read inaccurately.", label_portion:"How much you ate, g", label_pack_portion:"package serving", label_save_log:"Add to diary", label_save_only:"Just save to catalog", label_saved_only:"Saved — you can find it in search.", label_total:"Total for {w} g", food_portion_approx:"serving ~{n} g",
     str_e1rm:"est. 1RM", str_menu:"Strength ranks", str_kicker:"STRENGTH", str_title:"Strength ranks", str_overall:"Overall rank", str_stronger:"Stronger than ~{n}% of lifters", str_basis:"Estimated from strength standards for your sex, body weight and age. The max is taken from your best set of up to 12 reps (Epley formula).", str_missing:"To calculate ranks, add your sex and weight in the profile.", str_btn_profile:"Complete profile", str_to_next:"To «{lvl}»: +{n} {u}", str_top:"Top level — congratulations!", str_community:"Among GymBot users: stronger than {n}% of {m}", str_untracked:"No rank yet", str_untracked_hint:"Do a set in any of these exercises and the rank will appear.", str_all:"All ranks", str_from:"best set {w} kg × {r}", str_from_reps:"best set — {r} reps", str_reps:"reps", str_on:"from {n} lifts", str_empty:"No sets in the main lifts yet — ranks will appear after your first workout with them.", str_lvl_start:"Start", str_lvl_beginner:"Beginner", str_lvl_novice:"Novice", str_lvl_intermediate:"Intermediate", str_lvl_advanced:"Advanced", str_lvl_elite:"Elite",
     terms_menu:"Terms of use", terms_kicker:"DOCUMENT", terms_title:"Terms of use", terms_updated:"Version of 24 October 2026", terms_read:"Read the terms", terms_premium_link:"Premium terms, cancellation and refunds", terms_close:"Close", terms_s_general_t:"1. General", terms_s_general_b:"GymBot is a training and nutrition log with an AI coach in Telegram. It is available from age 18.\n\nThe AI coach's advice, calorie estimates from photos and load recommendations are for reference only and are not medical prescriptions. You make your own decisions about training, nutrition and supplements, taking your health into account. If you have conditions or contraindications, consult a doctor.\n\nDo not use the app for spam, insults or other people's data. We may restrict access for this.", terms_s_data_t:"2. Data", terms_s_data_b:"What data is collected and who it is shared with is described in the consents. You can view them in your profile; consents for health data and for sharing data with the AI service can be withdrawn at any time.", terms_s_prem_t:"3. Premium", terms_p_what:"Premium is the paid part of the app: more AI coach questions and food photo recognitions per day, plus the other features listed on the Premium screen. Current limits are shown there. Premium may gain new features.", terms_p_pay:"Payment is made only with Telegram Stars inside Telegram. Currently a month costs {pm} ⭐ and a year {py} ⭐. If the price changes, an already paid period is not recalculated.", terms_p_pay_np:"Payment is made only with Telegram Stars inside Telegram. Current prices are shown on the Premium screen. If the price changes, an already paid period is not recalculated.", terms_p_month:"A month is a subscription: every 30 days Telegram automatically charges the same amount until you cancel. You can cancel any time — on the Premium screen with «Turn off auto-renewal» or in Telegram: Settings → My Stars. After cancelling, Premium works until the end of the paid period and there are no new charges.", terms_p_year:"A year is a one-time payment for 365 days with no auto-renewal. If you also have an active monthly subscription, we turn it off so you are not charged twice.", terms_p_trial:"The trial is {n} days free, once per account. It does not renew by itself and charges nothing.", terms_p_refund:"Refunds. If Stars were charged but Premium didn't turn on, or a charge was made by mistake or twice, contact support with /paysupport in the bot and mention the payment date. On refund, the Stars go back to your Telegram balance and the Premium days for that payment are removed in full. Refunds for time already used are reviewed case by case.", terms_p_account:"Premium is tied to your Telegram account and cannot be transferred to other people.", terms_s_support_t:"4. Support", terms_s_support_b:"Questions and complaints — in the app's «Support» section; payment questions — /paysupport in the bot. We reply in the chat with the bot.\n\nThese terms may change. We will announce significant changes in the bot.",
     warmup_title:"WARM UP", warmup_skip:"SKIP", warmup_done:"✓ WARM UP DONE",
@@ -2247,6 +2249,7 @@ const T = {
     workout_closed_elsewhere:"Oldingi mashq allaqachon yakunlangan — boshqa qurilmada yoki avtomatik. Yangisini boshlashingiz mumkin.",
     finish_workout:"TUGATISH", workout_empty_note:"Birorta ham yondashuv yozilmadi — mashg‘ulot hisobga olinmadi va tarixga tushmadi.", set_done:"✓ YONDASHUV BAJARILDI", set_done_label:"YONDASHUV BAJARILDI",
     premium_menu:"Premium", premium_kicker:"PREMIUM", premium_title:"GymBot Premium", premium_lead:"Murabbiyga ko'proq savol va ovqatni ko'proq aniqlash — hamda GymBot rivojini qo'llab-quvvatlash.", premium_active_until:"Premium {date} gacha faol", premium_trial_until:"Sinov Premium {date} gacha", premium_manual:"Premium faol", premium_perk_ai:"Kuniga {n} ta murabbiy savoli", premium_perk_food:"Kuniga {n} ta ovqat surati", premium_perk_now:"Premium'siz — {n}", premium_perk_support:"Yangi imkoniyatlar tezroq: siz ilova rivojini qo'llab-quvvatlaysiz", premium_month:"Oy", premium_year:"Yil", premium_month_note:"har 30 kunda yangilanadi, istalgan vaqtda o'chirish mumkin", premium_year_note:"365 kunga bir martalik to'lov", premium_save:"{n}% tejash", premium_buy:"{n} ⭐ ga olish", premium_extend:"{n} ⭐ ga uzaytirish", premium_trial_btn:"{n} kun bepul sinab ko'rish", premium_renews:"Obuna {date} da yangilanadi", premium_renew_off:"Avto-yangilash o'chirilgan — Premium {date} gacha", premium_cancel_btn:"Avto-yangilashni o'chirish", premium_resume_btn:"Avto-yangilashni yoqish", premium_paid_wait:"To'lov o'tdi — Premium yoqilmoqda…", premium_paid_ok:"Premium {date} gacha yoqildi. Rahmat!", premium_paid_late:"To'lov o'tdi. Premium bir necha daqiqada yoqiladi — bot xabar yuboradi.", premium_failed:"To'lov o'tmadi. Qaytadan urinib ko'ring.", premium_error:"To'lovni ochib bo'lmadi. Keyinroq urinib ko'ring.", premium_already_sub:"Obuna allaqachon rasmiylashtirilgan.", premium_note:"Telegram yulduzlari bilan to'lov. Avto-yangilashni shu yerda yoki Telegram'da o'chirish mumkin: Sozlamalar → Mening yulduzlarim. To'lov bo'yicha savollar — botda /paysupport buyrug'i.", premium_nudge_ai:"Premium bilan — kuniga {n} ta murabbiy savoli", premium_nudge_food:"Premium bilan — kuniga {n} ta ovqat surati", premium_nudge_btn:"Batafsil", share_kicker:"ULASHISH", share_story:"Hikoyaga", share_chat:"Chatga", share_preparing:"Kartochka tayyorlanmoqda…", share_sent_bot:"Kartochka bot bilan chatda — uni do'stlaringizga yuboring", share_error:"Kartochkani tayyorlab bo'lmadi. Qaytadan urinib ko'ring.",
+    fcat_national:"Milliy taomlar", label_scan_btn:"Yorliqni skanerlash", fv_mode_dish:"Taom", fv_mode_label:"Yorliq", label_kicker:"YORLIQ SKANERI", label_title:"Yorliq surati", label_hint:"Qadoqdagi ozuqaviy qiymat jadvalini suratga oling — 100 g dagi KBJU ni to'ldiramiz va mahsulotni ma'lumotnomaga saqlaymiz.", label_photo_btn:"Yorliqni suratga olish", label_read_btn:"Aniqlash", label_reading:"YORLIQ O'QILMOQDA…", label_not_found:"Suratda ozuqaviy qiymat jadvali ko'rinmayapti. Uni yaqinroq va to'g'riroq suratga oling.", label_failed:"Yorliqni o'qib bo'lmadi. Qaytadan urinib ko'ring.", label_name:"Nomi", label_brand:"Brend", label_per100:"100 g da", label_low_conf:"Raqamlarni tekshiring: ba'zilari noaniq o'qilgan bo'lishi mumkin.", label_portion:"Qancha yedingiz, g", label_pack_portion:"qadoqdagi porsiya", label_save_log:"Kundalikka yozish", label_save_only:"Faqat ma'lumotnomaga saqlash", label_saved_only:"Saqlandi — uni qidiruvda topish mumkin.", label_total:"{w} g uchun jami", food_portion_approx:"porsiya ~{n} g",
     str_e1rm:"taxminiy maksimum", str_menu:"Kuch darajalari", str_kicker:"KUCH", str_title:"Kuch darajalari", str_overall:"Umumiy daraja", str_stronger:"Shug'ullanuvchilarning ~{n}% idan kuchliroq", str_basis:"Jinsingiz, tana vazningiz va yoshingiz uchun kuch me'yorlari bo'yicha baho. Maksimum 12 tagacha takrorli eng yaxshi yondashuv bo'yicha hisoblanadi (Epli formulasi).", str_missing:"Darajalarni hisoblash uchun profilda jins va vazningizni kiriting.", str_btn_profile:"Profilni to'ldirish", str_to_next:"«{lvl}» darajasigacha: +{n} {u}", str_top:"Eng yuqori daraja — tabriklaymiz!", str_community:"GymBot foydalanuvchilari orasida: {m} kishidan {n}% idan kuchliroq", str_untracked:"Hali darajasiz", str_untracked_hint:"Ushbu mashqlardan birida yondashuv bajaring — daraja o'zi paydo bo'ladi.", str_all:"Barcha darajalar", str_from:"eng yaxshi yondashuv {w} kg × {r}", str_from_reps:"eng yaxshi yondashuv — {r} takror", str_reps:"takror", str_on:"{n} ta mashq bo'yicha", str_empty:"Asosiy mashqlarda hali yondashuvlar yo'q — ular bilan birinchi mashg'ulotdan keyin darajalar paydo bo'ladi.", str_lvl_start:"Start", str_lvl_beginner:"Yangi boshlovchi", str_lvl_novice:"Boshlang'ich", str_lvl_intermediate:"O'rta", str_lvl_advanced:"Ilg'or", str_lvl_elite:"Elita",
     terms_menu:"Foydalanish qoidalari", terms_kicker:"HUJJAT", terms_title:"Foydalanish qoidalari", terms_updated:"2026-yil 24-oktabr tahriri", terms_read:"Qoidalarni o'qish", terms_premium_link:"Premium shartlari, bekor qilish va qaytarish", terms_close:"Yopish", terms_s_general_t:"1. Umumiy qoidalar", terms_s_general_b:"GymBot — Telegram'dagi AI-murabbiyli mashg'ulot va ovqatlanish kundaligi. Undan 18 yoshdan foydalanish mumkin.\n\nAI-murabbiy maslahatlari, surat bo'yicha kaloriya bahosi va yuklama tavsiyalari ma'lumot uchun bo'lib, tibbiy tayinlov emas. Mashg'ulot, ovqatlanish va qo'shimchalar bo'yicha qarorni sog'lig'ingizni hisobga olib o'zingiz qabul qilasiz. Kasallik yoki qarshi ko'rsatmalar bo'lsa, shifokor bilan maslahatlashing.\n\nIlovadan spam, haqorat va boshqalarning ma'lumotlari uchun foydalanish mumkin emas. Buning uchun kirishni cheklashimiz mumkin.", terms_s_data_t:"2. Ma'lumotlar", terms_s_data_b:"Qanday ma'lumotlar yig'ilishi va kimga uzatilishi roziliklarda yozilgan. Ularni profilda ko'rish mumkin; sog'liq haqidagi ma'lumotlar va AI-xizmatga uzatish bo'yicha roziliklarni istalgan vaqtda qaytarib olish mumkin.", terms_s_prem_t:"3. Premium", terms_p_what:"Premium — ilovaning pullik qismi: kuniga AI-murabbiyga ko'proq savol va ovqatni surat bo'yicha ko'proq aniqlash, shuningdek Premium ekranida sanab o'tilgan boshqa imkoniyatlar. Joriy limitlar o'sha yerda ko'rsatilgan. Premium tarkibi kengayishi mumkin.", terms_p_pay:"To'lov — faqat Telegram yulduzlari (Telegram Stars) bilan, Telegram ichida. Hozir oy {pm} ⭐, yil — {py} ⭐ turadi. Narx o'zgarsa, allaqachon to'langan davr qayta hisoblanmaydi.", terms_p_pay_np:"To'lov — faqat Telegram yulduzlari (Telegram Stars) bilan, Telegram ichida. Joriy narxlar Premium ekranida ko'rsatilgan. Narx o'zgarsa, allaqachon to'langan davr qayta hisoblanmaydi.", terms_p_month:"Oy — bu obuna: har 30 kunda Telegram siz bekor qilmaguningizcha xuddi shu summani avtomatik yechadi. Istalgan vaqtda bekor qilish mumkin — Premium ekranida «Avto-yangilashni o'chirish» tugmasi bilan yoki Telegram'da: Sozlamalar → Mening yulduzlarim. Bekor qilingandan keyin Premium to'langan davr oxirigacha ishlaydi, yangi yechimlar bo'lmaydi.", terms_p_year:"Yil — 365 kunga bir martalik to'lov, avto-yangilashsiz. Agar bunda oylik obunangiz amalda bo'lsa, yulduzlar ikki marta yechilmasligi uchun uni o'chiramiz.", terms_p_trial:"Sinov davri — {n} kun bepul, har bir akkaunt uchun bir marta. U o'zi uzaytirilmaydi va hech narsa yechmaydi.", terms_p_refund:"Qaytarish. Agar yulduzlar yechilgan, lekin Premium yoqilmagan bo'lsa yoki yechim xato yoxud ikki marta bo'lgan bo'lsa — botda /paysupport buyrug'i bilan qo'llab-quvvatlashga yozing va to'lov sanasini ko'rsating. Qaytarishda yulduzlar Telegram hisobingizga qaytadi, bu to'lov uchun Premium kunlari to'liq olib tashlanadi. Foydalanilgan vaqt uchun qaytarish alohida ko'rib chiqiladi.", terms_p_account:"Premium Telegram akkauntingizga bog'langan va boshqa odamlarga o'tkazilmaydi.", terms_s_support_t:"4. Qo'llab-quvvatlash", terms_s_support_b:"Savol va shikoyatlar — ilovaning «Qo'llab-quvvatlash» bo'limida, to'lov bo'yicha savollar — botda /paysupport buyrug'i bilan. Bot bilan chatda javob beramiz.\n\nQoidalar o'zgarishi mumkin. Muhim o'zgarishlar haqida botda xabar beramiz.",
     warmup_title:"ISITISH", warmup_skip:"O'TKAZIB YUBORISH", warmup_done:"✓ ISITISH BAJARILDI",
@@ -3131,6 +3134,7 @@ const T = {
     workout_closed_elsewhere:"Алдыңғы жаттығу аяқталған — басқа құрылғыда немесе автоматты түрде. Жаңасын бастауға болады.",
     finish_workout:"АЯҚТАУ", workout_empty_note:"Бірде-бір тәсіл жазылмады — жаттығу есептелмеді және тарихқа түспеді.", set_done:"✓ ТӘСІЛ ОРЫНДАЛДЫ", set_done_label:"ТӘСІЛ ОРЫНДАЛДЫ",
     premium_menu:"Premium", premium_kicker:"PREMIUM", premium_title:"GymBot Premium", premium_lead:"Жаттықтырушыға көбірек сұрақ және тамақты көбірек тану — әрі GymBot дамуына қолдау.", premium_active_until:"Premium {date} дейін белсенді", premium_trial_until:"Сынақ Premium {date} дейін", premium_manual:"Premium белсенді", premium_perk_ai:"Күніне {n} жаттықтырушы сұрағы", premium_perk_food:"Күніне {n} тамақ суреті", premium_perk_now:"Premium-сыз — {n}", premium_perk_support:"Жаңа мүмкіндіктер тезірек: сіз қолданбаның дамуын қолдайсыз", premium_month:"Ай", premium_year:"Жыл", premium_month_note:"әр 30 күн сайын ұзартылады, кез келген уақытта өшіруге болады", premium_year_note:"365 күнге бір реттік төлем", premium_save:"{n}% үнем", premium_buy:"{n} ⭐ алу", premium_extend:"{n} ⭐ ұзарту", premium_trial_btn:"{n} күн тегін байқап көру", premium_renews:"Жазылым {date} ұзартылады", premium_renew_off:"Автоұзарту өшірулі — Premium {date} дейін", premium_cancel_btn:"Автоұзартуды өшіру", premium_resume_btn:"Автоұзартуды қосу", premium_paid_wait:"Төлем өтті — Premium қосылуда…", premium_paid_ok:"Premium {date} дейін қосылды. Рахмет!", premium_paid_late:"Төлем өтті. Premium бірнеше минутта қосылады — бот хабарлама жібереді.", premium_failed:"Төлем өтпеді. Қайта көріңіз.", premium_error:"Төлемді ашу мүмкін болмады. Кейінірек көріңіз.", premium_already_sub:"Жазылым бұрыннан бар.", premium_note:"Telegram жұлдыздарымен төлем. Автоұзартуды осында немесе Telegram-да өшіруге болады: Баптаулар → Менің жұлдыздарым. Төлем бойынша сұрақтар — боттағы /paysupport командасы.", premium_nudge_ai:"Premium-мен — күніне {n} жаттықтырушы сұрағы", premium_nudge_food:"Premium-мен — күніне {n} тамақ суреті", premium_nudge_btn:"Толығырақ", share_kicker:"БӨЛІСУ", share_story:"Тарихқа", share_chat:"Чатқа", share_preparing:"Карточка дайындалуда…", share_sent_bot:"Карточка ботпен чатта — оны достарыңызға жіберіңіз", share_error:"Карточканы дайындау мүмкін болмады. Қайта көріңіз.",
+    fcat_national:"Ұлттық тағамдар", label_scan_btn:"Затбелгіні сканерлеу", fv_mode_dish:"Тағам", fv_mode_label:"Затбелгі", label_kicker:"ЗАТБЕЛГІ СКАНЕРІ", label_title:"Затбелгі суреті", label_hint:"Қаптамадағы тағамдық құндылық кестесін суретке түсіріңіз — 100 г-ға КБЖУ-ды толтырамыз, ал өнімді анықтамалыққа сақтаймыз.", label_photo_btn:"Затбелгіні суретке түсіру", label_read_btn:"Тану", label_reading:"ЗАТБЕЛГІ ОҚЫЛУДА…", label_not_found:"Суретте тағамдық құндылық кестесі көрінбейді. Оны жақынырақ және тігірек түсіріңіз.", label_failed:"Затбелгіні оқу мүмкін болмады. Қайта көріңіз.", label_name:"Атауы", label_brand:"Бренд", label_per100:"100 г-да", label_low_conf:"Сандарды тексеріңіз: кейбірі дәл оқылмаған болуы мүмкін.", label_portion:"Қанша жедіңіз, г", label_pack_portion:"қаптамадағы порция", label_save_log:"Күнделікке жазу", label_save_only:"Тек анықтамалыққа сақтау", label_saved_only:"Сақталды — оны іздеуден табуға болады.", label_total:"{w} г үшін барлығы", food_portion_approx:"порция ~{n} г",
     str_e1rm:"есептік максимум", str_menu:"Күш деңгейлері", str_kicker:"КҮШ", str_title:"Күш деңгейлері", str_overall:"Жалпы деңгей", str_stronger:"Жаттығатындардың ~{n}%-нан күштірек", str_basis:"Жынысыңыз, дене салмағыңыз және жасыңыз үшін күш нормативтері бойынша баға. Максимум 12 қайталауға дейінгі ең үздік тәсіл бойынша есептеледі (Эпли формуласы).", str_missing:"Деңгейлерді есептеу үшін профильде жынысыңыз бен салмағыңызды көрсетіңіз.", str_btn_profile:"Профильді толтыру", str_to_next:"«{lvl}» деңгейіне дейін: +{n} {u}", str_top:"Ең жоғары деңгей — құттықтаймыз!", str_community:"GymBot пайдаланушылары арасында: {m} адамның {n}%-нан күштірек", str_untracked:"Әзірге деңгейсіз", str_untracked_hint:"Осы жаттығулардың бірінде тәсіл жасаңыз — деңгей өзі пайда болады.", str_all:"Барлық деңгейлер", str_from:"ең үздік тәсіл {w} кг × {r}", str_from_reps:"ең үздік тәсіл — {r} қайт.", str_reps:"қайт.", str_on:"{n} жаттығу бойынша", str_empty:"Негізгі жаттығуларда әзірге тәсілдер жоқ — олармен алғашқы жаттығудан кейін деңгейлер пайда болады.", str_lvl_start:"Старт", str_lvl_beginner:"Жаңадан бастаушы", str_lvl_novice:"Бастауыш", str_lvl_intermediate:"Орташа", str_lvl_advanced:"Озық", str_lvl_elite:"Элита",
     terms_menu:"Пайдалану ережелері", terms_kicker:"ҚҰЖАТ", terms_title:"Пайдалану ережелері", terms_updated:"2026 жылғы 24 қазандағы редакция", terms_read:"Ережелерді оқу", terms_premium_link:"Premium шарттары, тоқтату және қайтару", terms_close:"Жабу", terms_s_general_t:"1. Жалпы ережелер", terms_s_general_b:"GymBot — Telegram-дағы AI-жаттықтырушысы бар жаттығу және тамақтану күнделігі. Оны 18 жастан пайдалануға болады.\n\nAI-жаттықтырушының кеңестері, сурет бойынша калория бағасы және жүктеме ұсыныстары анықтамалық сипатта және медициналық тағайындау емес. Жаттығу, тамақтану және қоспалар туралы шешімді денсаулығыңызды ескеріп, өзіңіз қабылдайсыз. Ауру немесе қарсы көрсетілімдер болса, дәрігермен кеңесіңіз.\n\nҚолданбаны спам, қорлау және бөгде адамдардың деректері үшін пайдалануға болмайды. Ол үшін қолжетімділікті шектеуіміз мүмкін.", terms_s_data_t:"2. Деректер", terms_s_data_b:"Қандай деректер жиналатыны және кімге берілетіні келісімдерде жазылған. Оларды профильде көруге болады; денсаулық туралы мәліметтерге және деректерді AI-сервиске беруге келісімдерді кез келген уақытта қайтарып алуға болады.", terms_s_prem_t:"3. Premium", terms_p_what:"Premium — қолданбаның ақылы бөлігі: күніне AI-жаттықтырушыға көбірек сұрақ және тамақты сурет бойынша көбірек тану, сондай-ақ Premium экранында көрсетілген басқа мүмкіндіктер. Ағымдағы лимиттер сонда көрсетілген. Premium құрамы кеңеюі мүмкін.", terms_p_pay:"Төлем — тек Telegram жұлдыздарымен (Telegram Stars), Telegram ішінде. Қазір ай {pm} ⭐, жыл — {py} ⭐ тұрады. Баға өзгерсе, төленген кезең қайта есептелмейді.", terms_p_pay_np:"Төлем — тек Telegram жұлдыздарымен (Telegram Stars), Telegram ішінде. Ағымдағы бағалар Premium экранында көрсетілген. Баға өзгерсе, төленген кезең қайта есептелмейді.", terms_p_month:"Ай — бұл жазылым: әр 30 күн сайын Telegram сіз тоқтатқанша сол соманы автоматты түрде алады. Кез келген уақытта тоқтатуға болады — Premium экранында «Автоұзартуды өшіру» батырмасымен немесе Telegram-да: Баптаулар → Менің жұлдыздарым. Тоқтатқаннан кейін Premium төленген кезеңнің соңына дейін жұмыс істейді, жаңа төлемдер болмайды.", terms_p_year:"Жыл — 365 күнге бір реттік төлем, автоұзартусыз. Егер бұл кезде айлық жазылымыңыз жұмыс істеп тұрса, жұлдыздар екі рет алынбауы үшін оны өшіреміз.", terms_p_trial:"Сынақ кезеңі — {n} күн тегін, әр аккаунтқа бір рет. Ол өздігінен ұзартылмайды және ештеңе алмайды.", terms_p_refund:"Қайтару. Егер жұлдыздар алынса, бірақ Premium қосылмаса, немесе төлем қателікпен не екі рет өтсе — боттағы /paysupport командасымен қолдауға жазып, төлем күнін көрсетіңіз. Қайтарғанда жұлдыздар Telegram шотыңызға қайтады, ал осы төлем үшін Premium күндері толық алынып тасталады. Пайдаланылған уақыт үшін қайтару жеке қаралады.", terms_p_account:"Premium Telegram аккаунтыңызға байланған және басқа адамдарға берілмейді.", terms_s_support_t:"4. Қолдау", terms_s_support_b:"Сұрақтар мен шағымдар — қолданбаның «Қолдау» бөлімінде, төлем бойынша сұрақтар — боттағы /paysupport командасымен. Ботпен чатта жауап береміз.\n\nЕрежелер өзгеруі мүмкін. Елеулі өзгерістер туралы ботта хабарлаймыз.",
     warmup_title:"ЖЫЛЫТУ", warmup_skip:"ӨТКІЗІП ЖІБЕРу", warmup_done:"✓ ЖЫЛЫТУ ОРЫНДАЛДЫ",
@@ -9090,6 +9094,11 @@ function FoodVisionScreen({tgId,onBack,mealType,onNav}){
       <BackBtn onBack={onBack}/>
       <Kicker>{t("ai_nutrition_title")}</Kicker>
       <Hero>{t("photo_kbju_title2")}</Hero>
+      {onNav&&<div style={{display:"flex",gap:6,marginTop:10}}>
+        <span style={{padding:"6px 14px",borderRadius:16,fontSize:12,fontFamily:"monospace",background:C.accent,color:C.bg}}>{t("fv_mode_dish")}</span>
+        <span onClick={()=>onNav("label_scan",{meal_type:mealType})} style={{padding:"6px 14px",borderRadius:16,fontSize:12,cursor:"pointer",
+          fontFamily:"monospace",border:`0.5px solid ${C.border}`,color:C.muted}}>🏷 {t("fv_mode_label")}</span>
+      </div>}
       <div style={{color:C.muted,fontSize:13,marginTop:4,marginBottom:20}}>{t("photo_kbju_hint")}</div>
       <input ref={inputRef} type="file" accept="image/*"
         onChange={e=>{handleFile(e.target.files[0]);e.target.value="";}} style={{display:"none"}}/>
@@ -9440,9 +9449,171 @@ function NutritionScreen({tgId,onBack,onNav}){
 
 
 // ── FoodSearchScreen ─────────────────────────────────────────────────────────
+// Название продукта на языке приложения (у местных блюд есть узбекское и казахское)
+function foodName(p){
+  if(!p)return "";
+  const lang=LANG_STORE.current;
+  return (lang==="uz"&&p.name_uz)||(lang==="kz"&&p.name_kz)||(lang==="en"&&p.name_en)||p.name;
+}
+
+function resizeImage(file,max=1600){
+  return new Promise((resolve,reject)=>{
+    const img=new Image();
+    img.onload=()=>{
+      const k=Math.min(1,max/Math.max(img.naturalWidth,img.naturalHeight));
+      const c=document.createElement("canvas");
+      c.width=Math.round(img.naturalWidth*k);c.height=Math.round(img.naturalHeight*k);
+      c.getContext("2d").drawImage(img,0,0,c.width,c.height);
+      resolve(c.toDataURL("image/jpeg",0.85));
+    };
+    img.onerror=reject;
+    img.src=URL.createObjectURL(file);
+  });
+}
+
+// ── Сканер этикеток: фото таблицы пищевой ценности → КБЖУ на 100 г ──────────
+// Распознавание — общий дневной лимит фото еды. Продукт сохраняется в справочник
+// (как свой, до проверки админом), порция — в дневник.
+function LabelScanScreen({tgId,onBack,onNav,mealType}){
+  const MEAL_OPTS=[
+    {value:"breakfast",label:t("meal_breakfast")},{value:"lunch",label:t("meal_lunch")},
+    {value:"dinner",label:t("meal_dinner")},{value:"snack",label:t("meal_snack")},
+  ];
+  const inputRef=useRef(null);
+  const [preview,setPreview]=useState(null);
+  const [loading,setLoading]=useState(false);
+  const [error,setError]=useState(null);
+  const [limitHit,setLimitHit]=useState(false);
+  const [quota,setQuota]=useState(null);
+  const [form,setForm]=useState(null);
+  const [weight,setWeight]=useState("100");
+  const [meal,setMeal]=useState(mealType||"snack");
+  const [saving,setSaving]=useState(false);
+  const [done,setDone]=useState(null);   // "log" | "only"
+  useEffect(()=>{
+    if(!tgId)return;
+    fetch(`${API}/food/quota/${tgId}`).then(r=>r.ok?r.json():null).then(q=>{if(q&&q.limit!=null)setQuota(q);}).catch(()=>{});
+  },[tgId]);
+
+  async function pick(file){
+    if(!file)return;
+    setError(null);setForm(null);setDone(null);setLimitHit(false);
+    try{setPreview(await resizeImage(file));}catch{setError(t("label_failed"));}
+  }
+  async function read(){
+    if(!preview||loading)return;
+    setLoading(true);setError(null);
+    try{
+      const r=await fetch(`${API}/food/label`,{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({tg_id:tgId,image_base64:preview.split(",")[1]})});
+      if(r.status===429){
+        let q=null;try{q=(await r.json())?.detail;}catch{}
+        if(q&&q.limit!=null)setQuota({used:q.used,limit:q.limit});
+        setError(t("food_limit_reached").replace("{limit}",q?.limit??""));setLimitHit(true);return;
+      }
+      if(!r.ok)throw new Error(r.status);
+      const d=await r.json();
+      if(d.quota)setQuota(d.quota);
+      if(!d.is_label){setError(t("label_not_found"));return;}
+      const v=d.per100||{};
+      const num=x=>x==null?"":String(x);
+      setForm({name:d.name||"",brand:d.brand||"",kcal:num(v.kcal),protein:num(v.protein),fat:num(v.fat),carbs:num(v.carbs),
+        fiber:num(v.fiber),category:d.category||"other",serving_g:d.serving_g||null,confidence:d.confidence});
+      setWeight(String(d.serving_g||100));
+    }catch(e){setError(e?.message==="503"?t("ai_unavailable"):t("label_failed"));}
+    finally{setLoading(false);}
+  }
+  const n=x=>{const v=parseFloat(String(x).replace(",","."));return isFinite(v)&&v>=0?v:0;};
+  const w=n(weight);
+  const tot=form?{kcal:Math.round(n(form.kcal)*w/100),p:Math.round(n(form.protein)*w/10)/10,
+    f:Math.round(n(form.fat)*w/10)/10,c:Math.round(n(form.carbs)*w/10)/10}:null;
+  const valid=!!form&&form.name.trim().length>=2&&form.kcal!==""&&n(form.kcal)<=1000;
+  async function save(log){
+    if(!valid||saving)return;
+    setSaving(true);setError(null);
+    try{
+      const r=await fetch(`${API}/food/label/save`,{method:"POST",headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({tg_id:tgId,name:form.name.trim(),brand:form.brand.trim()||null,kcal:n(form.kcal),
+          protein:Math.min(100,n(form.protein)),fat:Math.min(100,n(form.fat)),carbs:Math.min(100,n(form.carbs)),
+          fiber:Math.min(100,n(form.fiber)),category:form.category,
+          serving_g:form.serving_g||null,weight_g:log&&w>0?w:null,meal_type:log?meal:null})});
+      if(!r.ok)throw new Error(r.status);
+      setDone(log?"log":"only");haptic.notify("success");
+      if(log)setTimeout(()=>{if(onNav)onNav("nutrition",{});else onBack();},1200);
+    }catch(e){setError(t("err_save_failed").replace("{err}",e?.message||""));}
+    finally{setSaving(false);}
+  }
+  const field=(k,label,num)=><div style={{flex:1,minWidth:0}}>
+    <div style={{fontSize:10,color:C.muted,fontFamily:"monospace",marginBottom:4}}>{label}</div>
+    <input value={form[k]} inputMode={num?"decimal":undefined} onChange={e=>{const v=e.target.value;setForm(f=>({...f,[k]:v}));}}
+      style={{width:"100%",background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"9px 8px",color:C.text,
+        fontSize:14,outline:"none",boxSizing:"border-box",fontFamily:num?"monospace":"inherit"}}/>
+  </div>;
+
+  return <div style={{padding:"16px 16px 100px"}}>
+    <BackBtn onBack={onBack}/>
+    <Kicker>{t("label_kicker")}</Kicker>
+    <Hero>{t("label_title")}</Hero>
+    <div style={{color:C.muted,fontSize:13,marginTop:4,marginBottom:16,lineHeight:1.5}}>{t("label_hint")}</div>
+    <input ref={inputRef} type="file" accept="image/*" onChange={e=>{pick(e.target.files[0]);e.target.value="";}} style={{display:"none"}}/>
+    {!preview?<div onClick={()=>inputRef.current?.click()} style={{border:`2px dashed ${C.border}`,borderRadius:16,padding:"40px 20px",textAlign:"center",cursor:"pointer",marginBottom:16}}>
+      <div style={{fontSize:46,marginBottom:10}}>🏷</div>
+      <Btn accent full style={{pointerEvents:"none"}}>{t("label_photo_btn")}</Btn>
+    </div>:<div style={{marginBottom:12}}>
+      <img src={preview} alt="label" style={{width:"100%",borderRadius:12,maxHeight:260,objectFit:"contain",background:C.bg,marginBottom:10}}/>
+      <div style={{display:"flex",gap:8}}>
+        <Btn full onClick={()=>inputRef.current?.click()} style={{flex:1}}>{t("other_photo2")}</Btn>
+        {!form&&<Btn accent full onClick={read} disabled={loading} style={{flex:2}}>{loading?"…":t("label_read_btn")}</Btn>}
+      </div>
+      {quota&&!form&&<div style={{fontSize:11,color:C.muted,textAlign:"center",marginTop:8,fontFamily:"monospace"}}>
+        {t("food_quota_left").replace("{left}",Math.max(0,quota.limit-quota.used)).replace("{limit}",quota.limit)}</div>}
+    </div>}
+    {loading&&<Card style={{marginBottom:12}}><div style={{textAlign:"center",padding:"14px 0",color:C.accent,fontFamily:"monospace",fontSize:12,letterSpacing:2}}>{t("label_reading")}</div></Card>}
+    {error&&<Card style={{marginBottom:12}}>
+      <div style={{color:C.danger,fontSize:13,textAlign:"center",lineHeight:1.5}}>{error}</div>
+      {limitHit&&<PremiumNudge tgId={tgId} kind="food" onNav={onNav} style={{marginTop:8}}/>}
+    </Card>}
+    {form&&<Fragment>
+      <Card style={{marginBottom:12}}>
+        <div style={{display:"flex",flexDirection:"column",gap:10}}>
+          {field("name",t("label_name"))}
+          {field("brand",t("label_brand"))}
+          <Kicker style={{margin:"6px 0 0"}}>{t("label_per100")}</Kicker>
+          <div style={{display:"flex",gap:6}}>
+            {field("kcal",t("calories_short"),true)}{field("protein",t("nut_belki"),true)}
+            {field("fat",t("nut_zhiry"),true)}{field("carbs",t("carbs_short"),true)}
+          </div>
+          {form.confidence==="low"&&<div style={{fontSize:12,color:C.warn||C.accent,lineHeight:1.5}}>{t("label_low_conf")}</div>}
+        </div>
+      </Card>
+      {done==="only"?<Card accent style={{marginBottom:12}}><div style={{fontSize:13,color:C.accent,textAlign:"center"}}>{t("label_saved_only")}</div></Card>
+      :done==="log"?<div style={{textAlign:"center",color:C.accent,fontFamily:"monospace",fontSize:14,padding:20}}>{t("added_done")}</div>
+      :<Fragment>
+        <Kicker>{t("label_portion")}</Kicker>
+        <div style={{display:"flex",gap:8,flexWrap:"wrap",margin:"6px 0 8px"}}>
+          {[...(form.serving_g?[form.serving_g]:[]),50,100,200,300].filter((x,i,a)=>a.indexOf(x)===i).map(x=>
+            <button key={x} onClick={()=>setWeight(String(x))} style={{padding:"6px 12px",borderRadius:8,fontSize:12,cursor:"pointer",
+              background:weight===String(x)?C.accent:C.card,border:`0.5px solid ${weight===String(x)?C.accent:C.border}`,
+              color:weight===String(x)?C.bg:C.text,fontFamily:"monospace"}}>
+              {x===form.serving_g?`${x}${t("u_g")} · ${t("label_pack_portion")}`:`${x}${t("u_g")}`}</button>)}
+        </div>
+        <input type="number" value={weight} onChange={e=>setWeight(e.target.value)}
+          style={{width:"100%",background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 14px",color:C.text,
+            fontSize:14,outline:"none",boxSizing:"border-box",marginBottom:10}}/>
+        {tot&&<div style={{fontSize:12,color:C.muted,fontFamily:"monospace",marginBottom:12}}>
+          {t("label_total").replace("{w}",w)}: <span style={{color:C.accent}}>{tot.kcal} {t("kcal_short")}</span> · {t("u_prot")}{tot.p} · {t("u_fat")}{tot.f} · {t("u_carb")}{tot.c}
+        </div>}
+        <div style={{marginBottom:14}}><Kicker>{t("meal_section")}</Kicker><Sel value={meal} onChange={setMeal} options={MEAL_OPTS}/></div>
+        <Btn accent full disabled={!valid||saving||w<=0} onClick={()=>save(true)}>{saving?t("saving"):t("label_save_log")}</Btn>
+        <Btn full style={{marginTop:8}} disabled={!valid||saving} onClick={()=>save(false)}>{t("label_save_only")}</Btn>
+      </Fragment>}
+    </Fragment>}
+  </div>;
+}
+
 function FoodSearchScreen({tgId,onBack,onNav,mealType}){
   const CATS=[
-    {v:"",l:t("fs_vse")},
+    {v:"",l:t("fs_vse")},{v:"national",l:t("fcat_national")},
     {v:"meat",l:t("fcat_myaso")},{v:"fish",l:t("fcat_ryba")},{v:"dairy",l:t("fcat_molochka")},
     {v:"eggs",l:t("alg_yayca")},{v:"grains",l:t("fcat_krupy")},{v:"bread",l:t("fcat_hleb")},
     {v:"vegetables",l:t("fcat_ovoschi")},{v:"fruits",l:t("fcat_frukty")},{v:"nuts",l:t("alg_orehi")},
@@ -9514,7 +9685,7 @@ function FoodSearchScreen({tgId,onBack,onNav,mealType}){
     return<div style={{padding:"16px 16px 100px"}}>
       <BackBtn onBack={()=>setSel(null)}/>
       <Kicker>{t("add_product_btn")}</Kicker>
-      <Hero style={{marginBottom:16}}>{sel.name}</Hero>
+      <Hero style={{marginBottom:16}}>{foodName(sel)}</Hero>
       {sel.brand&&<div style={{fontFamily:"monospace",fontSize:11,color:C.muted,marginBottom:4}}>{sel.brand}</div>}
       {sel.supplement_type&&<Tag color={C.accent} style={{marginBottom:12}}>{sel.supplement_type}</Tag>}
 
@@ -9571,6 +9742,7 @@ function FoodSearchScreen({tgId,onBack,onNav,mealType}){
     <BackBtn onBack={onBack}/>
     <Kicker>{t("menu_nutrition")}</Kicker>
     <Hero style={{marginBottom:12}}>{t("food_search_title")}</Hero>
+    {tgId&&onNav&&<Btn full style={{marginBottom:12}} onClick={()=>onNav("label_scan",{meal_type:meal})}>🏷 {t("label_scan_btn")}</Btn>}
 
     <input value={q} onChange={e=>setQ(e.target.value)}
       placeholder={t("food_search_placeholder")}
@@ -9608,8 +9780,10 @@ function FoodSearchScreen({tgId,onBack,onNav,mealType}){
       <Card key={p.id} onClick={()=>{setSel(p);setWeight(p.serving_size_g?String(p.serving_size_g):"100");}} style={{marginBottom:10,cursor:"pointer"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
           <div style={{flex:1,minWidth:0}}>
-            <div style={{fontSize:14,color:C.text,fontWeight:600,marginBottom:2}}>{p.name}</div>
+            <div style={{fontSize:14,color:C.text,fontWeight:600,marginBottom:2}}>{foodName(p)}</div>
             {p.brand&&<div style={{fontSize:11,color:C.muted,fontFamily:"monospace"}}>{p.brand}</div>}
+            {p.category==="national"&&p.serving_size_g&&<div style={{fontSize:11,color:C.accent,fontFamily:"monospace"}}>
+              {t("food_portion_approx").replace("{n}",p.serving_size_g)}</div>}
             <div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginTop:4}}>
               {t("u_prot")}{p.protein}{t("u_g")} · {t("u_fat")}{p.fat}{t("u_g")} · {t("u_carb")}{p.carbs}{t("u_g")}
             </div>
@@ -11083,6 +11257,7 @@ export default function App(){
     if(screen==="leaderboard")return <LeaderboardScreen tgId={tgId} onBack={goBack}/>;
     if(screen==="gamification")return <GamificationScreen tgId={tgId} onBack={goBack} user={user}/>;
     if(screen==="food_search")return <FoodSearchScreen tgId={tgId} onBack={goBack} onNav={handleNav} mealType={p.meal_type}/>;
+    if(screen==="label_scan")return <LabelScanScreen tgId={tgId} onBack={goBack} onNav={handleNav} mealType={p.meal_type}/>;
     if(screen==="nutrition")return <NutritionScreen tgId={tgId} onBack={goBack} onNav={handleNav}/>;
     if(screen==="food_guide")return <FoodGuideScreen onBack={goBack}/>;
     if(screen==="measurements")return <MeasurementsScreen onBack={goBack} tgId={tgId}/>;
