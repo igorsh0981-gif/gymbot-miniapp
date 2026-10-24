@@ -75,9 +75,9 @@ function json(route, body, status = 200) {
   return route.fulfill({ status, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify(body) });
 }
 
-async function setup(page, { lang = "ru", setFails = false, curIdx = 0, tab = "workout", screen = "active_workout", swr = null, liteSaved = false, quota = 0, platform = null, net = { setMode: "ok", setBodies: [], counts: {} } } = {}) {
+async function setup(page, { lang = "ru", setFails = false, curIdx = 0, tab = "workout", screen = "active_workout", params = {}, swr = null, liteSaved = false, quota = 0, platform = null, net = { setMode: "ok", setBodies: [], counts: {} } } = {}) {
   if (setFails) net.setMode = "fail500";
-  await page.addInitScript(({ saved, lang, tab, screen, swr, quota, platform }) => {
+  await page.addInitScript(({ saved, lang, tab, screen, params, swr, quota, platform }) => {
     if (platform) window.__platform = platform;
     if (quota) {
       // Имитация переполненного хранилища: считаем только записи кэша
@@ -93,9 +93,9 @@ async function setup(page, { lang = "ru", setFails = false, curIdx = 0, tab = "w
     }
     if (saved) localStorage.setItem("gymbot_active_workout", JSON.stringify(saved));
     localStorage.setItem("gymbot_lang", lang);
-    history.replaceState({ _g: true, tab, screen, params: {} }, "");
+    history.replaceState({ _g: true, tab, screen, params }, "");
     if (swr) for (const [k, v] of Object.entries(swr)) localStorage.setItem("gymbot_swr:" + k, JSON.stringify({ t: Date.now(), d: v }));
-  }, { saved: tab === "workout" ? savedWorkout(curIdx, liteSaved) : null, lang, tab, screen, swr, quota, platform });
+  }, { saved: tab === "workout" ? savedWorkout(curIdx, liteSaved) : null, lang, tab, screen, params, swr, quota, platform });
   await page.route("**/*", async (route) => {
     const req = route.request();
     const url = new URL(req.url());
@@ -173,6 +173,26 @@ async function setup(page, { lang = "ru", setFails = false, curIdx = 0, tab = "w
         return json(route, { found: false });
       }
       if (p === `/food/quota/${TG_ID}`) return json(route, net.foodQuota || { used: 0, limit: 10 });
+      if (p.startsWith(`/nutrition/${TG_ID}`) && req.method() === "GET") {
+        (net.nutr = net.nutr || []).push(p.replace(String(TG_ID), "{tg}") + url.search);
+        return json(route, { tdee: 2500, target_kcal: 2500, water_norm_glasses: 8, today_logs: [], logs: [],
+                             today_totals: { kcal: 0, protein: 0, fat: 0, carb: 0 }, totals: { kcal: 0, protein: 0, fat: 0, carb: 0 } });
+      }
+      if (p === "/workout/77/finish") {
+        (net.finishBodies = net.finishBodies || []).push(JSON.parse(req.postData() || "{}"));
+        return json(route, net.finishEmpty ? { ok: true, empty: true, streak_days: 0, new_streak_rewards: [] } : { ok: true, streak_days: 1, new_streak_rewards: [] });
+      }
+      if (p === "/ai/ask-stream") {
+        (net.aiCalls = net.aiCalls || []).push("stream");
+        if (net.streamFail) return json(route, { detail: "boom" }, 500);
+        const ev = (o) => `data: ${JSON.stringify(o)}\n\n`;
+        return route.fulfill({ status: 200, contentType: "text/event-stream", headers: { "access-control-allow-origin": "*" },
+          body: ev({ type: "delta", text: "Хорошая работа: " }) + ev({ type: "delta", text: "жим прибавил 2,5 кг." }) + ev({ type: "done", answer: "Хорошая работа: жим прибавил 2,5 кг." }) });
+      }
+      if (p === "/ai/ask") { (net.aiCalls = net.aiCalls || []).push("ask"); return json(route, { answer: "Запасной разбор тренировки." }); }
+      if (p === "/workout/77/ai-review") { (net.saved = net.saved || []).push(url.searchParams.get("review")); return json(route, { ok: true }); }
+      if (p === "/workout/555") return json(route, { id: 555, date: "2026-10-23T20:00:00", status: "finished", total_volume: 600,
+        exercises: [{ name: "Жим штанги лёжа", sets: [{ set_number: 1, weight: 60, reps: 10, rpe: null }] }] });
       if (p === "/food/analyze") {
         (net.analyze = net.analyze || []).push(1);
         if (net.foodLimit) return json(route, { detail: { code: "food_limit", used: 10, limit: 10 } }, 429);
@@ -198,6 +218,7 @@ async function scenario(name, vp, opts, act) {
   opts = { ...opts, net: opts.net || { setMode: opts.setFails ? "fail500" : "ok", setBodies: [], counts: {} } };
   const ctx = await browser.newContext({ viewport: { width: vp.width, height: vp.height }, deviceScaleFactor: 2, isMobile: true, hasTouch: true, locale: "ru-RU", timezoneId: "Asia/Tashkent" });
   const page = await ctx.newPage();
+  if (opts.clock) await page.clock.setSystemTime(new Date(opts.clock));
   const errors = [];
   page.on("pageerror", (e) => errors.push(String(e)));
   page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
@@ -430,6 +451,45 @@ await scenario("30_new_workout_during_slow_check", VIEWPORTS[1], { net: { setMod
   await page.waitForTimeout(3500);
   const ls = await page.evaluate(() => JSON.parse(localStorage.getItem("gymbot_active_workout") || "null"));
   return { notice: await page.getByText(/Прошлая тренировка уже завершена/).count(), localWorkoutId: ls?.workoutId ?? null };
+});
+
+// Ночь по Ташкенту: 01:30 24.10 = 20:30 UTC 23.10. «Сегодня» — 24-е, шаг назад — 23-е.
+// Раньше дневник жил по UTC: в это время «сегодня» было 23-м, а «вчера» — 22-м.
+await scenario("32_nutrition_tashkent_night", VIEWPORTS[1], { tab: "menu", screen: "nutrition", clock: "2026-10-23T20:30:00Z" }, async (page, net) => {
+  await page.getByText("СЕГОДНЯ", { exact: true }).waitFor({ timeout: 5000 });
+  await page.getByRole("button", { name: "‹" }).click();
+  await page.waitForTimeout(500);
+  const dayLabel = await page.getByText(/23 окт/).count();
+  await page.getByRole("button", { name: "›" }).click();
+  await page.waitForTimeout(500);
+  return { reqs: net.nutr || [], dayLabel };
+});
+
+// Подходы прошлой тренировки на английском; дата — по Ташкенту (в базе 20:00 UTC 23.10)
+await scenario("33_workout_detail_en", VIEWPORTS[1], { lang: "en", tab: "menu", screen: "workout_detail", params: { workoutId: 555 } }, async (page) => {
+  await page.getByText(/Жим штанги лёжа/).waitFor({ timeout: 5000 });
+  await page.waitForTimeout(600);
+  return { nameEn: await page.getByText("1. Жим штанги лёжа (en)").count(), date: await page.getByText(/October 24, 2026/).count() };
+});
+
+// Разбор тренера на экране завершения — потоком; если поток не завёлся — обычным запросом
+for (const [name, streamFail] of [["34_finish_review_stream", false], ["35_finish_review_fallback", true]]) {
+  await scenario(name, VIEWPORTS[1], { net: { setMode: "ok", setBodies: [], counts: {}, streamFail } }, async (page, net) => {
+    await page.getByText("ПОДХОД 2 / 4").waitFor({ timeout: 5000 });
+    await page.getByRole("button", { name: "ЗАВЕРШИТЬ", exact: true }).first().click();
+    await page.getByText(streamFail ? "Запасной разбор тренировки." : "Хорошая работа: жим прибавил 2,5 кг.").waitFor({ timeout: 5000 });
+    await page.waitForTimeout(400);
+    return { aiCalls: net.aiCalls || [], saved: net.saved || [], cursor: await page.getByText("▍").count() };
+  });
+}
+
+// Сервер сказал «пустая» — без разбора тренера, с пояснением
+await scenario("36_finish_empty_workout", VIEWPORTS[1], { net: { setMode: "ok", setBodies: [], counts: {}, finishEmpty: true } }, async (page, net) => {
+  await page.getByText("ПОДХОД 2 / 4").waitFor({ timeout: 5000 });
+  await page.getByRole("button", { name: "ЗАВЕРШИТЬ", exact: true }).first().click();
+  await page.getByText(/тренировка не засчитана/).waitFor({ timeout: 5000 });
+  await page.waitForTimeout(400);
+  return { aiCalls: net.aiCalls || [], body: (net.finishBodies || [])[0] || null, analyzing: await page.getByText(/АНАЛИЗИРУЕТ/).count() };
 });
 
 await browser.close();

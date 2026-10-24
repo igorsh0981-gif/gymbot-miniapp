@@ -41,6 +41,15 @@ export const CHECKS = {
                                        (r.keys || []).includes("/home/123456789") ? [] : ["главный экран не записан"]),
   // закрытая на сервере тренировка
   "26_closed_elsewhere": r => all(eq("пояснение", r.notice, 1), eq("локальная копия", r.localWorkoutId, null), eq("экран подхода", r.setScreen, 0)),
+  // сутки по Ташкенту в дневнике питания
+  "32_nutrition_tashkent_night": r => all(eq("запросы", r.reqs, ["/nutrition/{tg}", "/nutrition/{tg}/history?date=2026-10-23", "/nutrition/{tg}"]),
+                                          eq("подпись вчера", r.dayLabel, 1)),
+  // названия упражнений в истории — на языке приложения, дата — местная
+  "33_workout_detail_en": r => all(eq("название", r.nameEn, 1), eq("дата", r.date, 1)),
+  // разбор тренера потоком; запасной путь — обычный запрос, разбор сохраняется один раз
+  "34_finish_review_stream": r => all(eq("запросы", r.aiCalls, ["stream"]), eq("сохранён", r.saved, ["Хорошая работа: жим прибавил 2,5 кг."]), eq("курсор убран", r.cursor, 0)),
+  "35_finish_review_fallback": r => all(eq("запросы", r.aiCalls, ["stream", "ask"]), eq("сохранён", r.saved, ["Запасной разбор тренировки."])),
+  "36_finish_empty_workout": r => all(eq("разбор не запрашивали", r.aiCalls, []), eq("флаг очереди", r.body?.has_unsent, false), eq("нет «анализирую»", r.analyzing, 0)),
   "30_new_workout_during_slow_check": r => all(eq("пояснение", r.notice, 0), r.localWorkoutId ? [] : ["новая тренировка стёрта"]),
   // без связи при первом запуске — не экран согласия
   "27_offline_first_start": r => all(eq("экран связи", r.offlineShown, 1), eq("экран согласия", r.consent, 0), eq("восстановилось", r.recovered, 1)),
