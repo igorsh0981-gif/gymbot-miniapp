@@ -50,6 +50,9 @@ window.Telegram={WebApp:{
   initDataUnsafe:{user:{id:${TG_ID},first_name:"Игорь",language_code:"ru"}},
   version:"8.0", platform:(window.__platform||"android"), colorScheme:"dark", themeParams:{},
   isVersionAtLeast:v=>true, ready(){}, expand(){}, close(){}, sendData(){}, openLink(){}, openTelegramLink(){},
+  openInvoice(url,cb){(window.__tgCalls=window.__tgCalls||[]).push(["openInvoice",url]);setTimeout(()=>cb&&cb(window.__invoiceStatus||"paid"),50)},
+  shareToStory(url,opts){(window.__tgCalls=window.__tgCalls||[]).push(["shareToStory",url,opts||null])},
+  shareMessage(id,cb){(window.__tgCalls=window.__tgCalls||[]).push(["shareMessage",id]);cb&&cb(true)},
   onEvent(){}, offEvent(){}, setHeaderColor(){}, setBackgroundColor(){}, enableClosingConfirmation(){}, disableClosingConfirmation(){},
   HapticFeedback:{impactOccurred(s){(window.__haptics=window.__haptics||[]).push("impact:"+s)},notificationOccurred(t){(window.__haptics=window.__haptics||[]).push("notify:"+t)},selectionChanged(){(window.__haptics=window.__haptics||[]).push("select")}},
   BackButton:{isVisible:false,_h:[],onClick(f){this._h.push(f)},offClick(f){this._h=this._h.filter(x=>x!==f)},show(){this.isVisible=true},hide(){this.isVisible=false}},
@@ -197,6 +200,28 @@ async function setup(page, { lang = "ru", setFails = false, curIdx = 0, tab = "w
         (net.analyze = net.analyze || []).push(1);
         if (net.foodLimit) return json(route, { detail: { code: "food_limit", used: 10, limit: 10 } }, 429);
         return json(route, { ok: true, dish_name: "Плов", weight_g: 300, calories: 600, protein_g: 20, fat_g: 25, carbs_g: 70, confidence: "high", note: null, quota: { used: 4, limit: 10 } });
+      }
+      if (p === `/premium/${TG_ID}`) {
+        if (!net.premium) return json(route, {});
+        const until = new Date(Date.now() + 31 * 86400000).toISOString().slice(0, 19);
+        if (net.premInvoice) return json(route, { ...net.premium, active: true, source: "paid", until, trial_available: false });
+        return json(route, net.premium);
+      }
+      if (p === `/premium/${TG_ID}/invoice`) {
+        net.premInvoice = JSON.parse(req.postData() || "{}").plan;
+        return json(route, { url: "https://t.me/$invoice-" + net.premInvoice, plan: net.premInvoice, stars: 199 });
+      }
+      if (p === `/premium/${TG_ID}/trial`) {
+        (net.trials = net.trials || []).push(1);
+        return json(route, { ...net.premium, active: true, source: "trial", until: "2026-10-31T10:00:00", trial_available: false });
+      }
+      const sm = p.match(/^\/share\/\d+\/workout\/(\d+)(\/prepared|\/send)?$/);
+      if (sm) {
+        (net.share = net.share || []).push((sm[2] || "/card").slice(1) + ":" + sm[1]);
+        if (sm[2] === "/prepared") return json(route, { id: "prep-1" });
+        if (sm[2] === "/send") return json(route, { ok: true });
+        return json(route, { story_url: "https://api.test/api/share/img/77.story.ru.1.x.jpg", post_url: "https://api.test/p.jpg",
+          thumb_url: "https://api.test/t.jpg", link: "https://t.me/GYMASH_bot?start=ref_ABC", caption: "💪", story_text: "Грудь 💪 t.me/GYMASH_bot", has_record: true });
       }
       if (p.startsWith("/custom-exercises")) return json(route, { exercises: [] });
       if (p.startsWith("/workout/") && p.endsWith("/state")) return json(route, { ok: true });
@@ -490,6 +515,53 @@ await scenario("36_finish_empty_workout", VIEWPORTS[1], { net: { setMode: "ok", 
   await page.getByText(/тренировка не засчитана/).waitFor({ timeout: 5000 });
   await page.waitForTimeout(400);
   return { aiCalls: net.aiCalls || [], body: (net.finishBodies || [])[0] || null, analyzing: await page.getByText(/АНАЛИЗИРУЕТ/).count() };
+});
+
+// ── Premium и карточка тренировки ──
+const PREMIUM = { enabled: true, visible: true, active: false, until: null, source: null, trial_available: true, trial_days: 7,
+  subscription: null, plans: [{ id: "month", stars: 199, days: 30, recurring: true }, { id: "year", stars: 1290, days: 365, recurring: false }],
+  perks: { ai_free: 5, ai_premium: 30, food_free: 10, food_premium: 20 } };
+await scenario("37_premium_buy_month", VIEWPORTS[1], { tab: "menu", screen: "premium", net: { setMode: "ok", setBodies: [], counts: {}, premium: PREMIUM } }, async (page, net) => {
+  await page.getByText("GymBot Premium").waitFor({ timeout: 5000 });
+  const save = await page.getByText(/выгода 46%/).count();
+  await page.getByRole("button", { name: /оформить за 199/i }).click();
+  await page.getByText(/Premium включён до/).waitFor({ timeout: 6000 });
+  return { plan: net.premInvoice, calls: await page.evaluate(() => window.__tgCalls || []), save, perks: await page.getByText("30 вопросов тренеру в день").count() };
+});
+await scenario("38_premium_trial", VIEWPORTS[1], { tab: "menu", screen: "premium", net: { setMode: "ok", setBodies: [], counts: {}, premium: PREMIUM } }, async (page, net) => {
+  await page.getByRole("button", { name: /попробовать 7 дн/i }).click();
+  await page.getByText(/Пробный Premium до/).first().waitFor({ timeout: 4000 });
+  return { trials: (net.trials || []).length, trialBtn: await page.getByRole("button", { name: /попробовать/i }).count() };
+});
+await scenario("39_finish_share", VIEWPORTS[1], {}, async (page, net) => {
+  await page.getByText("ПОДХОД 2 / 4").waitFor({ timeout: 5000 });
+  await page.getByRole("button", { name: "ЗАВЕРШИТЬ", exact: true }).first().click();
+  await page.getByText("ПОДЕЛИТЬСЯ").waitFor({ timeout: 5000 });
+  await page.getByRole("button", { name: /в историю/i }).click();
+  await page.waitForTimeout(300);
+  await page.getByRole("button", { name: /в чат/i }).click();
+  await page.waitForTimeout(300);
+  return { share: net.share || [], calls: await page.evaluate(() => window.__tgCalls || []) };
+});
+await scenario("40_premium_entry_points", VIEWPORTS[1], { tab: "menu", screen: "food_vision", net: { setMode: "ok", setBodies: [], counts: {}, home: HOME, foodQuota: { used: 10, limit: 10 }, foodLimit: true, premium: PREMIUM } }, async (page, net) => {
+  await page.locator('input[type="file"]').setInputFiles(path.join(ROOT, "fixtures/photo.jpg"));
+  await page.getByRole("button", { name: /ГОТОВО/ }).click();
+  await page.getByRole("button", { name: /АНАЛИЗИРОВАТЬ/ }).click();
+  await page.getByText("С Premium — 20 фото еды в день").waitFor({ timeout: 4000 });
+  await page.getByText("С Premium — 20 фото еды в день").click();
+  await page.getByText("GymBot Premium").waitFor({ timeout: 4000 });
+  return { nudge: 1, opened: 1 };
+});
+await scenario("41_workout_detail_share_old_client", VIEWPORTS[1], { tab: "menu", screen: "workout_detail", params: { workoutId: 555 } }, async (page, net) => {
+  await page.evaluate(() => { window.Telegram.WebApp.isVersionAtLeast = v => parseFloat(v) <= 7.0; });
+  await page.getByRole("button", { name: /в чат/i }).click();
+  await page.getByText(/Карточка в чате с ботом/).waitFor({ timeout: 4000 });
+  return { share: net.share || [], calls: await page.evaluate(() => window.__tgCalls || []) };
+});
+await scenario("42_story_on_desktop_goes_to_bot", VIEWPORTS[1], { tab: "menu", screen: "workout_detail", params: { workoutId: 555 }, platform: "tdesktop" }, async (page, net) => {
+  await page.getByRole("button", { name: /в историю/i }).click();
+  await page.getByText(/Карточка в чате с ботом/).waitFor({ timeout: 4000 });
+  return { share: net.share || [], calls: await page.evaluate(() => window.__tgCalls || []) };
 });
 
 await browser.close();
