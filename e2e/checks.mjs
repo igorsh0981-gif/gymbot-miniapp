@@ -89,4 +89,8 @@ export const CHECKS = {
   "53_program_start_day": r => all(eq("повторы в секундах", r.reps, 1), eq("нет в каталоге", r.missing, 1), eq("подпись состава", r.hint, 1),
                                    eq("старт с днём", r.start && [r.start.program_day, r.start.exercise_ids], [1, [101]])),
   "54_program_locked": r => all(eq("на Premium", r.toPremium, 1), eq("стартов", r.starts, 0)),
+  // друзья, лента, команды
+  "55_social_accept_invite": r => all(eq("принят код", r.accepts, ["ANNA0002"]), eq("друг в списке", r.friendRow, 1), eq("приватность", r.privacy, 1)),
+  "56_social_feed_like": r => all(eq("отметка", r.likes, [901]), eq("ещё упражнения", r.more, 1), eq("сводка", r.meta, 1), eq("свои — «Вы»", r.you > 0 ? 1 : 0, 1)),
+  "57_team_join_board": r => all(eq("вступление", r.joins, ["TEAM0007"]), eq("владелец", r.owner, 1), eq("позвать", r.invite, 1)),
 };

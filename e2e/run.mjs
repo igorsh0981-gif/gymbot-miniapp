@@ -246,6 +246,18 @@ async function setup(page, { lang = "ru", setFails = false, curIdx = 0, tab = "w
         (net.starts = net.starts || []).push(JSON.parse(req.postData() || "{}"));
         return json(route, { workout_id: 77 });
       }
+      if (p === `/social/${TG_ID}`) return json(route, net.social || { code: "IGOR0001", invite_link: "https://t.me/GYMASH_bot/gymapp?startapp=fr_IGOR0001", share_workouts: true, friends: [], teams: [] });
+      if (p === `/social/${TG_ID}/friends/accept`) {
+        (net.accepts = net.accepts || []).push(JSON.parse(req.postData() || "{}").code);
+        return json(route, { ok: true, already: false, friend: { id: 2, name: "Анна" } });
+      }
+      if (p === `/social/${TG_ID}/teams/join`) {
+        (net.joins = net.joins || []).push(JSON.parse(req.postData() || "{}").code);
+        return json(route, { ok: true, already: false, team: (net.social?.teams || [])[0] });
+      }
+      if (p === `/social/${TG_ID}/feed`) return json(route, net.feed || { items: [], next_before: null });
+      const lm = p.match(/^\/social\/\d+\/feed\/(\d+)\/like$/);
+      if (lm) { (net.likes = net.likes || []).push(+lm[1]); return json(route, { ok: true, liked: true, likes: 3 }); }
       if (p === `/programs/${TG_ID}`) return json(route, net.programs || { programs: [], active: null });
       if (p.startsWith(`/programs/${TG_ID}/`) && p.endsWith("/start") && req.method() === "POST") {
         (net.progStart = net.progStart || []).push(p);
@@ -706,6 +718,40 @@ await scenario("54_program_locked", VIEWPORTS[1], { tab: "menu", screen: "progra
   await page.getByRole("button", { name: /Открыть с Premium/ }).click();
   await page.getByText("GymBot Premium").waitFor({ timeout: 4000 });
   return { toPremium: 1, starts: (net.progStart || []).length };
+});
+const TEAM = { id: 7, name: "Зал №1", code: "TEAM0007", invite_link: "https://t.me/GYMASH_bot/gymapp?startapp=tm_TEAM0007", is_owner: false,
+  members: 3, week_total: 7, last_week_total: 9, my_place: 2,
+  board: [ { id: 2, name: "Анна", is_me: false, is_owner: true, week: 4, last_week: 3, place: 1 },
+           { id: 1, name: "Игорь", is_me: true, is_owner: false, week: 2, last_week: 4, place: 2 },
+           { id: 3, name: "Борис", is_me: false, is_owner: false, week: 1, last_week: 2, place: 3 } ] };
+const SOCIAL = { code: "IGOR0001", invite_link: "https://t.me/GYMASH_bot/gymapp?startapp=fr_IGOR0001", share_workouts: true,
+  friends: [ { id: 2, name: "Анна", week: 4, last_workout_at: "2026-10-24T08:00:00" } ], teams: [TEAM] };
+const FEED = { next_before: null, items: [
+  { workout_id: 901, user_id: 2, is_me: false, name: "Анна", date: "2026-10-24T08:00:00", duration_min: 50, volume: 4200,
+    exercises: ["Жим штанги лёжа", "Приседания со штангой"], exercises_count: 5, sets: 15,
+    records: [{ exercise: "Жим штанги лёжа", weight: 60, prev: 55 }], likes: 2, liked: false },
+  { workout_id: 900, user_id: 1, is_me: true, name: "Игорь", date: "2026-10-23T08:00:00", duration_min: 0, volume: 0,
+    exercises: ["Планка"], exercises_count: 1, sets: 3, records: [], likes: 0, liked: false } ] };
+await scenario("55_social_accept_invite", VIEWPORTS[1], { tab: "menu", screen: "social", params: { accept: "ANNA0002" },
+  net: { setMode: "ok", setBodies: [], counts: {}, social: SOCIAL, feed: FEED } }, async (page, net) => {
+  await page.getByText("Вы теперь друзья с Анна").waitFor({ timeout: 5000 });
+  return { accepts: net.accepts || [], friendRow: await page.getByText("4 трен. на этой неделе").count(),
+           privacy: await page.getByText("Показывать мои тренировки друзьям").count() };
+});
+await scenario("56_social_feed_like", VIEWPORTS[0], { tab: "menu", screen: "social",
+  net: { setMode: "ok", setBodies: [], counts: {}, social: SOCIAL, feed: FEED } }, async (page, net) => {
+  await page.getByText(/Рекорд: Жим штанги лёжа — 60 кг \(было 55\)/).waitFor({ timeout: 5000 });
+  const more = await page.getByText(/\+3/).count();
+  const meta = await page.getByText(/15 подх\. · 4,2 т · 50 мин/).count();
+  await page.getByRole("button", { name: /👏 2/ }).click();
+  await page.getByRole("button", { name: /👏 3/ }).waitFor({ timeout: 3000 });
+  return { likes: net.likes || [], more: more > 0 ? 1 : 0, meta, you: await page.getByText("Вы", { exact: true }).count() };
+});
+await scenario("57_team_join_board", VIEWPORTS[1], { tab: "menu", screen: "social", params: { join: "TEAM0007" },
+  net: { setMode: "ok", setBodies: [], counts: {}, social: SOCIAL, feed: FEED } }, async (page, net) => {
+  await page.getByText("Вы в команде «Зал №1»").waitFor({ timeout: 5000 });
+  await page.getByText("РЕЙТИНГ НЕДЕЛИ").waitFor({ timeout: 4000 });
+  return { joins: net.joins || [], owner: await page.getByText("владелец").count(), invite: await page.getByRole("button", { name: /Позвать в команду/ }).count() };
 });
 
 await browser.close();

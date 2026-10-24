@@ -476,6 +476,7 @@ const T = {
     workout_closed_elsewhere:"Прошлая тренировка уже завершена — на другом устройстве или автоматически. Можно начать новую.",
     finish_workout:"ЗАВЕРШИТЬ", workout_empty_note:"Ни одного подхода не записано — тренировка не засчитана и в историю не попала.", set_done:"✓ ПОДХОД ВЫПОЛНЕН", set_done_label:"ПОДХОД ВЫПОЛНЕН",
     premium_menu:"Premium", premium_kicker:"PREMIUM", premium_title:"GymBot Premium", premium_lead:"Больше вопросов тренеру и распознаваний еды — и поддержка развития GymBot.", premium_active_until:"Premium активен до {date}", premium_trial_until:"Пробный Premium до {date}", premium_manual:"Premium активен", premium_perk_ai:"{n} вопросов тренеру в день", premium_perk_food:"{n} фото еды в день", premium_perk_now:"без Premium — {n}", premium_perk_support:"Новые функции быстрее: вы поддерживаете развитие приложения", premium_month:"Месяц", premium_year:"Год", premium_month_note:"продлевается каждые 30 дней, выключить можно в любой момент", premium_year_note:"разовая оплата на 365 дней", premium_save:"выгода {n}%", premium_buy:"Оформить за {n} ⭐", premium_extend:"Продлить за {n} ⭐", premium_trial_btn:"Попробовать {n} дн. бесплатно", premium_renews:"Подписка продлится {date}", premium_renew_off:"Автопродление выключено — Premium до {date}", premium_cancel_btn:"Выключить автопродление", premium_resume_btn:"Включить автопродление", premium_paid_wait:"Оплата прошла — включаем Premium…", premium_paid_ok:"Premium включён до {date}. Спасибо!", premium_paid_late:"Оплата прошла. Premium включится в течение нескольких минут — бот пришлёт сообщение.", premium_failed:"Оплата не прошла. Попробуйте ещё раз.", premium_error:"Не получилось открыть оплату. Попробуйте позже.", premium_already_sub:"Подписка уже оформлена.", premium_note:"Оплата звёздами Telegram. Автопродление можно выключить здесь или в Telegram: Настройки → Мои звёзды. Вопросы по оплате — команда /paysupport в боте.", premium_nudge_ai:"С Premium — {n} вопросов тренеру в день", premium_nudge_food:"С Premium — {n} фото еды в день", premium_nudge_btn:"Подробнее", share_kicker:"ПОДЕЛИТЬСЯ", share_story:"В историю", share_chat:"В чат", share_preparing:"Готовлю карточку…", share_sent_bot:"Карточка в чате с ботом — перешлите её друзьям", share_error:"Не получилось подготовить карточку. Попробуйте ещё раз.",
+    soc_menu:"Друзья и команды", soc_kicker:"СООБЩЕСТВО", soc_title:"Друзья и команды", tab_feed:"Лента", tab_friends:"Друзья", tab_teams:"Команды", soc_invite_title:"Позовите друзей", soc_invite_hint:"Друзья видят тренировки и рекорды друг друга и ставят 👏. Вес, питание и здоровье не показываются никогда.", soc_invite_btn:"Пригласить друга", soc_copy:"Скопировать ссылку", soc_copied:"Ссылка скопирована", soc_share_text:"Тренируемся вместе в GymBot 💪", soc_privacy:"Показывать мои тренировки друзьям", soc_friends_empty:"Пока нет друзей — отправьте приглашение.", soc_week_n:"{n} трен. на этой неделе", soc_remove:"Удалить", soc_remove_confirm:"Удалить {name} из друзей?", soc_feed_empty:"Здесь будут ваши тренировки и тренировки друзей.", soc_you:"Вы", soc_sets:"{n} подх.", soc_tonnage:"{n} т", soc_min:"{n} мин", soc_record:"Рекорд: {ex} — {w} кг (было {p})", soc_more:"Показать ещё", soc_accepted:"Вы теперь друзья с {name}", soc_already:"{name} уже у вас в друзьях", soc_bad_code:"Ссылка устарела или неверная", soc_own_code:"Это ваша собственная ссылка 🙂", soc_teams_empty:"Команд пока нет. Создайте свою или вступите по коду.", soc_team_create:"Создать команду", soc_team_name:"Название команды", soc_team_join:"Вступить по коду", soc_team_code:"Код команды", soc_team_members:"{n} участн.", soc_team_week:"За неделю: {n} трен.", soc_team_place:"Ваше место: {n}", soc_team_invite:"Позвать в команду", soc_team_leave:"Выйти из команды", soc_team_leave_confirm:"Выйти из команды «{name}»?", soc_team_rename:"Переименовать", soc_team_joined:"Вы в команде «{name}»", soc_team_full:"В команде уже 50 человек", soc_too_many_teams:"Можно состоять не больше чем в 5 командах", soc_board_title:"РЕЙТИНГ НЕДЕЛИ", soc_board_hint:"Считаются завершённые тренировки с понедельника", soc_last_week:"прошлая: {n}", soc_owner:"владелец", soc_share_team_text:"Вступай в нашу команду «{name}» в GymBot 💪", soc_remove_member:"Убрать", soc_remove_member_confirm:"Убрать {name} из команды?",
     prog_menu:"Программы тренировок", prog_kicker:"ПРОГРАММЫ", prog_title:"Программы тренировок", prog_lead:"Готовые планы на несколько недель: что делать в каждый день, сколько подходов и повторов.", prog_meta:"{d} трен. в неделю · {w} нед.", prog_active:"ВАША ПРОГРАММА", prog_progress:"Тренировка {n} из {t}", prog_next:"Следующая: {day}", prog_start_day:"Начать: {day}", prog_start:"Начать программу", prog_replace_confirm:"Сейчас идёт «{cur}». Начать новую программу вместо неё?", prog_stop:"Остановить программу", prog_stop_confirm:"Остановить программу? Сделанные тренировки останутся в истории.", prog_unlock:"Открыть с Premium", prog_tip:"СОВЕТ", prog_days:"ДНИ ПРОГРАММЫ", prog_rest_s:"отдых {n} с", prog_rest_m:"отдых {n} мин", prog_reps_max:"макс.", prog_sec:"с", prog_finished:"Программа пройдена! Выберите следующую.", prog_free:"Бесплатно", prog_week:"неделя {n}", prog_not_in_catalog:"нет в каталоге", prog_is_active:"Программа идёт", prog_all:"Все программы", prog_open:"Открыть",
     fcat_national:"Местная кухня", label_scan_btn:"Сканировать этикетку", fv_mode_dish:"Блюдо", fv_mode_label:"Этикетка", label_kicker:"СКАНЕР ЭТИКЕТОК", label_title:"Фото этикетки", label_hint:"Сфотографируйте таблицу пищевой ценности на упаковке — заполним КБЖУ на 100 г, а продукт сохраним в справочник.", label_photo_btn:"Сфотографировать этикетку", label_read_btn:"Распознать", label_reading:"ЧИТАЮ ЭТИКЕТКУ…", label_not_found:"На фото не видно таблицы пищевой ценности. Сфотографируйте её ближе и ровнее.", label_failed:"Не получилось прочитать этикетку. Попробуйте ещё раз.", label_name:"Название", label_brand:"Бренд", label_per100:"На 100 г", label_low_conf:"Проверьте цифры: часть могла прочитаться неточно.", label_portion:"Сколько съели, г", label_pack_portion:"порция с упаковки", label_save_log:"Записать в дневник", label_save_only:"Только сохранить в справочник", label_saved_only:"Продукт сохранён — его можно найти в поиске.", label_total:"Итого на {w} г", food_portion_approx:"порция ~{n} г",
     str_e1rm:"расч. максимум", str_menu:"Силовые ранги", str_kicker:"СИЛА", str_title:"Силовые ранги", str_overall:"Общий ранг", str_stronger:"Сильнее ~{n}% тренирующихся", str_basis:"Оценка по силовым нормативам для вашего пола, веса тела и возраста. Максимум считается по лучшему подходу до 12 повторов (формула Эпли).", str_missing:"Чтобы посчитать ранги, укажите в профиле пол и вес.", str_btn_profile:"Заполнить профиль", str_to_next:"До уровня «{lvl}»: +{n} {u}", str_top:"Высший уровень — поздравляем!", str_community:"Среди пользователей GymBot: сильнее {n}% из {m}", str_untracked:"Ещё без ранга", str_untracked_hint:"Сделайте подход в любом из этих упражнений — ранг появится сам.", str_all:"Все ранги", str_from:"лучший подход {w} кг × {r}", str_from_reps:"лучший подход — {r} повт.", str_reps:"повт.", str_on:"по {n} упр.", str_empty:"Пока нет подходов в базовых упражнениях — ранги появятся после первой тренировки с ними.", str_lvl_start:"Старт", str_lvl_beginner:"Новичок", str_lvl_novice:"Начинающий", str_lvl_intermediate:"Средний", str_lvl_advanced:"Продвинутый", str_lvl_elite:"Элита",
@@ -1366,6 +1367,7 @@ const T = {
     workout_closed_elsewhere:"Your previous workout has already been finished — on another device or automatically. You can start a new one.",
     finish_workout:"FINISH", workout_empty_note:"No sets were logged, so this workout was not counted and is not in your history.", set_done:"✓ SET DONE", set_done_label:"SET DONE",
     premium_menu:"Premium", premium_kicker:"PREMIUM", premium_title:"GymBot Premium", premium_lead:"More coach questions and food recognitions — and you support GymBot's development.", premium_active_until:"Premium is active until {date}", premium_trial_until:"Premium trial until {date}", premium_manual:"Premium is active", premium_perk_ai:"{n} coach questions a day", premium_perk_food:"{n} food photos a day", premium_perk_now:"{n} without Premium", premium_perk_support:"New features sooner: you support the app's development", premium_month:"Month", premium_year:"Year", premium_month_note:"renews every 30 days, turn off any time", premium_year_note:"one-time payment for 365 days", premium_save:"save {n}%", premium_buy:"Get for {n} ⭐", premium_extend:"Extend for {n} ⭐", premium_trial_btn:"Try {n} days free", premium_renews:"Subscription renews on {date}", premium_renew_off:"Auto-renewal is off — Premium until {date}", premium_cancel_btn:"Turn off auto-renewal", premium_resume_btn:"Turn on auto-renewal", premium_paid_wait:"Payment received — turning Premium on…", premium_paid_ok:"Premium is on until {date}. Thank you!", premium_paid_late:"Payment received. Premium will turn on within a few minutes — the bot will message you.", premium_failed:"Payment failed. Please try again.", premium_error:"Couldn't open the payment. Please try later.", premium_already_sub:"You already have a subscription.", premium_note:"Paid with Telegram Stars. You can turn auto-renewal off here or in Telegram: Settings → My Stars. Payment questions — /paysupport in the bot.", premium_nudge_ai:"With Premium — {n} coach questions a day", premium_nudge_food:"With Premium — {n} food photos a day", premium_nudge_btn:"Learn more", share_kicker:"SHARE", share_story:"To story", share_chat:"To chat", share_preparing:"Preparing the card…", share_sent_bot:"The card is in your chat with the bot — forward it to friends", share_error:"Couldn't prepare the card. Please try again.",
+    soc_menu:"Friends & teams", soc_kicker:"COMMUNITY", soc_title:"Friends & teams", tab_feed:"Feed", tab_friends:"Friends", tab_teams:"Teams", soc_invite_title:"Invite friends", soc_invite_hint:"Friends see each other's workouts and records and give 👏. Weight, nutrition and health are never shown.", soc_invite_btn:"Invite a friend", soc_copy:"Copy link", soc_copied:"Link copied", soc_share_text:"Let's train together in GymBot 💪", soc_privacy:"Show my workouts to friends", soc_friends_empty:"No friends yet — send an invite.", soc_week_n:"{n} workouts this week", soc_remove:"Remove", soc_remove_confirm:"Remove {name} from friends?", soc_feed_empty:"Your and your friends' workouts will appear here.", soc_you:"You", soc_sets:"{n} sets", soc_tonnage:"{n} t", soc_min:"{n} min", soc_record:"Record: {ex} — {w} kg (was {p})", soc_more:"Show more", soc_accepted:"You and {name} are now friends", soc_already:"{name} is already your friend", soc_bad_code:"The link is outdated or invalid", soc_own_code:"That's your own link 🙂", soc_teams_empty:"No teams yet. Create one or join with a code.", soc_team_create:"Create team", soc_team_name:"Team name", soc_team_join:"Join with a code", soc_team_code:"Team code", soc_team_members:"{n} members", soc_team_week:"This week: {n} workouts", soc_team_place:"Your place: {n}", soc_team_invite:"Invite to team", soc_team_leave:"Leave team", soc_team_leave_confirm:"Leave «{name}»?", soc_team_rename:"Rename", soc_team_joined:"You're in «{name}»", soc_team_full:"The team already has 50 members", soc_too_many_teams:"You can be in at most 5 teams", soc_board_title:"WEEKLY RANKING", soc_board_hint:"Completed workouts since Monday", soc_last_week:"last: {n}", soc_owner:"owner", soc_share_team_text:"Join our team «{name}» in GymBot 💪", soc_remove_member:"Remove", soc_remove_member_confirm:"Remove {name} from the team?",
     prog_menu:"Training programs", prog_kicker:"PROGRAMS", prog_title:"Training programs", prog_lead:"Ready-made plans for several weeks: what to do each day, how many sets and reps.", prog_meta:"{d} workouts a week · {w} wk", prog_active:"YOUR PROGRAM", prog_progress:"Workout {n} of {t}", prog_next:"Next: {day}", prog_start_day:"Start: {day}", prog_start:"Start program", prog_replace_confirm:"You're on «{cur}». Start the new program instead?", prog_stop:"Stop program", prog_stop_confirm:"Stop the program? Completed workouts stay in your history.", prog_unlock:"Unlock with Premium", prog_tip:"TIP", prog_days:"PROGRAM DAYS", prog_rest_s:"rest {n} s", prog_rest_m:"rest {n} min", prog_reps_max:"max", prog_sec:"s", prog_finished:"Program complete! Choose the next one.", prog_free:"Free", prog_week:"week {n}", prog_not_in_catalog:"not in catalog", prog_is_active:"In progress", prog_all:"All programs", prog_open:"Open",
     fcat_national:"Local cuisine", label_scan_btn:"Scan a label", fv_mode_dish:"Dish", fv_mode_label:"Label", label_kicker:"LABEL SCANNER", label_title:"Label photo", label_hint:"Take a photo of the nutrition facts table on the package — we'll fill in the values per 100 g and save the product to the catalog.", label_photo_btn:"Photograph the label", label_read_btn:"Read label", label_reading:"READING THE LABEL…", label_not_found:"No nutrition table found in the photo. Take it closer and straighter.", label_failed:"Couldn't read the label. Please try again.", label_name:"Name", label_brand:"Brand", label_per100:"Per 100 g", label_low_conf:"Check the numbers: some may have been read inaccurately.", label_portion:"How much you ate, g", label_pack_portion:"package serving", label_save_log:"Add to diary", label_save_only:"Just save to catalog", label_saved_only:"Saved — you can find it in search.", label_total:"Total for {w} g", food_portion_approx:"serving ~{n} g",
     str_e1rm:"est. 1RM", str_menu:"Strength ranks", str_kicker:"STRENGTH", str_title:"Strength ranks", str_overall:"Overall rank", str_stronger:"Stronger than ~{n}% of lifters", str_basis:"Estimated from strength standards for your sex, body weight and age. The max is taken from your best set of up to 12 reps (Epley formula).", str_missing:"To calculate ranks, add your sex and weight in the profile.", str_btn_profile:"Complete profile", str_to_next:"To «{lvl}»: +{n} {u}", str_top:"Top level — congratulations!", str_community:"Among GymBot users: stronger than {n}% of {m}", str_untracked:"No rank yet", str_untracked_hint:"Do a set in any of these exercises and the rank will appear.", str_all:"All ranks", str_from:"best set {w} kg × {r}", str_from_reps:"best set — {r} reps", str_reps:"reps", str_on:"from {n} lifts", str_empty:"No sets in the main lifts yet — ranks will appear after your first workout with them.", str_lvl_start:"Start", str_lvl_beginner:"Beginner", str_lvl_novice:"Novice", str_lvl_intermediate:"Intermediate", str_lvl_advanced:"Advanced", str_lvl_elite:"Elite",
@@ -2252,6 +2254,7 @@ const T = {
     workout_closed_elsewhere:"Oldingi mashq allaqachon yakunlangan — boshqa qurilmada yoki avtomatik. Yangisini boshlashingiz mumkin.",
     finish_workout:"TUGATISH", workout_empty_note:"Birorta ham yondashuv yozilmadi — mashg‘ulot hisobga olinmadi va tarixga tushmadi.", set_done:"✓ YONDASHUV BAJARILDI", set_done_label:"YONDASHUV BAJARILDI",
     premium_menu:"Premium", premium_kicker:"PREMIUM", premium_title:"GymBot Premium", premium_lead:"Murabbiyga ko'proq savol va ovqatni ko'proq aniqlash — hamda GymBot rivojini qo'llab-quvvatlash.", premium_active_until:"Premium {date} gacha faol", premium_trial_until:"Sinov Premium {date} gacha", premium_manual:"Premium faol", premium_perk_ai:"Kuniga {n} ta murabbiy savoli", premium_perk_food:"Kuniga {n} ta ovqat surati", premium_perk_now:"Premium'siz — {n}", premium_perk_support:"Yangi imkoniyatlar tezroq: siz ilova rivojini qo'llab-quvvatlaysiz", premium_month:"Oy", premium_year:"Yil", premium_month_note:"har 30 kunda yangilanadi, istalgan vaqtda o'chirish mumkin", premium_year_note:"365 kunga bir martalik to'lov", premium_save:"{n}% tejash", premium_buy:"{n} ⭐ ga olish", premium_extend:"{n} ⭐ ga uzaytirish", premium_trial_btn:"{n} kun bepul sinab ko'rish", premium_renews:"Obuna {date} da yangilanadi", premium_renew_off:"Avto-yangilash o'chirilgan — Premium {date} gacha", premium_cancel_btn:"Avto-yangilashni o'chirish", premium_resume_btn:"Avto-yangilashni yoqish", premium_paid_wait:"To'lov o'tdi — Premium yoqilmoqda…", premium_paid_ok:"Premium {date} gacha yoqildi. Rahmat!", premium_paid_late:"To'lov o'tdi. Premium bir necha daqiqada yoqiladi — bot xabar yuboradi.", premium_failed:"To'lov o'tmadi. Qaytadan urinib ko'ring.", premium_error:"To'lovni ochib bo'lmadi. Keyinroq urinib ko'ring.", premium_already_sub:"Obuna allaqachon rasmiylashtirilgan.", premium_note:"Telegram yulduzlari bilan to'lov. Avto-yangilashni shu yerda yoki Telegram'da o'chirish mumkin: Sozlamalar → Mening yulduzlarim. To'lov bo'yicha savollar — botda /paysupport buyrug'i.", premium_nudge_ai:"Premium bilan — kuniga {n} ta murabbiy savoli", premium_nudge_food:"Premium bilan — kuniga {n} ta ovqat surati", premium_nudge_btn:"Batafsil", share_kicker:"ULASHISH", share_story:"Hikoyaga", share_chat:"Chatga", share_preparing:"Kartochka tayyorlanmoqda…", share_sent_bot:"Kartochka bot bilan chatda — uni do'stlaringizga yuboring", share_error:"Kartochkani tayyorlab bo'lmadi. Qaytadan urinib ko'ring.",
+    soc_menu:"Do'stlar va jamoalar", soc_kicker:"HAMJAMIYAT", soc_title:"Do'stlar va jamoalar", tab_feed:"Lenta", tab_friends:"Do'stlar", tab_teams:"Jamoalar", soc_invite_title:"Do'stlarni taklif qiling", soc_invite_hint:"Do'stlar bir-birining mashg'ulotlari va rekordlarini ko'radi va 👏 qo'yadi. Vazn, ovqatlanish va sog'liq hech qachon ko'rsatilmaydi.", soc_invite_btn:"Do'stni taklif qilish", soc_copy:"Havolani nusxalash", soc_copied:"Havola nusxalandi", soc_share_text:"GymBot'da birga shug'ullanamiz 💪", soc_privacy:"Mashg'ulotlarimni do'stlarga ko'rsatish", soc_friends_empty:"Hali do'stlar yo'q — taklif yuboring.", soc_week_n:"bu hafta {n} mashg'ulot", soc_remove:"O'chirish", soc_remove_confirm:"{name} do'stlardan o'chirilsinmi?", soc_feed_empty:"Bu yerda sizning va do'stlaringizning mashg'ulotlari bo'ladi.", soc_you:"Siz", soc_sets:"{n} yondashuv", soc_tonnage:"{n} t", soc_min:"{n} daq", soc_record:"Rekord: {ex} — {w} kg (avval {p})", soc_more:"Yana ko'rsatish", soc_accepted:"Siz endi {name} bilan do'stsiz", soc_already:"{name} allaqachon do'stingiz", soc_bad_code:"Havola eskirgan yoki noto'g'ri", soc_own_code:"Bu o'zingizning havolangiz 🙂", soc_teams_empty:"Hali jamoalar yo'q. O'zingiznikini yarating yoki kod orqali qo'shiling.", soc_team_create:"Jamoa yaratish", soc_team_name:"Jamoa nomi", soc_team_join:"Kod orqali qo'shilish", soc_team_code:"Jamoa kodi", soc_team_members:"{n} ishtirokchi", soc_team_week:"Bu hafta: {n} mashg'ulot", soc_team_place:"Sizning o'rningiz: {n}", soc_team_invite:"Jamoaga taklif qilish", soc_team_leave:"Jamoadan chiqish", soc_team_leave_confirm:"«{name}» jamoasidan chiqasizmi?", soc_team_rename:"Nomini o'zgartirish", soc_team_joined:"Siz «{name}» jamoasidasiz", soc_team_full:"Jamoada allaqachon 50 kishi bor", soc_too_many_teams:"Ko'pi bilan 5 ta jamoada bo'lish mumkin", soc_board_title:"HAFTA REYTINGI", soc_board_hint:"Dushanbadan beri tugatilgan mashg'ulotlar hisoblanadi", soc_last_week:"o'tgan: {n}", soc_owner:"egasi", soc_share_team_text:"GymBot'dagi «{name}» jamoamizga qo'shiling 💪", soc_remove_member:"Chiqarish", soc_remove_member_confirm:"{name} jamoadan chiqarilsinmi?",
     prog_menu:"Mashg'ulot dasturlari", prog_kicker:"DASTURLAR", prog_title:"Mashg'ulot dasturlari", prog_lead:"Bir necha haftalik tayyor rejalar: har kuni nima qilish, nechta yondashuv va takror.", prog_meta:"haftasiga {d} mashg'ulot · {w} hafta", prog_active:"SIZNING DASTURINGIZ", prog_progress:"{t} tadan {n}-mashg'ulot", prog_next:"Keyingisi: {day}", prog_start_day:"Boshlash: {day}", prog_start:"Dasturni boshlash", prog_replace_confirm:"Hozir «{cur}» davom etmoqda. Uning o'rniga yangi dasturni boshlaysizmi?", prog_stop:"Dasturni to'xtatish", prog_stop_confirm:"Dasturni to'xtatasizmi? Bajarilgan mashg'ulotlar tarixda qoladi.", prog_unlock:"Premium bilan ochish", prog_tip:"MASLAHAT", prog_days:"DASTUR KUNLARI", prog_rest_s:"dam {n} s", prog_rest_m:"dam {n} daq", prog_reps_max:"maks.", prog_sec:"s", prog_finished:"Dastur tugadi! Keyingisini tanlang.", prog_free:"Bepul", prog_week:"{n}-hafta", prog_not_in_catalog:"katalogda yo'q", prog_is_active:"Davom etmoqda", prog_all:"Barcha dasturlar", prog_open:"Ochish",
     fcat_national:"Milliy taomlar", label_scan_btn:"Yorliqni skanerlash", fv_mode_dish:"Taom", fv_mode_label:"Yorliq", label_kicker:"YORLIQ SKANERI", label_title:"Yorliq surati", label_hint:"Qadoqdagi ozuqaviy qiymat jadvalini suratga oling — 100 g dagi KBJU ni to'ldiramiz va mahsulotni ma'lumotnomaga saqlaymiz.", label_photo_btn:"Yorliqni suratga olish", label_read_btn:"Aniqlash", label_reading:"YORLIQ O'QILMOQDA…", label_not_found:"Suratda ozuqaviy qiymat jadvali ko'rinmayapti. Uni yaqinroq va to'g'riroq suratga oling.", label_failed:"Yorliqni o'qib bo'lmadi. Qaytadan urinib ko'ring.", label_name:"Nomi", label_brand:"Brend", label_per100:"100 g da", label_low_conf:"Raqamlarni tekshiring: ba'zilari noaniq o'qilgan bo'lishi mumkin.", label_portion:"Qancha yedingiz, g", label_pack_portion:"qadoqdagi porsiya", label_save_log:"Kundalikka yozish", label_save_only:"Faqat ma'lumotnomaga saqlash", label_saved_only:"Saqlandi — uni qidiruvda topish mumkin.", label_total:"{w} g uchun jami", food_portion_approx:"porsiya ~{n} g",
     str_e1rm:"taxminiy maksimum", str_menu:"Kuch darajalari", str_kicker:"KUCH", str_title:"Kuch darajalari", str_overall:"Umumiy daraja", str_stronger:"Shug'ullanuvchilarning ~{n}% idan kuchliroq", str_basis:"Jinsingiz, tana vazningiz va yoshingiz uchun kuch me'yorlari bo'yicha baho. Maksimum 12 tagacha takrorli eng yaxshi yondashuv bo'yicha hisoblanadi (Epli formulasi).", str_missing:"Darajalarni hisoblash uchun profilda jins va vazningizni kiriting.", str_btn_profile:"Profilni to'ldirish", str_to_next:"«{lvl}» darajasigacha: +{n} {u}", str_top:"Eng yuqori daraja — tabriklaymiz!", str_community:"GymBot foydalanuvchilari orasida: {m} kishidan {n}% idan kuchliroq", str_untracked:"Hali darajasiz", str_untracked_hint:"Ushbu mashqlardan birida yondashuv bajaring — daraja o'zi paydo bo'ladi.", str_all:"Barcha darajalar", str_from:"eng yaxshi yondashuv {w} kg × {r}", str_from_reps:"eng yaxshi yondashuv — {r} takror", str_reps:"takror", str_on:"{n} ta mashq bo'yicha", str_empty:"Asosiy mashqlarda hali yondashuvlar yo'q — ular bilan birinchi mashg'ulotdan keyin darajalar paydo bo'ladi.", str_lvl_start:"Start", str_lvl_beginner:"Yangi boshlovchi", str_lvl_novice:"Boshlang'ich", str_lvl_intermediate:"O'rta", str_lvl_advanced:"Ilg'or", str_lvl_elite:"Elita",
@@ -3138,6 +3141,7 @@ const T = {
     workout_closed_elsewhere:"Алдыңғы жаттығу аяқталған — басқа құрылғыда немесе автоматты түрде. Жаңасын бастауға болады.",
     finish_workout:"АЯҚТАУ", workout_empty_note:"Бірде-бір тәсіл жазылмады — жаттығу есептелмеді және тарихқа түспеді.", set_done:"✓ ТӘСІЛ ОРЫНДАЛДЫ", set_done_label:"ТӘСІЛ ОРЫНДАЛДЫ",
     premium_menu:"Premium", premium_kicker:"PREMIUM", premium_title:"GymBot Premium", premium_lead:"Жаттықтырушыға көбірек сұрақ және тамақты көбірек тану — әрі GymBot дамуына қолдау.", premium_active_until:"Premium {date} дейін белсенді", premium_trial_until:"Сынақ Premium {date} дейін", premium_manual:"Premium белсенді", premium_perk_ai:"Күніне {n} жаттықтырушы сұрағы", premium_perk_food:"Күніне {n} тамақ суреті", premium_perk_now:"Premium-сыз — {n}", premium_perk_support:"Жаңа мүмкіндіктер тезірек: сіз қолданбаның дамуын қолдайсыз", premium_month:"Ай", premium_year:"Жыл", premium_month_note:"әр 30 күн сайын ұзартылады, кез келген уақытта өшіруге болады", premium_year_note:"365 күнге бір реттік төлем", premium_save:"{n}% үнем", premium_buy:"{n} ⭐ алу", premium_extend:"{n} ⭐ ұзарту", premium_trial_btn:"{n} күн тегін байқап көру", premium_renews:"Жазылым {date} ұзартылады", premium_renew_off:"Автоұзарту өшірулі — Premium {date} дейін", premium_cancel_btn:"Автоұзартуды өшіру", premium_resume_btn:"Автоұзартуды қосу", premium_paid_wait:"Төлем өтті — Premium қосылуда…", premium_paid_ok:"Premium {date} дейін қосылды. Рахмет!", premium_paid_late:"Төлем өтті. Premium бірнеше минутта қосылады — бот хабарлама жібереді.", premium_failed:"Төлем өтпеді. Қайта көріңіз.", premium_error:"Төлемді ашу мүмкін болмады. Кейінірек көріңіз.", premium_already_sub:"Жазылым бұрыннан бар.", premium_note:"Telegram жұлдыздарымен төлем. Автоұзартуды осында немесе Telegram-да өшіруге болады: Баптаулар → Менің жұлдыздарым. Төлем бойынша сұрақтар — боттағы /paysupport командасы.", premium_nudge_ai:"Premium-мен — күніне {n} жаттықтырушы сұрағы", premium_nudge_food:"Premium-мен — күніне {n} тамақ суреті", premium_nudge_btn:"Толығырақ", share_kicker:"БӨЛІСУ", share_story:"Тарихқа", share_chat:"Чатқа", share_preparing:"Карточка дайындалуда…", share_sent_bot:"Карточка ботпен чатта — оны достарыңызға жіберіңіз", share_error:"Карточканы дайындау мүмкін болмады. Қайта көріңіз.",
+    soc_menu:"Достар мен командалар", soc_kicker:"ҚАУЫМДАСТЫҚ", soc_title:"Достар мен командалар", tab_feed:"Лента", tab_friends:"Достар", tab_teams:"Командалар", soc_invite_title:"Достарды шақырыңыз", soc_invite_hint:"Достар бір-бірінің жаттығулары мен рекордтарын көріп, 👏 қояды. Салмақ, тамақтану және денсаулық ешқашан көрсетілмейді.", soc_invite_btn:"Досты шақыру", soc_copy:"Сілтемені көшіру", soc_copied:"Сілтеме көшірілді", soc_share_text:"GymBot-та бірге жаттығамыз 💪", soc_privacy:"Жаттығуларымды достарға көрсету", soc_friends_empty:"Әзірге достар жоқ — шақыру жіберіңіз.", soc_week_n:"осы аптада {n} жаттығу", soc_remove:"Жою", soc_remove_confirm:"{name} достардан жойылсын ба?", soc_feed_empty:"Мұнда сіздің және достарыңыздың жаттығулары болады.", soc_you:"Сіз", soc_sets:"{n} тәсіл", soc_tonnage:"{n} т", soc_min:"{n} мин", soc_record:"Рекорд: {ex} — {w} кг (бұрын {p})", soc_more:"Тағы көрсету", soc_accepted:"Сіз енді {name} екеуіңіз доссыз", soc_already:"{name} бұрыннан досыңыз", soc_bad_code:"Сілтеме ескірген немесе қате", soc_own_code:"Бұл өз сілтемеңіз 🙂", soc_teams_empty:"Әзірге командалар жоқ. Өзіңіздікін құрыңыз немесе код арқылы қосылыңыз.", soc_team_create:"Команда құру", soc_team_name:"Команда атауы", soc_team_join:"Код арқылы қосылу", soc_team_code:"Команда коды", soc_team_members:"{n} қатысушы", soc_team_week:"Осы апта: {n} жаттығу", soc_team_place:"Сіздің орныңыз: {n}", soc_team_invite:"Командаға шақыру", soc_team_leave:"Командадан шығу", soc_team_leave_confirm:"«{name}» командасынан шығасыз ба?", soc_team_rename:"Атауын өзгерту", soc_team_joined:"Сіз «{name}» командасындасыз", soc_team_full:"Командада 50 адам бар", soc_too_many_teams:"Ең көбі 5 командада болуға болады", soc_board_title:"АПТА РЕЙТИНГІ", soc_board_hint:"Дүйсенбіден бергі аяқталған жаттығулар есептеледі", soc_last_week:"өткен: {n}", soc_owner:"иесі", soc_share_team_text:"GymBot-тағы «{name}» командамызға қосыл 💪", soc_remove_member:"Шығару", soc_remove_member_confirm:"{name} командадан шығарылсын ба?",
     prog_menu:"Жаттығу бағдарламалары", prog_kicker:"БАҒДАРЛАМАЛАР", prog_title:"Жаттығу бағдарламалары", prog_lead:"Бірнеше аптаға дайын жоспарлар: әр күні не істеу керек, қанша тәсіл мен қайталау.", prog_meta:"аптасына {d} жаттығу · {w} апта", prog_active:"СІЗДІҢ БАҒДАРЛАМАҢЫЗ", prog_progress:"{t} жаттығудың {n}-сі", prog_next:"Келесісі: {day}", prog_start_day:"Бастау: {day}", prog_start:"Бағдарламаны бастау", prog_replace_confirm:"Қазір «{cur}» жүріп жатыр. Оның орнына жаңа бағдарламаны бастайсыз ба?", prog_stop:"Бағдарламаны тоқтату", prog_stop_confirm:"Бағдарламаны тоқтатасыз ба? Орындалған жаттығулар тарихта қалады.", prog_unlock:"Premium-мен ашу", prog_tip:"КЕҢЕС", prog_days:"БАҒДАРЛАМА КҮНДЕРІ", prog_rest_s:"демалыс {n} с", prog_rest_m:"демалыс {n} мин", prog_reps_max:"макс.", prog_sec:"с", prog_finished:"Бағдарлама аяқталды! Келесісін таңдаңыз.", prog_free:"Тегін", prog_week:"{n}-апта", prog_not_in_catalog:"каталогта жоқ", prog_is_active:"Жүріп жатыр", prog_all:"Барлық бағдарламалар", prog_open:"Ашу",
     fcat_national:"Ұлттық тағамдар", label_scan_btn:"Затбелгіні сканерлеу", fv_mode_dish:"Тағам", fv_mode_label:"Затбелгі", label_kicker:"ЗАТБЕЛГІ СКАНЕРІ", label_title:"Затбелгі суреті", label_hint:"Қаптамадағы тағамдық құндылық кестесін суретке түсіріңіз — 100 г-ға КБЖУ-ды толтырамыз, ал өнімді анықтамалыққа сақтаймыз.", label_photo_btn:"Затбелгіні суретке түсіру", label_read_btn:"Тану", label_reading:"ЗАТБЕЛГІ ОҚЫЛУДА…", label_not_found:"Суретте тағамдық құндылық кестесі көрінбейді. Оны жақынырақ және тігірек түсіріңіз.", label_failed:"Затбелгіні оқу мүмкін болмады. Қайта көріңіз.", label_name:"Атауы", label_brand:"Бренд", label_per100:"100 г-да", label_low_conf:"Сандарды тексеріңіз: кейбірі дәл оқылмаған болуы мүмкін.", label_portion:"Қанша жедіңіз, г", label_pack_portion:"қаптамадағы порция", label_save_log:"Күнделікке жазу", label_save_only:"Тек анықтамалыққа сақтау", label_saved_only:"Сақталды — оны іздеуден табуға болады.", label_total:"{w} г үшін барлығы", food_portion_approx:"порция ~{n} г",
     str_e1rm:"есептік максимум", str_menu:"Күш деңгейлері", str_kicker:"КҮШ", str_title:"Күш деңгейлері", str_overall:"Жалпы деңгей", str_stronger:"Жаттығатындардың ~{n}%-нан күштірек", str_basis:"Жынысыңыз, дене салмағыңыз және жасыңыз үшін күш нормативтері бойынша баға. Максимум 12 қайталауға дейінгі ең үздік тәсіл бойынша есептеледі (Эпли формуласы).", str_missing:"Деңгейлерді есептеу үшін профильде жынысыңыз бен салмағыңызды көрсетіңіз.", str_btn_profile:"Профильді толтыру", str_to_next:"«{lvl}» деңгейіне дейін: +{n} {u}", str_top:"Ең жоғары деңгей — құттықтаймыз!", str_community:"GymBot пайдаланушылары арасында: {m} адамның {n}%-нан күштірек", str_untracked:"Әзірге деңгейсіз", str_untracked_hint:"Осы жаттығулардың бірінде тәсіл жасаңыз — деңгей өзі пайда болады.", str_all:"Барлық деңгейлер", str_from:"ең үздік тәсіл {w} кг × {r}", str_from_reps:"ең үздік тәсіл — {r} қайт.", str_reps:"қайт.", str_on:"{n} жаттығу бойынша", str_empty:"Негізгі жаттығуларда әзірге тәсілдер жоқ — олармен алғашқы жаттығудан кейін деңгейлер пайда болады.", str_lvl_start:"Старт", str_lvl_beginner:"Жаңадан бастаушы", str_lvl_novice:"Бастауыш", str_lvl_intermediate:"Орташа", str_lvl_advanced:"Озық", str_lvl_elite:"Элита",
@@ -4891,6 +4895,13 @@ function MenuScreen({user,onNav,activeWorkout=false}){
       </Card>)}
     </div>
     <ProgramHomeCard tgId={tgId} onNav={onNav}/>
+    <Card onClick={()=>onNav("social")} pad="13px 14px" style={{marginTop:8}}>
+      <div style={{display:"flex",alignItems:"center",gap:9}}>
+        <span style={{fontSize:17}}>👥</span>
+        <span style={{fontSize:14,color:C.text}}>{t("soc_menu")}</span>
+        <span style={{marginLeft:"auto",color:C.muted,fontSize:16}}>›</span>
+      </div>
+    </Card>
     {prem?.visible&&<Card accent onClick={()=>onNav("premium")} pad="13px 14px" style={{marginTop:8}}>
       <div style={{display:"flex",alignItems:"center",gap:9}}>
         <Icon name="star" size={18} fill="currentColor"/>
@@ -4913,6 +4924,7 @@ function MoreScreen({user,onNav,onBack}){
       {label:t("menu_gamification"),icon:"🏆",s:"gamification"},
       {label:t("more_achievements"),icon:"🎖",s:"achievements"},
       {label:t("more_leaderboard"),icon:"📊",s:"leaderboard"},
+      {label:t("soc_menu"),icon:"👥",s:"social"},
       {label:t("menu_referral"),icon:"🎁",s:"referral"},
       {label:t("menu_language"),icon:"🌐",s:"language"},
       {label:t("menu_support"),icon:"?",s:"support"},
@@ -8308,6 +8320,266 @@ function ProgramHomeCard({tgId,onNav}){
   </Card>;
 }
 
+// ── Друзья, лента и команды (social.py) ─────────────────────────────────────
+// Друзья — по личной ссылке startapp=fr_<код>, команды — startapp=tm_<код>.
+// В ленте — только тренировки и рекорды; вес, питание и здоровье — никогда.
+function shareTg(url,textMsg){
+  const link=`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(textMsg||"")}`;
+  if(tg?.openTelegramLink)tg.openTelegramLink(link);else window.open(link,"_blank");
+}
+function socErr(detail){
+  const c=detail?.code;
+  return c==="own_code"?t("soc_own_code"):c==="team_full"?t("soc_team_full"):c==="too_many_teams"?t("soc_too_many_teams"):t("soc_bad_code");
+}
+function fmtTon(kg){const v=Math.round((kg||0)/100)/10;return t("soc_tonnage").replace("{n}",String(v).replace(".",LANG_STORE.current==="en"?".":","));}
+
+function FeedItem({it,tgId,onLiked}){
+  const [busy,setBusy]=useState(false);
+  async function like(){
+    if(busy)return;setBusy(true);
+    try{
+      const r=await fetch(`${API}/social/${tgId}/feed/${it.workout_id}/like`,{method:"POST"});
+      if(r.ok){const d=await r.json();haptic.impact?.("light");onLiked(it.workout_id,d);}
+    }catch{}finally{setBusy(false);}
+  }
+  const more=it.exercises_count-it.exercises.length;
+  return <Card style={{marginBottom:10}} pad="12px 14px">
+    <div style={{display:"flex",alignItems:"center",gap:10}}>
+      <div style={{width:32,height:32,borderRadius:"50%",background:it.is_me?C.accent:C.bg,border:`0.5px solid ${C.border}`,
+        display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,fontWeight:700,color:it.is_me?C.bg:C.accent,flexShrink:0}}>
+        {(it.is_me?t("soc_you"):it.name).trim().charAt(0).toUpperCase()}</div>
+      <div style={{flex:1,minWidth:0}}>
+        <div style={{fontSize:14,fontWeight:600,color:C.text}}>{it.is_me?t("soc_you"):it.name}</div>
+        <div style={{fontSize:11,color:C.muted,fontFamily:"monospace"}}>{fmtDay(it.date)}</div>
+      </div>
+    </div>
+    <div style={{fontSize:13,color:C.text,marginTop:10,lineHeight:1.5}}>
+      {it.exercises.map(trEx).join(" · ")}{more>0?` · +${more}`:""}
+    </div>
+    <div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginTop:6}}>
+      {[t("soc_sets").replace("{n}",it.sets),it.volume>0?fmtTon(it.volume):null,it.duration_min>0?t("soc_min").replace("{n}",it.duration_min):null].filter(Boolean).join(" · ")}
+    </div>
+    {it.records.map((r,i)=><div key={i} style={{fontSize:12,color:C.accent,marginTop:6}}>
+      🏆 {t("soc_record").replace("{ex}",trEx(r.exercise)).replace("{w}",fmtKg(r.weight)).replace("{p}",fmtKg(r.prev))}</div>)}
+    <div style={{display:"flex",marginTop:10}}>
+      <button onClick={like} disabled={busy||it.is_me&&false} style={{background:it.liked?C.accent:"transparent",color:it.liked?C.bg:C.text,
+        border:`0.5px solid ${it.liked?C.accent:C.border}`,borderRadius:16,padding:"5px 12px",fontSize:13,cursor:"pointer"}}>
+        👏 {it.likes>0?it.likes:""}</button>
+    </div>
+  </Card>;
+}
+
+function SocialFeed({tgId}){
+  const [items,setItems]=useState(null);
+  const [next,setNext]=useState(null);
+  const [loading,setLoading]=useState(false);
+  async function load(before){
+    setLoading(true);
+    try{
+      const r=await fetch(`${API}/social/${tgId}/feed${before?`?before=${encodeURIComponent(before)}`:""}`);
+      const d=await r.json();
+      setItems(p=>before?[...(p||[]),...(d.items||[])]:(d.items||[]));setNext(d.next_before||null);
+    }catch{setItems(p=>p||[]);}finally{setLoading(false);}
+  }
+  useEffect(()=>{if(tgId)load(null);},[tgId]);
+  if(!items)return <Loader text={t("loading")}/>;
+  if(!items.length)return <div style={{fontSize:13,color:C.muted,textAlign:"center",padding:"30px 10px"}}>{t("soc_feed_empty")}</div>;
+  return <div>
+    {items.map(it=><FeedItem key={it.workout_id} it={it} tgId={tgId}
+      onLiked={(id,d)=>setItems(p=>p.map(x=>x.workout_id===id?{...x,liked:d.liked,likes:d.likes}:x))}/>)}
+    {next&&<Btn full disabled={loading} onClick={()=>load(next)}>{loading?"…":t("soc_more")}</Btn>}
+  </div>;
+}
+
+function SocialFriends({tgId,data,reload}){
+  const [copied,setCopied]=useState(false);
+  async function setShare(v){
+    await fetch(`${API}/social/${tgId}/privacy`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({share_workouts:v})}).catch(()=>{});
+    reload();
+  }
+  async function remove(f){
+    if(!window.confirm(t("soc_remove_confirm").replace("{name}",f.name)))return;
+    await fetch(`${API}/social/${tgId}/friends/${f.id}`,{method:"DELETE"}).catch(()=>{});
+    reload();
+  }
+  return <div>
+    <Card accent style={{marginBottom:12}}>
+      <div style={{fontSize:15,fontWeight:700,color:C.text}}>{t("soc_invite_title")}</div>
+      <div style={{fontSize:12,color:C.muted,lineHeight:1.5,marginTop:6}}>{t("soc_invite_hint")}</div>
+      <Btn accent full style={{marginTop:10}} onClick={()=>shareTg(data.invite_link,t("soc_share_text"))}>{t("soc_invite_btn")}</Btn>
+      <Btn full style={{marginTop:8}} onClick={()=>{navigator.clipboard?.writeText(data.invite_link).then(()=>{setCopied(true);setTimeout(()=>setCopied(false),1500);}).catch(()=>{});}}>
+        {copied?t("soc_copied"):t("soc_copy")}</Btn>
+    </Card>
+    <Card style={{marginBottom:12}} pad="12px 14px" onClick={()=>setShare(!data.share_workouts)}>
+      <div style={{display:"flex",alignItems:"center",gap:10}}>
+        <span style={{flex:1,fontSize:14,color:C.text}}>{t("soc_privacy")}</span>
+        <span style={{width:42,height:24,borderRadius:12,background:data.share_workouts?C.accent:C.border,position:"relative",flexShrink:0}}>
+          <span style={{position:"absolute",top:3,left:data.share_workouts?21:3,width:18,height:18,borderRadius:"50%",background:C.bg,transition:"left .15s"}}/>
+        </span>
+      </div>
+    </Card>
+    {data.friends.length===0?<div style={{fontSize:13,color:C.muted,textAlign:"center",padding:"18px 10px"}}>{t("soc_friends_empty")}</div>
+      :data.friends.map(f=><Card key={f.id} style={{marginBottom:8}} pad="11px 14px">
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <div style={{flex:1,minWidth:0}}>
+            <div style={{fontSize:14,color:C.text,fontWeight:600}}>{f.name}</div>
+            {f.week!=null&&<div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginTop:2}}>{t("soc_week_n").replace("{n}",f.week)}</div>}
+          </div>
+          <span onClick={()=>remove(f)} style={{fontSize:12,color:C.muted,cursor:"pointer"}}>{t("soc_remove")}</span>
+        </div>
+      </Card>)}
+  </div>;
+}
+
+function TeamBoard({team,tgId,onChanged}){
+  async function leave(){
+    if(!window.confirm(t("soc_team_leave_confirm").replace("{name}",team.name)))return;
+    await fetch(`${API}/social/${tgId}/teams/${team.id}/leave`,{method:"POST"}).catch(()=>{});
+    onChanged(null);
+  }
+  async function rename(){
+    const n=window.prompt(t("soc_team_name"),team.name);
+    if(!n||n.trim().length<2)return;
+    const r=await fetch(`${API}/social/${tgId}/teams/${team.id}/rename`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name:n})}).catch(()=>null);
+    if(r?.ok)onChanged(await r.json());
+  }
+  async function kick(m){
+    if(!window.confirm(t("soc_remove_member_confirm").replace("{name}",m.name)))return;
+    const r=await fetch(`${API}/social/${tgId}/teams/${team.id}/members/${m.id}`,{method:"DELETE"}).catch(()=>null);
+    if(r?.ok)onChanged(await r.json());
+  }
+  return <div>
+    <Card accent style={{marginBottom:12}}>
+      <div style={{fontSize:17,fontWeight:700,color:C.text}}>{team.name}</div>
+      <div style={{fontSize:12,color:C.muted,fontFamily:"monospace",marginTop:4}}>
+        {t("soc_team_members").replace("{n}",team.members)} · {t("soc_team_week").replace("{n}",team.week_total)}</div>
+      <Btn accent full style={{marginTop:10}} onClick={()=>shareTg(team.invite_link,t("soc_share_team_text").replace("{name}",team.name))}>{t("soc_team_invite")}</Btn>
+      <div style={{fontSize:11,color:C.muted,marginTop:8,fontFamily:"monospace",textAlign:"center"}}>{t("soc_team_code")}: {team.code}</div>
+    </Card>
+    <Kicker>{t("soc_board_title")}</Kicker>
+    <div style={{fontSize:11,color:C.muted,margin:"4px 0 8px"}}>{t("soc_board_hint")}</div>
+    <Card pad="4px 14px" style={{marginBottom:12}}>
+      {team.board.map((m,i)=><div key={m.id} style={{display:"flex",alignItems:"center",gap:10,padding:"10px 0",borderTop:i?`0.5px solid ${C.border}`:"none"}}>
+        <span style={{width:22,fontFamily:"monospace",fontSize:13,color:m.place<=3?C.accent:C.muted}}>{m.place}</span>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{fontSize:14,color:m.is_me?C.accent:C.text,fontWeight:m.is_me?700:500}}>
+            {m.is_me?t("soc_you"):m.name}{m.is_owner&&<span style={{fontSize:10,color:C.muted,marginLeft:6}}>{t("soc_owner")}</span>}</div>
+          <div style={{fontSize:10,color:C.muted,fontFamily:"monospace"}}>{t("soc_last_week").replace("{n}",m.last_week)}</div>
+        </div>
+        <Mono size={16}>{m.week}</Mono>
+        {team.is_owner&&!m.is_me&&<span onClick={()=>kick(m)} style={{fontSize:11,color:C.muted,cursor:"pointer",marginLeft:4}}>✕</span>}
+      </div>)}
+    </Card>
+    {team.is_owner&&<Btn full style={{marginBottom:8}} onClick={rename}>{t("soc_team_rename")}</Btn>}
+    <Btn full onClick={leave}>{t("soc_team_leave")}</Btn>
+  </div>;
+}
+
+function SocialTeams({tgId,data,reload,openTeamId,setOpenTeamId}){
+  const [name,setName]=useState("");
+  const [code,setCode]=useState("");
+  const [msg,setMsg]=useState(null);
+  const [busy,setBusy]=useState(false);
+  const team=data.teams.find(x=>x.id===openTeamId);
+  if(team)return <div>
+    <div onClick={()=>setOpenTeamId(null)} style={{fontSize:12,color:C.muted,cursor:"pointer",marginBottom:10,fontFamily:"monospace"}}>← {t("tab_teams")}</div>
+    <TeamBoard team={team} tgId={tgId} onChanged={tm=>{if(!tm)setOpenTeamId(null);reload();}}/>
+  </div>;
+  async function create(){
+    if(busy||name.trim().length<2)return;setBusy(true);setMsg(null);
+    try{
+      const r=await fetch(`${API}/social/${tgId}/teams`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name})});
+      const d=await r.json();
+      if(!r.ok){setMsg(socErr(d.detail));return;}
+      setName("");await reload();setOpenTeamId(d.id);
+    }catch{setMsg(t("home_load_error"));}finally{setBusy(false);}
+  }
+  async function join(){
+    if(busy||code.trim().length<4)return;setBusy(true);setMsg(null);
+    try{
+      const r=await fetch(`${API}/social/${tgId}/teams/join`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code:code.trim()})});
+      const d=await r.json();
+      if(!r.ok){setMsg(socErr(d.detail));return;}
+      setCode("");await reload();setOpenTeamId(d.team.id);
+    }catch{setMsg(t("home_load_error"));}finally{setBusy(false);}
+  }
+  const inp={width:"100%",background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 12px",color:C.text,fontSize:14,outline:"none",boxSizing:"border-box"};
+  return <div>
+    {data.teams.length===0&&<div style={{fontSize:13,color:C.muted,textAlign:"center",padding:"10px 10px 16px"}}>{t("soc_teams_empty")}</div>}
+    {data.teams.map(tm=><Card key={tm.id} onClick={()=>setOpenTeamId(tm.id)} style={{marginBottom:8}} pad="12px 14px">
+      <div style={{display:"flex",alignItems:"center",gap:10}}>
+        <div style={{flex:1,minWidth:0}}>
+          <div style={{fontSize:15,fontWeight:700,color:C.text}}>{tm.name}</div>
+          <div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginTop:3}}>
+            {t("soc_team_members").replace("{n}",tm.members)} · {t("soc_team_week").replace("{n}",tm.week_total)}</div>
+        </div>
+        {tm.my_place&&<span style={{fontSize:12,color:C.accent,fontFamily:"monospace"}}>#{tm.my_place}</span>}
+        <span style={{color:C.muted}}>›</span>
+      </div>
+    </Card>)}
+    {msg&&<div style={{fontSize:13,color:C.danger,margin:"8px 0"}}>{msg}</div>}
+    <Card style={{marginTop:12}} pad="12px 14px">
+      <Kicker style={{margin:0}}>{t("soc_team_create")}</Kicker>
+      <input value={name} onChange={e=>setName(e.target.value)} maxLength={60} placeholder={t("soc_team_name")} style={{...inp,marginTop:8}}/>
+      <Btn accent full style={{marginTop:8}} disabled={busy||name.trim().length<2} onClick={create}>{t("soc_team_create")}</Btn>
+    </Card>
+    <Card style={{marginTop:8}} pad="12px 14px">
+      <Kicker style={{margin:0}}>{t("soc_team_join")}</Kicker>
+      <input value={code} onChange={e=>setCode(e.target.value.toUpperCase())} maxLength={12} placeholder={t("soc_team_code")} style={{...inp,marginTop:8,fontFamily:"monospace",letterSpacing:2}}/>
+      <Btn full style={{marginTop:8}} disabled={busy||code.trim().length<4} onClick={join}>{t("soc_team_join")}</Btn>
+    </Card>
+  </div>;
+}
+
+function SocialScreen({tgId,onBack,accept=null,join=null,tab:tab0=null}){
+  const [tab,setTab]=useState(tab0||(accept?"friends":join?"teams":"feed"));
+  const [data,setData]=useState(null);
+  const [banner,setBanner]=useState(null);   // {text, ok}
+  const [openTeamId,setOpenTeamId]=useState(null);
+  const handled=useRef(false);
+  async function reload(){
+    try{const r=await fetch(`${API}/social/${tgId}`);if(r.ok)setData(await r.json());}catch{}
+  }
+  useEffect(()=>{
+    if(!tgId)return;
+    (async()=>{
+      if(!handled.current&&(accept||join)){
+        handled.current=true;
+        try{
+          if(accept){
+            const r=await fetch(`${API}/social/${tgId}/friends/accept`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code:accept})});
+            const d=await r.json();
+            setBanner(r.ok?{text:t(d.already?"soc_already":"soc_accepted").replace("{name}",d.friend?.name||""),ok:true}:{text:socErr(d.detail)});
+            if(r.ok&&!d.already)haptic.notify("success");
+          }else{
+            const r=await fetch(`${API}/social/${tgId}/teams/join`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code:join})});
+            const d=await r.json();
+            setBanner(r.ok?{text:t("soc_team_joined").replace("{name}",d.team?.name||""),ok:true}:{text:socErr(d.detail)});
+            if(r.ok)setOpenTeamId(d.team.id);
+          }
+        }catch{setBanner({text:t("home_load_error")});}
+      }
+      await reload();
+    })();
+  },[tgId]);
+  const tabs=[["feed",t("tab_feed")],["friends",t("tab_friends")],["teams",t("tab_teams")]];
+  return <div style={{padding:"16px 16px 100px"}}>
+    <BackBtn onBack={onBack}/>
+    <Kicker>{t("soc_kicker")}</Kicker>
+    <Hero>{t("soc_title")}</Hero>
+    {banner&&<Card accent={!!banner.ok} style={{marginTop:12}} pad="11px 14px">
+      <div style={{fontSize:13,color:banner.ok?C.accent:C.text}}>{banner.text}</div></Card>}
+    <div style={{display:"flex",gap:6,margin:"14px 0"}}>
+      {tabs.map(([k,l])=><button key={k} onClick={()=>{setTab(k);if(k!=="teams")setOpenTeamId(null);}} style={{flex:1,padding:"8px 0",borderRadius:16,fontSize:13,cursor:"pointer",
+        background:tab===k?C.accent:C.card,color:tab===k?C.bg:C.muted,border:`0.5px solid ${tab===k?C.accent:C.border}`,fontFamily:"inherit"}}>{l}</button>)}
+    </div>
+    {tab==="feed"&&<SocialFeed tgId={tgId}/>}
+    {tab!=="feed"&&!data&&<Loader text={t("loading")}/>}
+    {tab==="friends"&&data&&<SocialFriends tgId={tgId} data={data} reload={reload}/>}
+    {tab==="teams"&&data&&<SocialTeams tgId={tgId} data={data} reload={reload} openTeamId={openTeamId} setOpenTeamId={setOpenTeamId}/>}
+  </div>;
+}
+
 function ProgressScreen({stats,tgId,onNav}){
   const [week,setWeek]=useState(()=>_cachedHome(tgId)?.week||null);
   const [muscleData,setMuscleData]=useState(null);
@@ -11274,6 +11546,15 @@ export default function App(){
       // /premium в боте ведёт сюда
       setTimeout(()=>push("menu","premium",{}),500);
     }
+    if(startParam?.startsWith("fr_")||startParam?.startsWith("tm_")){
+      // Приглашение в друзья или в команду: обработаем, когда пользователь загрузится
+      // (новичок — после регистрации; приглашение другом сервер засчитает и как реферальное).
+      const code=startParam.slice(3);
+      try{sessionStorage.setItem("gymbot_social",JSON.stringify({type:startParam.slice(0,2),code}));}catch{}
+    }
+    if(startParam==="friends"){
+      setTimeout(()=>push("menu","social",{}),500);
+    }
     if(startParam==="terms"||startParam==="terms_premium"){
       // /terms в боте
       setTimeout(()=>push("menu","terms",{section:startParam==="terms_premium"?"premium":null}),500);
@@ -11417,6 +11698,15 @@ export default function App(){
     }
     push(tab,s,p);
   }
+  // Приглашение в друзья/команду из ссылки — когда человек уже есть и согласия даны
+  useEffect(()=>{
+    if(!user||user._not_found||!(user.consents?.terms&&user.consents?.basic))return;
+    let pending=null;
+    try{pending=JSON.parse(sessionStorage.getItem("gymbot_social")||"null");}catch{}
+    if(!pending?.code)return;
+    try{sessionStorage.removeItem("gymbot_social");}catch{}
+    setTimeout(()=>push("menu","social",pending.type==="fr"?{accept:pending.code}:{join:pending.code}),400);
+  },[user?.telegram_id,user?._not_found,user?.consents?.terms,user?.consents?.basic]);
   const goBack=()=>window.history.back();
 
   function render(){
@@ -11439,6 +11729,7 @@ export default function App(){
     if(screen==="terms")return <TermsScreen tgId={tgId} section={p.section} onBack={goBack}/>;
     if(screen==="strength")return <StrengthScreen tgId={tgId} onBack={goBack} onNav={handleNav}/>;
     if(screen==="programs")return <ProgramsScreen tgId={tgId} onBack={goBack} onNav={handleNav}/>;
+    if(screen==="social")return <SocialScreen tgId={tgId} onBack={goBack} accept={p.accept||null} join={p.join||null} tab={p.tab||null}/>;
     if(screen==="program_detail")return <ProgramDetailScreen tgId={tgId} slug={p.slug} onBack={goBack} onNav={handleNav}/>;
     if(screen==="achievements")return <AchievementsScreen tgId={tgId} onBack={goBack}/>;
     if(screen==="leaderboard")return <LeaderboardScreen tgId={tgId} onBack={goBack}/>;
