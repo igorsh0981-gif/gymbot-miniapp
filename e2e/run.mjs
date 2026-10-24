@@ -563,6 +563,12 @@ await scenario("42_story_on_desktop_goes_to_bot", VIEWPORTS[1], { tab: "menu", s
   await page.getByText(/Карточка в чате с ботом/).waitFor({ timeout: 4000 });
   return { share: net.share || [], calls: await page.evaluate(() => window.__tgCalls || []) };
 });
+await scenario("43_home_premium_entry", VIEWPORTS[1], { tab: "menu", screen: null, net: { setMode: "ok", setBodies: [], counts: {}, home: HOME, premium: PREMIUM } }, async (page, net) => {
+  await page.getByText("С Premium — 30 вопросов тренеру в день").waitFor({ timeout: 5000 });
+  await page.getByText("С Premium — 30 вопросов тренеру в день").click();
+  await page.getByText("GymBot Premium").waitFor({ timeout: 4000 });
+  return { entry: 1, opened: 1 };
+});
 
 await browser.close();
 fs.writeFileSync(path.join(OUT, "results.json"), JSON.stringify(results, null, 2));
