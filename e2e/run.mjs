@@ -223,6 +223,7 @@ async function setup(page, { lang = "ru", setFails = false, curIdx = 0, tab = "w
         return json(route, { story_url: "https://api.test/api/share/img/77.story.ru.1.x.jpg", post_url: "https://api.test/p.jpg",
           thumb_url: "https://api.test/t.jpg", link: "https://t.me/GYMASH_bot?start=ref_ABC", caption: "💪", story_text: "Грудь 💪 t.me/GYMASH_bot", has_record: true });
       }
+      if (p === `/strength/${TG_ID}`) return json(route, net.strength || { lifts: [], missing: [], keys: [], overall: null });
       if (p.startsWith("/custom-exercises")) return json(route, { exercises: [] });
       if (p.startsWith("/workout/") && p.endsWith("/state")) return json(route, { ok: true });
       return json(route, {});
@@ -582,6 +583,33 @@ await scenario("45_more_terms", VIEWPORTS[1], { tab: "menu", screen: "more", net
   await page.getByText("Правила использования").first().click();
   await page.getByText("1. Общие положения").waitFor({ timeout: 4000 });
   return { opened: 1, general: await page.getByText(/не являются медицинским назначением/).count() };
+});
+const STRENGTH = { gender: "male", bodyweight: 80, missing: [], keys: ["bench", "squat", "deadlift", "pullup"], age_coef: 1,
+  overall: { level: 3, level_key: "intermediate", score: 3.2, percentile: 55, lifts: 2 },
+  lifts: [
+    { key: "bench", kind: "ratio", best: 93.3, from: { weight: 80, reps: 5, date: "2026-10-20T10:00:00" }, exercise: "Жим штанги лёжа",
+      level: 3, level_key: "intermediate", score: 3.33, percentile: 60, ratio: 1.17, thresholds: [40, 60, 80, 120, 160],
+      next: { level: "advanced", target: 120, to_go: 26.7 }, community: { people: 13, stronger_than_pct: 69 } },
+    { key: "pullup", kind: "reps", best: 13, from: { weight: 0, reps: 13, date: "2026-10-20T10:00:00" }, exercise: "Подтягивания широким хватом",
+      level: 3, level_key: "intermediate", score: 3.12, percentile: 54, ratio: null, thresholds: [1, 6, 12, 20, 28],
+      next: { level: "advanced", target: 20, to_go: 7 }, community: null } ] };
+await scenario("46_strength_screen", VIEWPORTS[0], { tab: "menu", screen: "strength", net: { setMode: "ok", setBodies: [], counts: {}, strength: STRENGTH } }, async (page, net) => {
+  await page.getByText("Общий ранг").waitFor({ timeout: 5000 });
+  const has = async re => (await page.getByText(re).count()) > 0 ? 1 : 0;
+  return { overall: await has(/Сильнее ~55% тренирующихся/), next: await has(/До уровня «Продвинутый»: \+26\.7 кг/),
+           from: await has(/лучший подход 80 кг × 5/), reps: await has(/До уровня «Продвинутый»: \+7 повт\./),
+           community: await has(/сильнее 69% из 13/), untracked: await has("Становая тяга") };
+});
+await scenario("47_strength_missing_profile", VIEWPORTS[1], { tab: "menu", screen: "strength", net: { setMode: "ok", setBodies: [], counts: {},
+  strength: { gender: null, bodyweight: null, missing: ["gender", "weight"], keys: ["bench"], lifts: [], overall: null } } }, async (page, net) => {
+  await page.getByRole("button", { name: /Заполнить профиль/i }).click();
+  await page.waitForTimeout(600);
+  return { toProfile: net.counts["GET /user/{tg}"] > 0 ? 1 : 0, msg: 1 };
+});
+await scenario("48_progress_strength_card", VIEWPORTS[1], { tab: "progress", screen: null, net: { setMode: "ok", setBodies: [], counts: {}, strength: STRENGTH } }, async (page, net) => {
+  await page.getByText(/Средний · /).first().click();
+  await page.getByText("Общий ранг").waitFor({ timeout: 4000 });
+  return { opened: 1, oldNorms: await page.getByText(/VS НОРМЫ/).count() };
 });
 
 await browser.close();
