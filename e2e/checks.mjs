@@ -72,4 +72,9 @@ export const CHECKS = {
   // правила использования: раздел Premium с ценами из настроек, вход из «Сервисов»
   "44_premium_terms": r => all(eq("цены", r.prices, 1), eq("пробный", r.trial, 1), eq("возврат", r.refund, 1), eq("отмена", r.cancel, 1)),
   "45_more_terms": r => all(eq("открылись", r.opened, 1), eq("общие положения", r.general, 1)),
+  // силовые ранги: общий ранг, шаг до следующего уровня (кг и повторы), сравнение с людьми, без профиля — на профиль
+  "46_strength_screen": r => all(eq("общий", r.overall, 1), eq("до следующего", r.next, 1), eq("подход", r.from, 1),
+                                 eq("повторы", r.reps, 1), eq("среди людей", r.community, 1), eq("без ранга", r.untracked, 1)),
+  "47_strength_missing_profile": r => all(eq("кнопка", r.msg, 1)),
+  "48_progress_strength_card": r => all(eq("открыли ранги", r.opened, 1)),
 };
