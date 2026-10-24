@@ -84,4 +84,9 @@ export const CHECKS = {
   "50_label_not_found": r => all(eq("сообщение", r.msg, 1), eq("сохранений", r.saves, 0)),
   // местная кухня: категория, узбекские названия, порция
   "51_food_search_national_uz": r => all(eq("порция", r.portion, 1), eq("кнопка сканера", r.scanBtn, 1), eq("запрос категории", r.query, 1)),
+  // программы: активная со следующим днём, бейджи, старт дня передаёт program_day, закрытая — на Premium
+  "52_programs_list": r => all(eq("прогресс", r.progress, 1), eq("следующий день", r.next, 1), eq("premium", r.premium, 1), eq("бесплатно", r.free, 1), eq("мета", r.meta, 1)),
+  "53_program_start_day": r => all(eq("повторы в секундах", r.reps, 1), eq("нет в каталоге", r.missing, 1), eq("подпись состава", r.hint, 1),
+                                   eq("старт с днём", r.start && [r.start.program_day, r.start.exercise_ids], [1, [101]])),
+  "54_program_locked": r => all(eq("на Premium", r.toPremium, 1), eq("стартов", r.starts, 0)),
 };
