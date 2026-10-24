@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef, Fragment } from "react";
 
 const tg = window.Telegram?.WebApp;
-const API = "https://web-production-4fe0b.up.railway.app/api";
+// Адрес API задаётся при сборке (VITE_API_URL) — для тестового контура.
+// Без переменной — боевой, как раньше.
+const API = (import.meta.env && import.meta.env.VITE_API_URL) || "https://web-production-4fe0b.up.railway.app/api";
 
 // Автоматически прикрепляем подписанный Telegram initData ко всем запросам к своему API —
 // бэкенд проверяет эту подпись и не доверяет просто tg_id из URL. Оборачиваем fetch один раз
@@ -68,6 +70,13 @@ function _sqEmit() { _sq.listeners.forEach(f => { try { f(); } catch {} }); }
 function _sqMine() { const u = _sqUid(); return _sq.items.filter(it => !it.uid || !u || it.uid === u); }
 function sqPending() { return _sqMine().length; }
 function sqPendingSets(workoutId) { return _sqMine().filter(it => it.kind === "set" && it.workoutId === workoutId).length; }
+/** Подходы тренировки, которых сервер ещё не получил: в очереди и отложенные
+ *  после серии 5xx. Отложенные sqPending не видит — а сервер, не найдя подходов,
+ *  удалил бы тренировку, и они пропали бы при следующем запуске с 404. */
+function sqUnsentSets(workoutId) {
+  const u = _sqUid();
+  return [..._sq.items, ..._sq.parked].filter(it => (!it.uid || !u || it.uid === u) && it.kind === "set" && it.workoutId === workoutId).length;
+}
 function sqSubscribe(f) { _sq.listeners.add(f); return () => _sq.listeners.delete(f); }
 function sqPush(kind, url, body, extra = {}) {
   _sq.items.push({ kind, url, body, at: Date.now(), uid: _sqUid(), fails: 0, ...extra });
@@ -462,7 +471,8 @@ const T = {
     sport_section:"Виды спорта", sport_desc:"Запись занятия с расчётом калорий",
     sport_section_title:"Виды спорта", sport_section_desc:"Запись занятия с расчётом калорий",
     resume_workout:"ПРОДОЛЖИТЬ ТРЕНИРОВКУ", resume_desc:"У тебя есть незавершённая тренировка",
-    finish_workout:"ЗАВЕРШИТЬ", set_done:"✓ ПОДХОД ВЫПОЛНЕН", set_done_label:"ПОДХОД ВЫПОЛНЕН",
+    workout_closed_elsewhere:"Прошлая тренировка уже завершена — на другом устройстве или автоматически. Можно начать новую.",
+    finish_workout:"ЗАВЕРШИТЬ", workout_empty_note:"Ни одного подхода не записано — тренировка не засчитана и в историю не попала.", set_done:"✓ ПОДХОД ВЫПОЛНЕН", set_done_label:"ПОДХОД ВЫПОЛНЕН",
     warmup_title:"РАЗМИНКА", warmup_skip:"ПРОПУСТИТЬ", warmup_done:"✓ РАЗМИНКА ВЫПОЛНЕНА",
     warmup_hint:"Кардио для разминки — опционально", warmup_badge:"🏃 РАЗМИНКА",
     ready_wk_kicker:"ТРЕНИРОВКА СОБРАНА", ready_wk_hint:"Состав подобран по твоей истории", ready_wk_change:"Изменить состав",
@@ -941,6 +951,8 @@ const T = {
     open_telegram:"Открой приложение через Telegram.",
     failed_load:"Не удалось загрузить",
     failed_recognize:"Не удалось распознать. Попробуй другое фото.",
+    food_limit_reached:"На сегодня распознавания по фото закончились ({limit} в день). Завтра снова можно, а пока блюдо можно внести вручную.",
+    food_quota_left:"Распознаваний на сегодня: {left} из {limit}",
     limit_exceeded:"Дневной лимит запросов исчерпан. Попробуй завтра.",ai_unavailable:"AI-тренер временно недоступен. Попробуй чуть позже — лимит запросов не списан.",last_time:"Прошлый раз",day_today_l:"сегодня",day_yesterday:"вчера",days_ago_n:"{n} дн. назад",set_save_failed:"Подход не сохранился — проверь связь и нажми ещё раз",sq_dropped:"Не сохранено подходов: {n} — тренировка уже закрыта на сервере",sq_waiting:"⏳ Ждут отправки: {n}. Уйдут сами, как появится связь",sq_finish_pending:"Ещё не отправлено подходов: {n}. Завершить сейчас? Они уйдут позже, но в итоги этой тренировки не попадут.",
     specify_name:"Укажите название",
     specify_name_cal:"Укажите название и калории",
@@ -1344,7 +1356,8 @@ const T = {
     sport_section:"Sports", sport_desc:"Log activity with calorie calculation",
     sport_section_title:"Sports", sport_section_desc:"Log activity with calorie calculation",
     resume_workout:"CONTINUE WORKOUT", resume_desc:"You have an unfinished workout",
-    finish_workout:"FINISH", set_done:"✓ SET DONE", set_done_label:"SET DONE",
+    workout_closed_elsewhere:"Your previous workout has already been finished — on another device or automatically. You can start a new one.",
+    finish_workout:"FINISH", workout_empty_note:"No sets were logged, so this workout was not counted and is not in your history.", set_done:"✓ SET DONE", set_done_label:"SET DONE",
     warmup_title:"WARM UP", warmup_skip:"SKIP", warmup_done:"✓ WARM UP DONE",
     warmup_hint:"Cardio for warm-up — optional", warmup_badge:"🏃 WARM UP",
     ready_wk_kicker:"WORKOUT READY", ready_wk_hint:"Built from your training history", ready_wk_change:"Change exercises",
@@ -1823,6 +1836,8 @@ const T = {
     open_telegram:"Open via Telegram.",
     failed_load:"Failed to load",
     failed_recognize:"Failed to recognize. Try another photo.",
+    food_limit_reached:"You've used today's photo recognitions ({limit} a day). Try again tomorrow, or add the meal manually for now.",
+    food_quota_left:"Recognitions left today: {left} of {limit}",
     limit_exceeded:"Daily limit reached. Try tomorrow.",ai_unavailable:"The AI coach is temporarily unavailable. Try again a bit later — your request limit wasn't used.",last_time:"Last time",day_today_l:"today",day_yesterday:"yesterday",days_ago_n:"{n} days ago",set_save_failed:"Set not saved — check your connection and tap again",sq_dropped:"{n} set(s) not saved — the workout is already closed on the server",sq_waiting:"⏳ Waiting to send: {n}. They will go as soon as you are online",sq_finish_pending:"{n} set(s) not sent yet. Finish now? They will be sent later but won't count in this workout's summary.",
     specify_name:"Enter name",
     specify_name_cal:"Enter name and calories",
@@ -2222,7 +2237,8 @@ const T = {
     sport_section:"Sport turlari", sport_desc:"Kaloriya hisobi bilan mashg'ulotni yozish",
     sport_section_title:"Sport turlari", sport_section_desc:"Kaloriya hisobi bilan mashg'ulotni yozish",
     resume_workout:"MASHQNI DAVOM ETTIRISH", resume_desc:"Tugallanmagan mashqingiz bor",
-    finish_workout:"TUGATISH", set_done:"✓ YONDASHUV BAJARILDI", set_done_label:"YONDASHUV BAJARILDI",
+    workout_closed_elsewhere:"Oldingi mashq allaqachon yakunlangan — boshqa qurilmada yoki avtomatik. Yangisini boshlashingiz mumkin.",
+    finish_workout:"TUGATISH", workout_empty_note:"Birorta ham yondashuv yozilmadi — mashg‘ulot hisobga olinmadi va tarixga tushmadi.", set_done:"✓ YONDASHUV BAJARILDI", set_done_label:"YONDASHUV BAJARILDI",
     warmup_title:"ISITISH", warmup_skip:"O'TKAZIB YUBORISH", warmup_done:"✓ ISITISH BAJARILDI",
     warmup_hint:"Isitish uchun kardio — ixtiyoriy", warmup_badge:"🏃 ISITISH",
     ready_wk_kicker:"MASHG'ULOT TAYYOR", ready_wk_hint:"Tarkib mashg'ulot tarixingiz asosida tanlandi", ready_wk_change:"Tarkibni o'zgartirish",
@@ -2701,6 +2717,8 @@ const T = {
     open_telegram:"Telegram orqali oching.",
     failed_load:"Yuklab bo'lmadi",
     failed_recognize:"Tanib bo'lmadi. Boshqa foto urinib ko'ring.",
+    food_limit_reached:"Bugungi rasm orqali aniqlashlar tugadi (kuniga {limit} ta). Ertaga yana mumkin, hozircha taomni qo'lda kiritishingiz mumkin.",
+    food_quota_left:"Bugun qolgan aniqlashlar: {left} / {limit}",
     limit_exceeded:"Kunlik limit tugadi. Ertaga urinib ko'ring.",ai_unavailable:"AI-murabbiy vaqtincha ishlamayapti. Birozdan keyin urinib ko‘r — so‘rovlar limiti sarflanmadi.",last_time:"O‘tgan safar",day_today_l:"bugun",day_yesterday:"kecha",days_ago_n:"{n} kun oldin",set_save_failed:"Yondashuv saqlanmadi — aloqani tekshirib, qayta bos",sq_dropped:"Saqlanmagan yondashuvlar: {n} — mashg‘ulot serverda allaqachon yopilgan",sq_waiting:"⏳ Yuborilishini kutmoqda: {n}. Aloqa paydo bo‘lishi bilan o‘zi ketadi",sq_finish_pending:"Hali yuborilmagan yondashuvlar: {n}. Hozir tugatasizmi? Ular keyinroq ketadi, lekin bu mashg‘ulot natijalariga kirmaydi.",
     specify_name:"Nomni kiriting",
     specify_name_cal:"Nom va kaloriyalarni kiriting",
@@ -3100,7 +3118,8 @@ const T = {
     sport_section:"Спорт түрлері", sport_desc:"Калория есебімен сабақты жазу",
     sport_section_title:"Спорт түрлері", sport_section_desc:"Калория есебімен сабақты жазу",
     resume_workout:"ЖАТТЫҒУДЫ ЖАЛҒАСТЫРУ", resume_desc:"Аяқталмаған жаттығуыңыз бар",
-    finish_workout:"АЯҚТАУ", set_done:"✓ ТӘСІЛ ОРЫНДАЛДЫ", set_done_label:"ТӘСІЛ ОРЫНДАЛДЫ",
+    workout_closed_elsewhere:"Алдыңғы жаттығу аяқталған — басқа құрылғыда немесе автоматты түрде. Жаңасын бастауға болады.",
+    finish_workout:"АЯҚТАУ", workout_empty_note:"Бірде-бір тәсіл жазылмады — жаттығу есептелмеді және тарихқа түспеді.", set_done:"✓ ТӘСІЛ ОРЫНДАЛДЫ", set_done_label:"ТӘСІЛ ОРЫНДАЛДЫ",
     warmup_title:"ЖЫЛЫТУ", warmup_skip:"ӨТКІЗІП ЖІБЕРу", warmup_done:"✓ ЖЫЛЫТУ ОРЫНДАЛДЫ",
     warmup_hint:"Жылыту үшін кардио — міндетті емес", warmup_badge:"🏃 ЖЫЛЫТУ",
     ready_wk_kicker:"ЖАТТЫҒУ ЖИНАЛДЫ", ready_wk_hint:"Құрамы жаттығу тарихыңыз бойынша таңдалды", ready_wk_change:"Құрамын өзгерту",
@@ -3579,6 +3598,8 @@ const T = {
     open_telegram:"Telegram арқылы ашыңыз.",
     failed_load:"Жүктеу мүмкін емес",
     failed_recognize:"Танып болмады. Басқа фото байқаңыз.",
+    food_limit_reached:"Бүгінгі суреттен танулар бітті (күніне {limit}). Ертең қайта болады, әзірге тағамды қолмен енгізуге болады.",
+    food_quota_left:"Бүгін қалған танулар: {left} / {limit}",
     limit_exceeded:"Күндік лимит таусылды. Ертең байқаңыз.",ai_unavailable:"AI-жаттықтырушы уақытша қолжетімсіз. Сәл кейінірек қайталап көр — сұраулар лимиті жұмсалмады.",last_time:"Өткен жолы",day_today_l:"бүгін",day_yesterday:"кеше",days_ago_n:"{n} күн бұрын",set_save_failed:"Тәсіл сақталмады — байланысты тексеріп, қайта бас",sq_dropped:"Сақталмаған тәсілдер: {n} — жаттығу серверде жабылып қойған",sq_waiting:"⏳ Жіберуді күтуде: {n}. Байланыс пайда болғанда өздері кетеді",sq_finish_pending:"Әлі жіберілмеген тәсілдер: {n}. Қазір аяқтайсыз ба? Олар кейін кетеді, бірақ осы жаттығудың қорытындысына кірмейді.",
     specify_name:"Атауды енгізіңіз",
     specify_name_cal:"Атау мен калорияларды енгізіңіз",
@@ -4012,7 +4033,7 @@ function dateLocale() {
   return l === "kz" ? "kk" : (l || "ru");
 }
 
-/** Сегодняшняя дата по часам ТЕЛЕФОНА, в виде YYYY-MM-DD.
+/** Сегодняшняя дата по Ташкенту, в виде YYYY-MM-DD.
  *
  *  Везде стоял `new Date().toISOString().split("T")[0]`, а toISOString переводит
  *  в UTC. В Ташкенте это +5, поэтому с полуночи до пяти утра «сегодня» было
@@ -4021,8 +4042,18 @@ function dateLocale() {
  *  тренировки как перепутанный порядок событий.
  */
 function localToday() {
-  const d = new Date();
-  return new Date(d.getTime() - d.getTimezoneOffset() * 60000).toISOString().split("T")[0];
+  // По Ташкенту (UTC+5, без перехода на летнее время), а не по поясу телефона:
+  // сервер делит сутки так же, и utcToLocal показывает время в том же поясе.
+  // С поясом телефона в поездке «сегодня» в дневнике не совпало бы с серверным.
+  return new Date(Date.now() + 5 * 3600000).toISOString().slice(0, 10);
+}
+/** Сдвиг даты YYYY-MM-DD на delta дней — чистая арифметика по календарю,
+ *  без часового пояса (new Date("2026-10-24") — это UTC-полночь, и setDate
+ *  в местном поясе мог дать тот же день или пропустить один). */
+function shiftDay(ymd, delta) {
+  const d = new Date(ymd + "T00:00:00Z");
+  d.setUTCDate(d.getUTCDate() + delta);
+  return d.toISOString().slice(0, 10);
 }
 
 /** Отметка времени из базы (наивный UTC, без «Z») → момент для показа.
@@ -4041,6 +4072,11 @@ function utcToLocal(iso) {
   if (!iso) return null;
   const d = new Date(iso);
   return isNaN(d.getTime()) ? null : new Date(d.getTime() + 5 * 3600000);
+}
+/** YYYY-MM-DD по полям Date (getFullYear/getMonth/getDate), без перевода в UTC. */
+function ymdOf(d) {
+  const p = n => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
 }
 
 /** Подпись дня прошлой тренировки: «сегодня», «вчера», «3 дн. назад», «12 окт.».
@@ -4061,6 +4097,29 @@ function tField(obj, field) {
   const lang = LANG_STORE.current;
   if (lang !== "ru" && obj[field + "_" + lang]) return obj[field + "_" + lang];
   return obj[field] || "";
+}
+
+// ── Названия из истории на языке приложения ─────────────────────────────────
+// Подходы хранят название упражнения в момент записи — по-русски, как в
+// каталоге. История и прогресс показывали его как есть, и у узбека или казаха
+// прошлые тренировки оставались русскими навсегда. Каталог (он грузится при
+// старте) знает переводы: ищем по русскому названию и подменяем при показе.
+// Своё упражнение в каталоге не найдётся — останется как записано.
+const _exByRu = new Map(), _mgByRu = new Map();
+function indexCatalogNames(exercises, groups) {
+  _exByRu.clear(); _mgByRu.clear();
+  for (const e of exercises || []) if (e?.name && !e.is_custom) _exByRu.set(String(e.name).trim().toLowerCase(), e);
+  for (const g of groups || []) if (g?.name) _mgByRu.set(String(g.name).trim().toLowerCase(), g);
+}
+function trEx(name) {
+  if (!name) return name || "";
+  const e = _exByRu.get(String(name).trim().toLowerCase());
+  return (e && tField(e, "name")) || name;
+}
+function trGroupName(name) {
+  if (!name) return name || "";
+  const g = _mgByRu.get(String(name).trim().toLowerCase());
+  return (g && tField(g, "name")) || name;
 }
 
 // Локализованное название группы мышц
@@ -4108,6 +4167,25 @@ function DiskWait({onBack,text,onRetry}){
         {onRetry&&<Btn full onClick={onRetry} style={{marginTop:16}}>{t("retry")}</Btn>}
       </div>
       :<Loader text={text}/>}
+  </div>;
+}
+/** Нет связи с сервером при запуске: что случилось и кнопка повтора.
+ *  Повторяет и сам, как только браузер скажет, что связь вернулась. */
+function OfflineScreen({onRetry}){
+  // «online» приходит, только если пропала сама сеть. Когда лежит сервер
+  // (выкладка), браузер остаётся онлайн — поэтому ещё и раз в 15 секунд.
+  useEffect(()=>{
+    const on=()=>{if(document.visibilityState!=="hidden")onRetry();};
+    window.addEventListener("online",on);
+    const iv=setInterval(on,15000);
+    return()=>{window.removeEventListener("online",on);clearInterval(iv);};
+  },[]);
+  return <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:C.bg,padding:24,boxSizing:"border-box"}}>
+    <div style={{textAlign:"center",maxWidth:320}}>
+      <div style={{fontSize:32,marginBottom:12}} aria-hidden="true">📡</div>
+      <div style={{fontSize:14,color:C.muted,lineHeight:1.5,marginBottom:16}}>{t("home_load_error")}</div>
+      <Btn accent full onClick={onRetry}>{t("retry")}</Btn>
+    </div>
   </div>;
 }
 function BackBtn({onBack}){
@@ -5943,7 +6021,8 @@ function WorkoutDetailScreen({workoutId,tgId,onBack}){
   // Тренировка в процессе (active) — показываем что есть
   const isActive = data.status === "active";
   const totalSets=data.exercises?.reduce((s,e)=>s+e.sets.length,0)||0;
-  const dateStr=data.date?new Date(data.date).toLocaleDateString(dateLocale(),{day:"numeric",month:"long",year:"numeric"}):"—";
+  // в базе UTC: тренировка в 01:00 по Ташкенту иначе показывалась вчерашним числом
+  const dateStr=utcToLocal(data.date)?.toLocaleDateString(dateLocale(),{day:"numeric",month:"long",year:"numeric"})||"—";
 
   return <div style={{padding:"16px 16px 100px"}}>
     <BackBtn onBack={onBack}/>
@@ -5958,7 +6037,7 @@ function WorkoutDetailScreen({workoutId,tgId,onBack}){
     {data.exercises?.length===0&&<Card><div style={{textAlign:"center",padding:"16px 0",color:C.muted}}>{t("no_sets")}</div></Card>}
 
     {data.exercises?.map((ex,i)=><Card key={i} style={{marginBottom:10}}>
-      <div style={{fontWeight:700,fontSize:15,color:C.text,marginBottom:10}}>{i+1}. {tField(ex,"name")}</div>
+      <div style={{fontWeight:700,fontSize:15,color:C.text,marginBottom:10}}>{i+1}. {trEx(tField(ex,"name"))}</div>
       <div style={{display:"grid",gridTemplateColumns:"auto 1fr 1fr 1fr",gap:"4px 12px",alignItems:"center"}}>
         <div style={{fontSize:10,color:C.muted,fontFamily:"monospace"}}>{t("wd_ph")}</div>
         <div style={{fontSize:10,color:C.muted,fontFamily:"monospace"}}>{t("weight_label2")}</div>
@@ -6007,11 +6086,14 @@ function peekExDetails(id,lang){
 /** Техника всех упражнений тренировки — одним запросом на старте, чтобы
  *  шторка открывалась и там, где нет связи. Кладём в тот же кэш, откуда
  *  читает useExerciseText, и на диск. */
+const _primeInflight=new Set();   // `${id}|${lang}` — уже запрошены, ответ ещё не пришёл
 function primeExDetails(list,lang){
   const ids=[...new Set((list||[]).filter(exNeedsText).map(e=>e.id))]
-    .filter(id=>!peekExDetails(id,lang)).slice(0,30);
+    .filter(id=>!peekExDetails(id,lang)&&!_primeInflight.has(`${id}|${lang}`)).slice(0,30);
   if(!ids.length)return;
+  ids.forEach(id=>_primeInflight.add(`${id}|${lang}`));
   apiGet(`${API}/exercises/details?ids=${ids.join(",")}&lang=${encodeURIComponent(lang)}`)
+    .finally(()=>ids.forEach(id=>_primeInflight.delete(`${id}|${lang}`)))
     .then(d=>{
       for(const it of d?.items||[]){
         if(!it?.id)continue;
@@ -6313,6 +6395,7 @@ function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscle
   const [logBusy,setLogBusy]=useState(false); // B-04: блокировка двойного нажатия
   const [lgReplaceMode,setLgReplaceMode]=useState(false); // B-07: замена упражнения
   const [aiReview,setAiReview]=useState(null); // B-06: AI оценка (null=загрузка, ""=ошибка)
+  const [aiReviewStream,setAiReviewStream]=useState(""); // разбор, пока он пишется
   const [streakInfo,setStreakInfo]=useState(null); // {streak_days, new_streak_rewards: [{days,name,emoji,pts,desc}]}
   // Предложение включить сигнал об отдыхе. Показывается один раз, после первой
   // тренировки, и только тем, кому ещё не предлагали. Включать молча нельзя:
@@ -6338,21 +6421,48 @@ function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscle
   // Запланированная тренировка после восстановления: проп сюда уже не придёт,
   // а без него план не закрывается по завершении.
   const [restoredPlannedId,setRestoredPlannedId]=useState(null);
+  // Тренировка с этого устройства на сервере уже закрыта — показываем пояснение
+  const [closedElsewhere,setClosedElsewhere]=useState(false);
+  // Текущий id тренировки для ответа, пришедшего позже: замыкание эффекта
+  // видит значение на момент отправки запроса, а не на момент ответа.
+  const workoutIdRef=useRef(null);
+  workoutIdRef.current=workoutId;
   useEffect(()=>{
     if(restored||!tgId)return;
     // Явный старт новой тренировки — восстанавливать нечего
     if(preselectedExIds?.length>0||preselectedGroupIds?.length>0||plannedWorkoutId){setRestored(true);return;}
     if(!exercises?.length||!customLoaded)return;   // ждём каталог и свои упражнения
     let alive=true;
+    const _readSv=()=>{try{const r=localStorage.getItem("gymbot_active_workout");return r?JSON.parse(r):null;}catch{return null;}};
+    // Какая тренировка лежала на устройстве, когда спросили сервер. Пока ответ
+    // летит (плохая связь в зале), человек мог начать новую — её не трогаем.
+    const askedFor=_readSv()?.workoutId||null;
     fetch(`${API}/workout/${tgId}/active`)
       .then(r=>r.ok?r.json():null)
       .then(d=>{
         if(!alive)return;
         setRestored(true);
+        const _now_sv=_readSv();
+        // Сервер ответил, что активной тренировки нет, а на устройстве лежит
+        // начатая (с id с сервера). Значит её завершили на другом устройстве
+        // или закрыла ночная уборка. Раньше копия жила дальше: показывалась
+        // вчерашняя тренировка, а сохранение состояния получало 404.
+        // d===null — сбой запроса, а не «нет тренировки»: тогда не трогаем.
+        if(d&&d.found===false){
+          // Стираем только ту тренировку, о которой спрашивали, и только если
+          // она всё ещё та же и на устройстве, и на экране.
+          if(askedFor&&_now_sv?.workoutId===askedFor&&workoutIdRef.current===askedFor){
+            try{localStorage.removeItem("gymbot_active_workout");}catch{}
+            setWorkoutId(null);setSelExs([]);setSets({});setCurIdx(0);
+            setWarmup(null);setWarmupDone(false);setExTips({});setLastSetAt(null);
+            setResumeBanner(false);setStep(initStep);setStartTime(Date.now());
+            setClosedElsewhere(true);
+          }
+          return;
+        }
         if(!d?.found)return;
         // Локальное состояние свежее серверного — значит человек прямо сейчас
         // тренируется на этом устройстве, перетирать нельзя.
-        const _now_sv=(()=>{try{const r=localStorage.getItem("gymbot_active_workout");return r?JSON.parse(r):null;}catch{return null;}})();
         const localAt=_now_sv?.savedAt||0;
         const srvAt=d.state_at?Date.parse(d.state_at+"Z"):0;
         // Локальное состояние считается годным, только если в нём есть состав.
@@ -6542,21 +6652,27 @@ function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscle
     // Итоги, рекорды и разбор тренера сервер считает по записанным подходам —
     // поэтому сначала отправляем очередь.
     if(finishing)return;
-    if(sqPending()>0){
+    if(sqPending()>0||sqUnsentSets(workoutId)>0){
       setFinishing(true);
       const sent=await sqFlush();
       setFinishing(false);
-      if(!sent&&!window.confirm(t("sq_finish_pending").replace("{n}",sqPendingSets(workoutId)||sqPending())))return;
+      const left=sqUnsentSets(workoutId);
+      if((!sent||left>0)&&!window.confirm(t("sq_finish_pending").replace("{n}",left||sqPending())))return;
     }
     console.log("[finish] START workoutId:",workoutId,"plannedWorkoutId:",plannedWorkoutId,"tgId:",tgId);
     try{localStorage.removeItem("gymbot_active_workout");}catch{}
     const dur=workoutDurationMin();
+    // Пустая тренировка (ни одного подхода) сервером удаляется и не засчитывается:
+    // ни разбора тренера, ни отметки запланированной.
+    // Решает сервер (он видит подходы со всех устройств); по своим подсчётам — только если ответа нет.
+    let emptyWorkout=Object.values(sets).reduce((n,a)=>n+a.length,0)===0;
     try{
       if(workoutId){
-        const fr=await fetch(`${API}/workout/${workoutId}/finish?tg_id=${tgId}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({duration_minutes:dur})});
+        const fr=await fetch(`${API}/workout/${workoutId}/finish?tg_id=${tgId}`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({duration_minutes:dur,has_unsent:sqUnsentSets(workoutId)>0})});
         console.log("[finish] workout finish →",fr.status);
         try{
           const fd=await fr.json();
+          if(fr.ok)emptyWorkout=!!fd.empty;
           setStreakInfo({
             streak_days:fd.streak_days||0,
             new_streak_rewards:fd.new_streak_rewards||[],
@@ -6569,7 +6685,7 @@ function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscle
     // иначе запланированная тренировка остаётся незакрытой.
     const pwId=plannedWorkoutId||restoredPlannedId;
     console.log("[finish] pwId=",pwId);
-    if(pwId&&tgId){
+    if(pwId&&tgId&&!emptyWorkout){
       try{
         const r=await fetch(`${API}/planned/${tgId}/${pwId}`,{method:"PUT",headers:{"Content-Type":"application/json"},body:JSON.stringify({status:"completed"})});
         console.log("[finish] planned PUT",pwId,"→",r.status);
@@ -6579,6 +6695,7 @@ function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscle
     }
     if(onFinish)onFinish();
     setStep(STEP.FN);
+    if(emptyWorkout){setAiReview("__empty__");return;}
     // B-06: запрашиваем AI оценку тренировки
     try{
       const totalSetsCount=Object.values(sets).reduce((s,a)=>s+a.length,0);
@@ -6599,13 +6716,60 @@ ${exList}
       // mode:"review" — разбор проведённой тренировки. Без него сервер видел слово
       // «тренировку» в вопросе и включал схему плана: модель тратила ответ на план
       // упражнений, которого никто не просил, вместо связной оценки.
-      const res=await fetch(`${API}/ai/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({question:q,tg_id:tgId,skip_limit:true,mode:"review"})});
-      if(res.status===429){setAiReview("__limit__");return;}
-      if(res.status===503){setAiReview("__unavailable__");return;}
-      if(!res.ok){setAiReview("__error__");return;}
-      const d=await res.json();
-      const reviewText=d.answer||"__error__";
+      const body=JSON.stringify({question:q,tg_id:tgId,skip_limit:true,mode:"review"});
+      // Разбор целиком шёл 9–19 секунд, и всё это время на экране было «анализирую».
+      // Берём потоком, как в чате: первые слова через пару секунд. Поток не завёлся
+      // и ничего не показано — тихо повторяем обычным запросом.
+      let reviewText=null, streamed="", got=false, complete=false;
+      try{
+        const res=await fetch(`${API}/ai/ask-stream`,{method:"POST",headers:{"Content-Type":"application/json"},body});
+        if(!res.ok||!res.body)throw new Error("stream unavailable");
+        const reader=res.body.getReader(), dec=new TextDecoder();
+        let buf="", lastPaint=0;
+        read: for(;;){
+          const {done,value}=await reader.read();
+          if(done)break;
+          buf+=dec.decode(value,{stream:true});
+          let nl;
+          while((nl=buf.indexOf("\n\n"))>=0){
+            const line=buf.slice(0,nl); buf=buf.slice(nl+2);
+            if(!line.startsWith("data:"))continue;
+            let ev; try{ev=JSON.parse(line.slice(5));}catch{continue;}
+            if(ev.type==="delta"){
+              streamed+=ev.text; got=true;
+              const now=Date.now();
+              if(now-lastPaint>80){lastPaint=now;setAiReviewStream(streamed);}
+            }else if(ev.type==="done"){
+              reviewText=ev.answer||streamed||"__error__";
+              complete=true;
+              break read;
+            }else if(ev.type==="error"){
+              if(ev.status===429){setAiReviewStream("");setAiReview("__limit__");return;}
+              if(ev.status===503&&!got){setAiReview("__unavailable__");return;}
+              throw new Error(`stream error ${ev.status}`);
+            }
+          }
+        }
+        if(reviewText===null)throw new Error("stream ended early");
+      }catch(streamErr){
+        if(got){
+          // Часть уже прочитана — второй запрос дал бы другой разбор. Оставляем пришедшее.
+          reviewText=streamed;
+        }else{
+          const res=await fetch(`${API}/ai/ask`,{method:"POST",headers:{"Content-Type":"application/json"},body});
+          if(res.status===429){setAiReview("__limit__");return;}
+          if(res.status===503){setAiReview("__unavailable__");return;}
+          if(!res.ok){setAiReview("__error__");return;}
+          const d=await res.json();
+          reviewText=d.answer||"__error__";
+          complete=true;
+        }
+      }
+      setAiReviewStream("");
       setAiReview(reviewText);
+      // Оборванный на середине разбор показываем, но не сохраняем: он ушёл бы
+      // в контекст тренера на следующих тренировках обрывком фразы.
+      if(!complete)return;
       // Сохраняем совет тренера в БД
       if(workoutId&&reviewText&&reviewText!=="__error__"&&reviewText!=="__limit__"){
         try{
@@ -6678,7 +6842,12 @@ ${exList}
       </div>
 
       {/* B-06: AI оценка тренировки */}
-      {aiReview===null?(
+      {aiReview===null&&aiReviewStream?(
+        <Card accent style={{marginBottom:16}}>
+          <Kicker>{t("ai_review_title")}</Kicker>
+          <div style={{fontSize:14,color:C.text,lineHeight:1.7,marginTop:8,whiteSpace:"pre-wrap"}}>{aiReviewStream}<span style={{color:C.accent}}>▍</span></div>
+        </Card>
+      ):aiReview===null?(
         <Card accent style={{marginBottom:16}}>
           <Kicker>{t("ai_trainer_title")}</Kicker>
           <div style={{textAlign:"center",padding:"12px 0"}}>
@@ -6686,7 +6855,7 @@ ${exList}
             <div style={{color:C.muted,fontSize:24,marginTop:8}}>◌</div>
           </div>
         </Card>
-      ):aiReview&&aiReview!=="__limit__"&&aiReview!=="__error__"&&aiReview!=="__unavailable__"?(
+      ):aiReview&&aiReview!=="__limit__"&&aiReview!=="__error__"&&aiReview!=="__unavailable__"&&aiReview!=="__empty__"?(
         <Card accent style={{marginBottom:16}}>
           <Kicker>{t("ai_review_title")}</Kicker>
           <div style={{fontSize:14,color:C.text,lineHeight:1.7,marginTop:8,whiteSpace:"pre-wrap"}}>{aiReview}</div>
@@ -6709,6 +6878,12 @@ ${exList}
             {t("ai_unavailable")}
           </div>
         </Card>
+      ):aiReview==="__empty__"?(
+        <Card style={{marginBottom:16}}>
+          <div style={{fontSize:13,color:C.muted,textAlign:"center",padding:"8px 0",lineHeight:1.5}}>
+            {t("workout_empty_note")}
+          </div>
+        </Card>
       ):null}
 
       <Btn accent full onClick={()=>{if(onFinishNav)onFinishNav();else onBack();}} style={{marginTop:8}}>{t("back_to_menu")}</Btn>
@@ -6721,6 +6896,9 @@ ${exList}
       <BackBtn onBack={onBack}/>
       <Kicker>{t("choose_type_label")}</Kicker>
       <Hero style={{marginBottom:24}}>{t("choose_type")}</Hero>
+      {closedElsewhere&&<Card style={{marginBottom:16}}>
+        <div style={{fontSize:13,color:C.muted,lineHeight:1.5}}>{t("workout_closed_elsewhere")}</div>
+      </Card>}
       {resumeBanner&&<Card accent style={{marginBottom:16,cursor:"pointer"}} onClick={()=>{setResumeBanner(false);setStep(STEP.LG);}}>
         <div style={{display:"flex",alignItems:"center",gap:12}}>
           <span style={{fontSize:28}}>▶</span>
@@ -6991,6 +7169,7 @@ ${exList}
     const exMedia=ex.is_custom?ex:((exercises||[]).find(e=>e.id===ex.id)||ex);
     const lsCur=lastSets[ex.id];
     const lastIdx=lsCur?.sets?.length?Math.min(doneSets.length,lsCur.sets.length-1):-1;
+
     const lastAgo=lsCur?.date?fmtDayAgo(lsCur.date):"";
 
     return(
@@ -7328,8 +7507,10 @@ function PlannedDetailScreen({pwId,tgId,onBack,exercises=[],muscleGroups=[],read
       .then(d=>{
         setData(d);
         if(d.planned_datetime){
-          const dt=new Date(d.planned_datetime);
-          setForm({title:d.title||"",date:dt.toISOString().split("T")[0],time:dt.toTimeString().slice(0,5)});
+          // В базе время UTC, форма — по Ташкенту. Раньше форма показывала UTC-время,
+          // а сохранение снова вычитало 5 ч: каждое редактирование сдвигало тренировку на 5 ч раньше.
+          const dt=utcToLocal(d.planned_datetime);
+          if(dt)setForm({title:d.title||"",date:ymdOf(dt),time:dt.toTimeString().slice(0,5)});
         }
       })
       .catch(()=>setData({exercises:[],title:t("failed_load"),status:"error"}));
@@ -7446,8 +7627,8 @@ function PlanWorkoutScreen({tgId,exercises,muscleGroups,onBack}){
       const planDt=new Date(`${form.date}T${form.time}:00`);
       const planned=await fetch(`${API}/planned/${tgId}`).then(r=>r.json()).catch(()=>({planned:[]}));
       const conflict=(planned.planned||[]).find(pw=>{
-        const pwDt=new Date(pw.planned_datetime);
-        return Math.abs(planDt-pwDt)<60*60*1000; // ±1 час
+        const pwDt=utcToLocal(pw.planned_datetime); // с сервера UTC, planDt — по Ташкенту
+        return pwDt&&Math.abs(planDt-pwDt)<60*60*1000; // ±1 час
       });
       if(conflict){
         const ok=window.confirm(t("plan_time_taken").replace("{dt}",planDt.toLocaleString(dateLocale(),{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"})).replace("{title}",conflict.title));
@@ -7872,13 +8053,13 @@ function ProgressScreen({stats,tgId,onNav}){
               background:activeGroup===name?C.accent:C.card,
               border:`0.5px solid ${activeGroup===name?C.accent:C.border}`,
               color:activeGroup===name?C.bg:C.muted}}>
-            {g.emoji} {name} ({g.workouts.length})
+            {g.emoji} {trGroupName(name)} ({g.workouts.length})
           </button>)}
         </div>
 
         {/* Графики */}
         {(activeGroup?[[activeGroup,selectedGroup]]:groups).map(([name,g])=>
-          g&&<MuscleGroupChart key={name} data={g.workouts} groupName={name} emoji={g.emoji}/>
+          g&&<MuscleGroupChart key={name} data={g.workouts} groupName={trGroupName(name)} emoji={g.emoji}/>
         )}
       </>
     }
@@ -7907,7 +8088,7 @@ function ProgressScreen({stats,tgId,onNav}){
           const pct=n.your_max?Math.min(100,Math.round((n.your_max/n.levels.elite)*100)):0;
           return<div key={i} style={{marginBottom:12,paddingBottom:12,borderBottom:i<norms.norms.length-1?`0.5px solid ${C.border}`:"none"}}>
             <div style={{display:"flex",justifyContent:"space-between",marginBottom:4}}>
-              <span style={{fontSize:13,color:C.text,fontWeight:500}}>{n.exercise}</span>
+              <span style={{fontSize:13,color:C.text,fontWeight:500}}>{trEx(n.exercise)}</span>
               <div style={{textAlign:"right"}}>
                 {n.your_max
                   ?<><Mono size={13}>{n.your_max}{n.unit||t("home_kg")}</Mono><span style={{fontSize:11,color:levelColor,marginLeft:6}}>{levelLabel}</span></>
@@ -8610,7 +8791,12 @@ function FoodVisionScreen({tgId,onBack,mealType}){
   const [editing,setEditing]=useState(false);
   const [editText,setEditText]=useState("");
   const [recalculating,setRecalculating]=useState(false);
+  const [quota,setQuota]=useState(null);   // {used, limit} — распознаваний за сегодня
   const inputRef=useRef(null);
+  useEffect(()=>{
+    if(!tgId)return;
+    fetch(`${API}/food/quota/${tgId}`).then(r=>r.ok?r.json():null).then(q=>{if(q&&q.limit!=null)setQuota(q);}).catch(()=>{});
+  },[tgId]);
 
   // ── Кадрирование ──────────────────────────────────────────────────────────
   const [cropping,setCropping]=useState(false);
@@ -8702,8 +8888,17 @@ function FoodVisionScreen({tgId,onBack,mealType}){
       const res=await fetch(`${API}/food/analyze`,{method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({image_base64:photo,tg_id:tgId,save:false})});
+      if(res.status===429){
+        // Лимит на сегодня: сервер говорит, сколько можно, — показываем это, а не «не удалось»
+        let q=null;try{q=(await res.json())?.detail;}catch{}
+        if(q&&q.limit!=null)setQuota({used:q.used,limit:q.limit});
+        setError(t("food_limit_reached").replace("{limit}",q?.limit??""));
+        return;
+      }
       if(!res.ok)throw new Error(res.status);
-      setResult(await res.json());
+      const d=await res.json();
+      if(d?.quota)setQuota(d.quota);
+      setResult(d);
     }catch(e){setError(e?.message==="503"?t("ai_unavailable"):t("failed_recognize"));}
     finally{setLoading(false);}
   }
@@ -8793,6 +8988,8 @@ function FoodVisionScreen({tgId,onBack,mealType}){
             {!result&&!loading&&<Btn accent full onClick={analyze} style={{flex:2}}>{t("analyze_btn2")}</Btn>}
           </div>
           {!result&&!loading&&<Btn full onClick={recropCurrentPhoto}>{t("fv_perekadrirovat")}</Btn>}
+          {quota&&!result&&<div style={{fontSize:11,color:C.muted,textAlign:"center",marginTop:8,fontFamily:"monospace"}}>
+            {t("food_quota_left").replace("{left}",Math.max(0,quota.limit-quota.used)).replace("{limit}",quota.limit)}</div>}
         </div>
       )}
       {loading&&<Card><div style={{textAlign:"center",padding:"16px 0",color:C.accent,fontFamily:"monospace",fontSize:12,letterSpacing:2}}>{t("analyzing_photo2")}</div></Card>}
@@ -8877,7 +9074,9 @@ function NutritionScreen({tgId,onBack,onNav}){
   const MEALS=[{type:"breakfast",label:t("meal_breakfast"),icon:"🌅"},{type:"lunch",label:t("meal_lunch"),icon:"☀️"},{type:"dinner",label:t("meal_dinner"),icon:"🌙"},{type:"snack",label:t("meal_snack"),icon:"🍎"}];
   const [data,setData]=useState(null);
   const [error,setError]=useState(null);
-  const [viewDate,setViewDate]=useState(()=>new Date().toISOString().split("T")[0]); // UTC намеренно: сервер бакетирует питание по UTC-дате, см. tech_debt
+  // Дата по местному времени — сервер теперь тоже делит питание на сутки по UTC+5.
+  // Раньше обе стороны жили по UTC, и с полуночи до пяти утра «сегодня» было вчера.
+  const [viewDate,setViewDate]=useState(()=>localToday());
   const [adding,setAdding]=useState(null);
   const [saving,setSaving]=useState(false);
   const [form,setForm]=useState({meal_name:"",kcal:"",protein:"",fat:"",carb:""});
@@ -8890,7 +9089,7 @@ function NutritionScreen({tgId,onBack,onNav}){
   const [editLogText,setEditLogText]=useState("");
   const [editLogWeight,setEditLogWeight]=useState(300);
   const [editLogBusy,setEditLogBusy]=useState(false);
-  const isToday=viewDate===new Date().toISOString().split("T")[0];
+  const isToday=viewDate===localToday();
 
   // Норма воды: вес(кг) * 30мл / 250мл = стаканов (мин 6, макс 12)
   const waterGoal=data?.water_norm_glasses||8;
@@ -8967,9 +9166,9 @@ function NutritionScreen({tgId,onBack,onNav}){
     <BackBtn onBack={onBack}/><Kicker>{t("menu_nutrition")}</Kicker><Hero>{t("nutrition_title")}</Hero>
 
     <div style={{display:"flex",alignItems:"center",gap:8,marginTop:8,marginBottom:16}}>
-      <button onClick={()=>{const d=new Date(viewDate);d.setDate(d.getDate()-1);setViewDate(d.toISOString().split("T")[0]);}} style={{background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"6px 14px",color:C.text,cursor:"pointer",fontSize:16}}>‹</button>
+      <button onClick={()=>setViewDate(shiftDay(viewDate,-1))} style={{background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"6px 14px",color:C.text,cursor:"pointer",fontSize:16}}>‹</button>
       <div style={{flex:1,textAlign:"center",fontFamily:"monospace",fontSize:12,color:isToday?C.accent:C.muted}}>{isToday?t("today"):new Date(viewDate+"T12:00:00").toLocaleDateString(dateLocale(),{day:"numeric",month:"short"})}</div>
-      {!isToday&&<button onClick={()=>setViewDate(new Date().toISOString().split("T")[0])} style={{background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"6px 14px",color:C.text,cursor:"pointer",fontSize:16}}>›</button>}
+      {!isToday&&<button onClick={()=>setViewDate(localToday())} style={{background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"6px 14px",color:C.text,cursor:"pointer",fontSize:16}}>›</button>}
     </div>
 
     <Card accent style={{marginBottom:12}}>
@@ -10313,6 +10512,7 @@ export default function App(){
     const want = lang || "ru";
     wantCatalogLang.current = want;
     const apply=(d,stale)=>{
+      indexCatalogNames(d.exercises,d.muscle_groups);
       setExercises(d.exercises||[]);setMuscleGroups(d.muscle_groups||[]);
       // После заглушки оставляем метку пустой, чтобы правильный язык её сменил.
       haveCatalogLang.current = stale ? null : want;
@@ -10436,6 +10636,10 @@ export default function App(){
   if(user?._not_found)return<OnboardingScreen tgId={tgId} tgUser={tg?.initDataUnsafe?.user} onComplete={()=>{setUser(null);loadUser();}}/>;
   // Согласие у тех, кто зарегистрировался до его появления: новые дают его
   // в онбординге, а существующие иначе остались бы без отметки навсегда.
+  // Профиль не загрузился (нет связи, сервер недоступен). Раньше заглушка без
+  // отметок о согласии попадала на экран согласия, и человек думал, что оно
+  // слетело, а нажать «Принимаю» без сети всё равно нельзя.
+  if(user?._error)return<OfflineScreen onRetry={()=>{setUser(null);loadUser();}}/>;
   if(user&&!(user.consents?.terms&&user.consents?.basic))return<ConsentGateScreen tgId={tgId} onDone={()=>{setUser(null);loadUser();}}/>;
   // Загрузка
   if(!user)return<div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:C.bg}}><Loader text={t("loading")}/></div>;

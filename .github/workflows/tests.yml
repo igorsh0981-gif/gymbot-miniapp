@@ -1,0 +1,31 @@
+# Сценарии приложения в Chromium: на каждый pull request и перед каждой
+# выкладкой на GitHub Pages (deploy.yml вызывает этот файл первым шагом).
+name: tests
+
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]     # для main тесты запускает deploy.yml
+  workflow_call:
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium
+      - name: Сборка и сценарии
+        run: npm run test:e2e
+      - name: Скриншоты прогона
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-shots
+          path: e2e/shots
+          retention-days: 7
