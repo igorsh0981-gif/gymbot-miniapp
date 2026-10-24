@@ -78,9 +78,10 @@ function json(route, body, status = 200) {
   return route.fulfill({ status, contentType: "application/json", headers: { "access-control-allow-origin": "*" }, body: JSON.stringify(body) });
 }
 
-async function setup(page, { lang = "ru", setFails = false, curIdx = 0, tab = "workout", screen = "active_workout", params = {}, swr = null, liteSaved = false, quota = 0, platform = null, net = { setMode: "ok", setBodies: [], counts: {} } } = {}) {
+async function setup(page, { lang = "ru", ls = null, setFails = false, curIdx = 0, tab = "workout", screen = "active_workout", params = {}, swr = null, liteSaved = false, quota = 0, platform = null, net = { setMode: "ok", setBodies: [], counts: {} } } = {}) {
   if (setFails) net.setMode = "fail500";
-  await page.addInitScript(({ saved, lang, tab, screen, params, swr, quota, platform }) => {
+  await page.addInitScript(({ saved, lang, tab, screen, params, swr, quota, platform, ls }) => {
+    if (ls) for (const [k, v] of Object.entries(ls)) localStorage.setItem(k, v);
     if (platform) window.__platform = platform;
     if (quota) {
       // Имитация переполненного хранилища: считаем только записи кэша
@@ -98,7 +99,7 @@ async function setup(page, { lang = "ru", setFails = false, curIdx = 0, tab = "w
     localStorage.setItem("gymbot_lang", lang);
     history.replaceState({ _g: true, tab, screen, params }, "");
     if (swr) for (const [k, v] of Object.entries(swr)) localStorage.setItem("gymbot_swr:" + k, JSON.stringify({ t: Date.now(), d: v }));
-  }, { saved: tab === "workout" ? savedWorkout(curIdx, liteSaved) : null, lang, tab, screen, params, swr, quota, platform });
+  }, { saved: tab === "workout" ? savedWorkout(curIdx, liteSaved) : null, lang, tab, screen, params, swr, quota, platform, ls });
   await page.route("**/*", async (route) => {
     const req = route.request();
     const url = new URL(req.url());
@@ -266,6 +267,11 @@ async function setup(page, { lang = "ru", setFails = false, curIdx = 0, tab = "w
       }
       if (p.startsWith(`/programs/${TG_ID}/`)) return json(route, net.programDetail || {});
       if (p === `/strength/${TG_ID}`) return json(route, net.strength || { lifts: [], missing: [], keys: [], overall: null });
+      if (p === `/whats-new/${TG_ID}`) {
+        if (req.method() === "POST") { (net.wnPosts = net.wnPosts || []).push(JSON.parse(req.postData() || "{}").version); return json(route, { ok: true }); }
+        net.wnGets = (net.wnGets || 0) + 1;
+        return json(route, net.wn || { seen: "2099-01-01", new_user: false });
+      }
       if (p.startsWith("/custom-exercises")) return json(route, { exercises: [] });
       if (p.startsWith("/workout/") && p.endsWith("/state")) return json(route, { ok: true });
       return json(route, {});
@@ -291,7 +297,7 @@ async function scenario(name, vp, opts, act) {
   page.on("pageerror", (e) => errors.push(String(e)));
   page.on("console", (m) => { if (m.type() === "error") errors.push(m.text()); });
   await setup(page, opts);
-  await page.goto("http://app.test/gymbot-miniapp/");
+  await page.goto("http://app.test/gymbot-miniapp/" + (opts.startapp ? "?startapp=" + opts.startapp : ""));
   await page.waitForTimeout(1200);
   let info = {};
   try { info = (await act(page, opts.net)) || {}; } catch (e) { errors.push("ACT: " + e.message); }
@@ -752,6 +758,70 @@ await scenario("57_team_join_board", VIEWPORTS[1], { tab: "menu", screen: "socia
   await page.getByText("Вы в команде «Зал №1»").waitFor({ timeout: 5000 });
   await page.getByText("РЕЙТИНГ НЕДЕЛИ").waitFor({ timeout: 4000 });
   return { joins: net.joins || [], owner: await page.getByText("владелец").count(), invite: await page.getByRole("button", { name: /Позвать в команду/ }).count() };
+});
+
+// ── «Что нового» ──
+const WN_NET = () => ({ setMode: "ok", setBodies: [], counts: {}, home: HOME, premium: PREMIUM, wn: { seen: null, new_user: false } });
+await scenario("58_whats_new_tour", VIEWPORTS[1], { tab: "menu", screen: null, net: WN_NET() }, async (page, net) => {
+  await page.getByRole("dialog").waitFor({ timeout: 5000 });
+  const first = await page.getByText("ЧТО НОВОГО · 1/5").count();
+  const title1 = await page.locator("#wn-title").textContent();
+  const levels = await page.getByText("от «Старт» до «Элита»", { exact: false }).count();
+  const bb = await page.evaluate(() => window.Telegram.WebApp.BackButton.isVisible);
+  const titles = [title1];
+  for (let k = 0; k < 4; k++) { await page.getByRole("button", { name: "ДАЛЕЕ" }).click(); await page.waitForTimeout(120); titles.push(await page.locator("#wn-title").textContent()); }
+  const trialCta = await page.getByRole("button", { name: /Попробовать 7 дн\. бесплатно/i }).count();
+  const perks = await page.getByText("До 30 вопросов AI-тренеру в день").count();
+  await page.screenshot({ path: path.join(OUT, "58b_whats_new_premium.png") });
+  await page.getByRole("button", { name: "ГОТОВО" }).click();
+  await page.waitForTimeout(300);
+  return { first, titles, levels, bb, trialCta, perks, dialogAfter: await page.getByRole("dialog").count(), posts: net.wnPosts || [],
+           ls: await page.evaluate(() => localStorage.getItem("gymbot_wn_seen_123456789")), bbAfter: await page.evaluate(() => window.Telegram.WebApp.BackButton.isVisible) };
+});
+await scenario("59_whats_new_cta_opens_feature", VIEWPORTS[0], { tab: "menu", screen: null, net: WN_NET() }, async (page, net) => {
+  await page.getByRole("dialog").waitFor({ timeout: 5000 });
+  await page.getByRole("button", { name: "ДАЛЕЕ" }).click();
+  await page.waitForTimeout(150);
+  await page.screenshot({ path: path.join(OUT, "59b_whats_new_food_360x740.png") });
+  await page.getByRole("button", { name: "ДАЛЕЕ" }).click();
+  await page.getByRole("button", { name: "ВЫБРАТЬ ПРОГРАММУ" }).click();
+  await page.waitForTimeout(400);
+  return { posts: net.wnPosts || [], dialog: await page.getByRole("dialog").count(), programs: await page.getByText("ПРОГРАММЫ", { exact: true }).count(),
+           programsReq: net.counts["GET /programs/{tg}"] || 0 };
+});
+await scenario("60_whats_new_swipe_and_back", VIEWPORTS[2], { tab: "menu", screen: null, net: { ...WN_NET(), wn: { seen: "2026-01-01", new_user: true } } }, async (page, net) => {
+  await page.getByRole("dialog").waitFor({ timeout: 5000 });
+  const kicker = await page.getByText("ПОЛЕЗНО ЗНАТЬ · 1/5").count();
+  const box = await page.getByRole("dialog").boundingBox();
+  const swipe = async (from, to) => {
+    await page.dispatchEvent('[role="dialog"]', "touchstart", { touches: [{ identifier: 1, clientX: from, clientY: 400 }], changedTouches: [{ identifier: 1, clientX: from, clientY: 400 }] });
+    await page.dispatchEvent('[role="dialog"]', "touchend", { touches: [], changedTouches: [{ identifier: 1, clientX: to, clientY: 400 }] });
+    await page.waitForTimeout(150);
+  };
+  await swipe(box.width - 40, 60);
+  const afterLeft = await page.getByText("ПОЛЕЗНО ЗНАТЬ · 2/5").count();
+  await swipe(60, box.width - 40);
+  const afterRight = await page.getByText("ПОЛЕЗНО ЗНАТЬ · 1/5").count();
+  await page.evaluate(() => window.Telegram.WebApp.BackButton._h.forEach(f => f()));
+  await page.waitForTimeout(300);
+  return { kicker, afterLeft, afterRight, dialogAfterBack: await page.getByRole("dialog").count(), posts: net.wnPosts || [] };
+});
+await scenario("61_whats_new_not_again", VIEWPORTS[1], { tab: "menu", screen: null, ls: { gymbot_wn_seen_123456789: "2026-10-25" }, net: WN_NET() }, async (page, net) => {
+  await page.waitForTimeout(800);
+  return { gets: net.wnGets || 0, dialog: await page.getByRole("dialog").count() };
+});
+await scenario("62_whats_new_not_over_deeplink", VIEWPORTS[1], { tab: "menu", screen: null, startapp: "premium", net: WN_NET() }, async (page, net) => {
+  await page.waitForTimeout(1200);
+  return { gets: net.wnGets || 0, dialog: await page.getByRole("dialog").count(), premium: await page.getByText(/ПОПРОБОВАТЬ|7 дней/i).count() > 0 ? 1 : 0 };
+});
+await scenario("63_whats_new_from_more_uz", VIEWPORTS[0], { lang: "uz", tab: "menu", screen: "more", net: { ...WN_NET(), wn: { seen: "2099-01-01", new_user: false } } }, async (page, net) => {
+  await page.getByText("Yangiliklar", { exact: true }).click();
+  await page.getByRole("dialog").waitFor({ timeout: 4000 });
+  const kicker = await page.getByText("YANGILIKLAR · 1/5").count();
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
+  await page.getByRole("button", { name: "MENING DARAJAM" }).click();
+  await page.waitForTimeout(400);
+  return { kicker, overflow, dialog: await page.getByRole("dialog").count(), strengthReq: net.counts["GET /strength/{tg}"] || 0, posts: net.wnPosts || [] };
 });
 
 await browser.close();
