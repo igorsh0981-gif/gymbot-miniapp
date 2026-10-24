@@ -56,4 +56,15 @@ export const CHECKS = {
   // лимит распознавания еды
   "28_food_quota_ok": r => all(eq("остаток", r.quotaLine, "Распознаваний на сегодня: 7 из 10"), eq("результат", r.result, 1), eq("сообщение о лимите", r.limitMsg, 0)),
   "29_food_limit_reached": r => all(eq("сообщение о лимите", r.limitMsg, 1), eq("результат", r.result, 0)),
+  // Premium: оплата через openInvoice, ожидание продления, пробный период, вход с лимита
+  "37_premium_buy_month": r => all(eq("план", r.plan, "month"), eq("счёт", (r.calls || []).map(c => c.slice(0, 2)), [["openInvoice", "https://t.me/$invoice-month"]]),
+                                   eq("выгода года", r.save, 1), eq("лимит тренера", r.perks, 1)),
+  "38_premium_trial": r => all(eq("запросов", r.trials, 1), eq("кнопка пропала", r.trialBtn, 0)),
+  "40_premium_entry_points": r => all(eq("подсказка", r.nudge, 1), eq("экран Premium", r.opened, 1)),
+  // карточка тренировки: история и чат через Telegram; старый клиент — в чат с ботом
+  "39_finish_share": r => all(eq("запросы", r.share, ["card:77", "prepared:77"]),
+                              eq("история", (r.calls || []).filter(c => c[0] === "shareToStory").map(c => [c[1], c[2]?.text]),
+                                 [["https://api.test/api/share/img/77.story.ru.1.x.jpg", "Грудь 💪 t.me/GYMASH_bot"]]),
+                              eq("чат", (r.calls || []).filter(c => c[0] === "shareMessage").map(c => c[1]), ["prep-1"])),
+  "41_workout_detail_share_old_client": r => all(eq("запросы", r.share, ["send:555"]), eq("методы Telegram", (r.calls || []).length, 0)),
 };

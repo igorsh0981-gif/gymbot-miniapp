@@ -473,6 +473,7 @@ const T = {
     resume_workout:"ПРОДОЛЖИТЬ ТРЕНИРОВКУ", resume_desc:"У тебя есть незавершённая тренировка",
     workout_closed_elsewhere:"Прошлая тренировка уже завершена — на другом устройстве или автоматически. Можно начать новую.",
     finish_workout:"ЗАВЕРШИТЬ", workout_empty_note:"Ни одного подхода не записано — тренировка не засчитана и в историю не попала.", set_done:"✓ ПОДХОД ВЫПОЛНЕН", set_done_label:"ПОДХОД ВЫПОЛНЕН",
+    premium_menu:"Premium", premium_kicker:"PREMIUM", premium_title:"GymBot Premium", premium_lead:"Больше вопросов тренеру и распознаваний еды — и поддержка развития GymBot.", premium_active_until:"Premium активен до {date}", premium_trial_until:"Пробный Premium до {date}", premium_manual:"Premium активен", premium_perk_ai:"{n} вопросов тренеру в день", premium_perk_food:"{n} фото еды в день", premium_perk_now:"без Premium — {n}", premium_perk_support:"Новые функции быстрее: вы поддерживаете развитие приложения", premium_month:"Месяц", premium_year:"Год", premium_month_note:"продлевается каждые 30 дней, выключить можно в любой момент", premium_year_note:"разовая оплата на 365 дней", premium_save:"выгода {n}%", premium_buy:"Оформить за {n} ⭐", premium_extend:"Продлить за {n} ⭐", premium_trial_btn:"Попробовать {n} дн. бесплатно", premium_renews:"Подписка продлится {date}", premium_renew_off:"Автопродление выключено — Premium до {date}", premium_cancel_btn:"Выключить автопродление", premium_resume_btn:"Включить автопродление", premium_paid_wait:"Оплата прошла — включаем Premium…", premium_paid_ok:"Premium включён до {date}. Спасибо!", premium_paid_late:"Оплата прошла. Premium включится в течение нескольких минут — бот пришлёт сообщение.", premium_failed:"Оплата не прошла. Попробуйте ещё раз.", premium_error:"Не получилось открыть оплату. Попробуйте позже.", premium_already_sub:"Подписка уже оформлена.", premium_note:"Оплата звёздами Telegram. Автопродление можно выключить здесь или в Telegram: Настройки → Мои звёзды. Вопросы по оплате — команда /paysupport в боте.", premium_nudge_ai:"С Premium — {n} вопросов тренеру в день", premium_nudge_food:"С Premium — {n} фото еды в день", premium_nudge_btn:"Подробнее", share_kicker:"ПОДЕЛИТЬСЯ", share_story:"В историю", share_chat:"В чат", share_preparing:"Готовлю карточку…", share_sent_bot:"Карточка в чате с ботом — перешлите её друзьям", share_error:"Не получилось подготовить карточку. Попробуйте ещё раз.",
     warmup_title:"РАЗМИНКА", warmup_skip:"ПРОПУСТИТЬ", warmup_done:"✓ РАЗМИНКА ВЫПОЛНЕНА",
     warmup_hint:"Кардио для разминки — опционально", warmup_badge:"🏃 РАЗМИНКА",
     ready_wk_kicker:"ТРЕНИРОВКА СОБРАНА", ready_wk_hint:"Состав подобран по твоей истории", ready_wk_change:"Изменить состав",
@@ -1358,6 +1359,7 @@ const T = {
     resume_workout:"CONTINUE WORKOUT", resume_desc:"You have an unfinished workout",
     workout_closed_elsewhere:"Your previous workout has already been finished — on another device or automatically. You can start a new one.",
     finish_workout:"FINISH", workout_empty_note:"No sets were logged, so this workout was not counted and is not in your history.", set_done:"✓ SET DONE", set_done_label:"SET DONE",
+    premium_menu:"Premium", premium_kicker:"PREMIUM", premium_title:"GymBot Premium", premium_lead:"More coach questions and food recognitions — and you support GymBot's development.", premium_active_until:"Premium is active until {date}", premium_trial_until:"Premium trial until {date}", premium_manual:"Premium is active", premium_perk_ai:"{n} coach questions a day", premium_perk_food:"{n} food photos a day", premium_perk_now:"{n} without Premium", premium_perk_support:"New features sooner: you support the app's development", premium_month:"Month", premium_year:"Year", premium_month_note:"renews every 30 days, turn off any time", premium_year_note:"one-time payment for 365 days", premium_save:"save {n}%", premium_buy:"Get for {n} ⭐", premium_extend:"Extend for {n} ⭐", premium_trial_btn:"Try {n} days free", premium_renews:"Subscription renews on {date}", premium_renew_off:"Auto-renewal is off — Premium until {date}", premium_cancel_btn:"Turn off auto-renewal", premium_resume_btn:"Turn on auto-renewal", premium_paid_wait:"Payment received — turning Premium on…", premium_paid_ok:"Premium is on until {date}. Thank you!", premium_paid_late:"Payment received. Premium will turn on within a few minutes — the bot will message you.", premium_failed:"Payment failed. Please try again.", premium_error:"Couldn't open the payment. Please try later.", premium_already_sub:"You already have a subscription.", premium_note:"Paid with Telegram Stars. You can turn auto-renewal off here or in Telegram: Settings → My Stars. Payment questions — /paysupport in the bot.", premium_nudge_ai:"With Premium — {n} coach questions a day", premium_nudge_food:"With Premium — {n} food photos a day", premium_nudge_btn:"Learn more", share_kicker:"SHARE", share_story:"To story", share_chat:"To chat", share_preparing:"Preparing the card…", share_sent_bot:"The card is in your chat with the bot — forward it to friends", share_error:"Couldn't prepare the card. Please try again.",
     warmup_title:"WARM UP", warmup_skip:"SKIP", warmup_done:"✓ WARM UP DONE",
     warmup_hint:"Cardio for warm-up — optional", warmup_badge:"🏃 WARM UP",
     ready_wk_kicker:"WORKOUT READY", ready_wk_hint:"Built from your training history", ready_wk_change:"Change exercises",
@@ -2239,6 +2241,7 @@ const T = {
     resume_workout:"MASHQNI DAVOM ETTIRISH", resume_desc:"Tugallanmagan mashqingiz bor",
     workout_closed_elsewhere:"Oldingi mashq allaqachon yakunlangan — boshqa qurilmada yoki avtomatik. Yangisini boshlashingiz mumkin.",
     finish_workout:"TUGATISH", workout_empty_note:"Birorta ham yondashuv yozilmadi — mashg‘ulot hisobga olinmadi va tarixga tushmadi.", set_done:"✓ YONDASHUV BAJARILDI", set_done_label:"YONDASHUV BAJARILDI",
+    premium_menu:"Premium", premium_kicker:"PREMIUM", premium_title:"GymBot Premium", premium_lead:"Murabbiyga ko'proq savol va ovqatni ko'proq aniqlash — hamda GymBot rivojini qo'llab-quvvatlash.", premium_active_until:"Premium {date} gacha faol", premium_trial_until:"Sinov Premium {date} gacha", premium_manual:"Premium faol", premium_perk_ai:"Kuniga {n} ta murabbiy savoli", premium_perk_food:"Kuniga {n} ta ovqat surati", premium_perk_now:"Premium'siz — {n}", premium_perk_support:"Yangi imkoniyatlar tezroq: siz ilova rivojini qo'llab-quvvatlaysiz", premium_month:"Oy", premium_year:"Yil", premium_month_note:"har 30 kunda yangilanadi, istalgan vaqtda o'chirish mumkin", premium_year_note:"365 kunga bir martalik to'lov", premium_save:"{n}% tejash", premium_buy:"{n} ⭐ ga olish", premium_extend:"{n} ⭐ ga uzaytirish", premium_trial_btn:"{n} kun bepul sinab ko'rish", premium_renews:"Obuna {date} da yangilanadi", premium_renew_off:"Avto-yangilash o'chirilgan — Premium {date} gacha", premium_cancel_btn:"Avto-yangilashni o'chirish", premium_resume_btn:"Avto-yangilashni yoqish", premium_paid_wait:"To'lov o'tdi — Premium yoqilmoqda…", premium_paid_ok:"Premium {date} gacha yoqildi. Rahmat!", premium_paid_late:"To'lov o'tdi. Premium bir necha daqiqada yoqiladi — bot xabar yuboradi.", premium_failed:"To'lov o'tmadi. Qaytadan urinib ko'ring.", premium_error:"To'lovni ochib bo'lmadi. Keyinroq urinib ko'ring.", premium_already_sub:"Obuna allaqachon rasmiylashtirilgan.", premium_note:"Telegram yulduzlari bilan to'lov. Avto-yangilashni shu yerda yoki Telegram'da o'chirish mumkin: Sozlamalar → Mening yulduzlarim. To'lov bo'yicha savollar — botda /paysupport buyrug'i.", premium_nudge_ai:"Premium bilan — kuniga {n} ta murabbiy savoli", premium_nudge_food:"Premium bilan — kuniga {n} ta ovqat surati", premium_nudge_btn:"Batafsil", share_kicker:"ULASHISH", share_story:"Hikoyaga", share_chat:"Chatga", share_preparing:"Kartochka tayyorlanmoqda…", share_sent_bot:"Kartochka bot bilan chatda — uni do'stlaringizga yuboring", share_error:"Kartochkani tayyorlab bo'lmadi. Qaytadan urinib ko'ring.",
     warmup_title:"ISITISH", warmup_skip:"O'TKAZIB YUBORISH", warmup_done:"✓ ISITISH BAJARILDI",
     warmup_hint:"Isitish uchun kardio — ixtiyoriy", warmup_badge:"🏃 ISITISH",
     ready_wk_kicker:"MASHG'ULOT TAYYOR", ready_wk_hint:"Tarkib mashg'ulot tarixingiz asosida tanlandi", ready_wk_change:"Tarkibni o'zgartirish",
@@ -3120,6 +3123,7 @@ const T = {
     resume_workout:"ЖАТТЫҒУДЫ ЖАЛҒАСТЫРУ", resume_desc:"Аяқталмаған жаттығуыңыз бар",
     workout_closed_elsewhere:"Алдыңғы жаттығу аяқталған — басқа құрылғыда немесе автоматты түрде. Жаңасын бастауға болады.",
     finish_workout:"АЯҚТАУ", workout_empty_note:"Бірде-бір тәсіл жазылмады — жаттығу есептелмеді және тарихқа түспеді.", set_done:"✓ ТӘСІЛ ОРЫНДАЛДЫ", set_done_label:"ТӘСІЛ ОРЫНДАЛДЫ",
+    premium_menu:"Premium", premium_kicker:"PREMIUM", premium_title:"GymBot Premium", premium_lead:"Жаттықтырушыға көбірек сұрақ және тамақты көбірек тану — әрі GymBot дамуына қолдау.", premium_active_until:"Premium {date} дейін белсенді", premium_trial_until:"Сынақ Premium {date} дейін", premium_manual:"Premium белсенді", premium_perk_ai:"Күніне {n} жаттықтырушы сұрағы", premium_perk_food:"Күніне {n} тамақ суреті", premium_perk_now:"Premium-сыз — {n}", premium_perk_support:"Жаңа мүмкіндіктер тезірек: сіз қолданбаның дамуын қолдайсыз", premium_month:"Ай", premium_year:"Жыл", premium_month_note:"әр 30 күн сайын ұзартылады, кез келген уақытта өшіруге болады", premium_year_note:"365 күнге бір реттік төлем", premium_save:"{n}% үнем", premium_buy:"{n} ⭐ алу", premium_extend:"{n} ⭐ ұзарту", premium_trial_btn:"{n} күн тегін байқап көру", premium_renews:"Жазылым {date} ұзартылады", premium_renew_off:"Автоұзарту өшірулі — Premium {date} дейін", premium_cancel_btn:"Автоұзартуды өшіру", premium_resume_btn:"Автоұзартуды қосу", premium_paid_wait:"Төлем өтті — Premium қосылуда…", premium_paid_ok:"Premium {date} дейін қосылды. Рахмет!", premium_paid_late:"Төлем өтті. Premium бірнеше минутта қосылады — бот хабарлама жібереді.", premium_failed:"Төлем өтпеді. Қайта көріңіз.", premium_error:"Төлемді ашу мүмкін болмады. Кейінірек көріңіз.", premium_already_sub:"Жазылым бұрыннан бар.", premium_note:"Telegram жұлдыздарымен төлем. Автоұзартуды осында немесе Telegram-да өшіруге болады: Баптаулар → Менің жұлдыздарым. Төлем бойынша сұрақтар — боттағы /paysupport командасы.", premium_nudge_ai:"Premium-мен — күніне {n} жаттықтырушы сұрағы", premium_nudge_food:"Premium-мен — күніне {n} тамақ суреті", premium_nudge_btn:"Толығырақ", share_kicker:"БӨЛІСУ", share_story:"Тарихқа", share_chat:"Чатқа", share_preparing:"Карточка дайындалуда…", share_sent_bot:"Карточка ботпен чатта — оны достарыңызға жіберіңіз", share_error:"Карточканы дайындау мүмкін болмады. Қайта көріңіз.",
     warmup_title:"ЖЫЛЫТУ", warmup_skip:"ӨТКІЗІП ЖІБЕРу", warmup_done:"✓ ЖЫЛЫТУ ОРЫНДАЛДЫ",
     warmup_hint:"Жылыту үшін кардио — міндетті емес", warmup_badge:"🏃 ЖЫЛЫТУ",
     ready_wk_kicker:"ЖАТТЫҒУ ЖИНАЛДЫ", ready_wk_hint:"Құрамы жаттығу тарихыңыз бойынша таңдалды", ready_wk_change:"Құрамын өзгерту",
@@ -4866,6 +4870,7 @@ function MenuScreen({user,onNav,activeWorkout=false}){
 }
 
 function MoreScreen({user,onNav,onBack}){
+  const [prem]=usePremium(user?.telegram_id);
   const groups=[
     {title:t("more_profile"),items:[
       {label:t("more_training_prefs"),icon:"⚙",s:"training_prefs"},
@@ -4904,6 +4909,16 @@ function MoreScreen({user,onNav,onBack}){
       </div>
       <span style={{marginLeft:"auto",color:C.muted,fontSize:20}}>›</span>
     </div>
+    {prem?.visible&&<Card accent onClick={()=>onNav("premium")} pad="12px 14px" style={{marginBottom:16}}>
+      <div style={{display:"flex",alignItems:"center",gap:11}}>
+        <span style={{fontSize:16,width:20,textAlign:"center"}}>⭐</span>
+        <span style={{fontSize:14,color:C.text,fontWeight:600}}>{t("premium_menu")}</span>
+        <span style={{marginLeft:"auto",fontSize:11,color:C.accent,fontFamily:"monospace"}}>
+          {prem.active?(prem.until?fmtDay(prem.until):"✓"):""}
+        </span>
+        <span style={{color:C.muted,fontSize:16}}>›</span>
+      </div>
+    </Card>}
     {groups.map((g,gi)=><div key={gi} style={{marginBottom:18}}>
       <Kicker>{g.title}</Kicker>
       <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:8}}>
@@ -6035,6 +6050,7 @@ function WorkoutDetailScreen({workoutId,tgId,onBack}){
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:8,marginBottom:16}}>
       {[{l:t("sets_label"),v:totalSets},{l:t("tonnage_label2"),v:`${Math.round((data.total_volume||0)/1000*10)/10} ${t("u_t")}`},{l:t("status_label"),v:data.status==="finished"?"✓":data.status||"—"}].map((s,i)=><Card key={i} style={{textAlign:"center"}}><div style={{fontSize:9,color:C.muted,fontFamily:"monospace",marginBottom:4}}>{s.l}</div><Mono size={14}>{s.v}</Mono></Card>)}
     </div>
+    {(data.status==="finished"||data.status==="completed")&&totalSets>0&&<ShareWorkout tgId={tgId} workoutId={workoutId}/>}
 
     {data.exercises?.length===0&&<Card><div style={{textAlign:"center",padding:"16px 0",color:C.muted}}>{t("no_sets")}</div></Card>}
 
@@ -6843,6 +6859,10 @@ ${exList}
         ].map((s,i)=><Card key={i} style={{textAlign:"center"}}><div style={{fontSize:9,color:C.muted,fontFamily:"monospace",marginBottom:4}}>{s.l}</div><Mono size={18}>{s.v}</Mono></Card>)}
       </div>
 
+      {/* Поделиться — только настоящей тренировкой: пустую сервер удалил */}
+      {aiReview!=="__empty__"&&Object.values(sets).reduce((n,a)=>n+a.length,0)>0&&
+        <ShareWorkout tgId={tgId} workoutId={workoutId}/>}
+
       {/* B-06: AI оценка тренировки */}
       {aiReview===null&&aiReviewStream?(
         <Card accent style={{marginBottom:16}}>
@@ -6867,6 +6887,7 @@ ${exList}
           <div style={{fontSize:13,color:C.muted,textAlign:"center",padding:"8px 0"}}>
             {t("ui_limit_ai_zaprosov_na")}
           </div>
+          <PremiumNudge tgId={tgId} kind="ai" onNav={onNav}/>
         </Card>
       ):aiReview==="__error__"?(
         <Card style={{marginBottom:16}}>
@@ -8356,6 +8377,7 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
   const [q,setQ]=useState("");
   const qTaRef=useRef(null);
   const [answer,setAnswer]=useState(null);
+  const [limitHit,setLimitHit]=useState(false);   // упёрлись в суточный лимит — покажем Premium
   const [aiBlocked,setAiBlocked]=useState(false); // отозвано согласие на передачу данных
   const [workoutPlan,setWorkoutPlan]=useState(null);
   const [loading,setLoading]=useState(false);
@@ -8516,7 +8538,7 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
               return;
             }else if(ev.type==="error"){
               setStreamText("");
-              if(ev.status===429){setAnswer(t("limit_exceeded"));return;}
+              if(ev.status===429){setLimitHit(true);setAnswer(t("limit_exceeded"));return;}
               if(ev.status===451){setAiBlocked(true);return;}
               // Anthropic недоступен: повтор обычным запросом упрётся в то же самое
               if(ev.status===503&&!gotAnything){setAnswer(t("ai_unavailable"));return;}
@@ -8540,7 +8562,7 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
         // Ничего не отдали — спокойно повторяем обычным запросом
         const res=await fetch(`${API}/ai/ask`,{method:"POST",
           headers:{"Content-Type":"application/json"},body});
-        if(res.status===429){setAnswer(t("limit_exceeded"));return;}
+        if(res.status===429){setLimitHit(true);setAnswer(t("limit_exceeded"));return;}
         if(res.status===451){setAiBlocked(true);return;}
         if(res.status===503){setAnswer(t("ai_unavailable"));return;}
         if(!res.ok){
@@ -8690,6 +8712,8 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
       </div>
     </div>}
 
+    {limitHit&&<PremiumNudge tgId={tgId} kind="ai" onNav={onNav} style={{marginBottom:12}}/>}
+
     {/* Быстрые вопросы — только если нет истории */}
     {chatHistory.length===0&&<div style={{marginBottom:8}}>
       <div style={{fontSize:10,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("quick_questions")}</div>
@@ -8782,7 +8806,7 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
 const CROP_SIZE=320; // размер квадратной рамки кадрирования на экране (px)
 const CROP_OUTPUT=800; // размер итогового изображения, отправляемого на анализ (px)
 
-function FoodVisionScreen({tgId,onBack,mealType}){
+function FoodVisionScreen({tgId,onBack,mealType,onNav}){
   const [rawFile,setRawFile]=useState(null); // исходный File до кадрирования
   const [photo,setPhoto]=useState(null); // base64 после кадрирования — то, что уходит на анализ
   const [preview,setPreview]=useState(null); // base64 после кадрирования — превью
@@ -8794,6 +8818,7 @@ function FoodVisionScreen({tgId,onBack,mealType}){
   const [editText,setEditText]=useState("");
   const [recalculating,setRecalculating]=useState(false);
   const [quota,setQuota]=useState(null);   // {used, limit} — распознаваний за сегодня
+  const [foodLimitHit,setFoodLimitHit]=useState(false);
   const inputRef=useRef(null);
   useEffect(()=>{
     if(!tgId)return;
@@ -8895,6 +8920,7 @@ function FoodVisionScreen({tgId,onBack,mealType}){
         let q=null;try{q=(await res.json())?.detail;}catch{}
         if(q&&q.limit!=null)setQuota({used:q.used,limit:q.limit});
         setError(t("food_limit_reached").replace("{limit}",q?.limit??""));
+        setFoodLimitHit(true);
         return;
       }
       if(!res.ok)throw new Error(res.status);
@@ -8998,6 +9024,7 @@ function FoodVisionScreen({tgId,onBack,mealType}){
       {error&&(
         <Card>
           <div style={{color:C.danger,fontSize:13,textAlign:"center",padding:"8px 0",marginBottom:result?8:0}}>{error}</div>
+          {foodLimitHit&&<PremiumNudge tgId={tgId} kind="food" onNav={onNav} style={{marginTop:4}}/>}
           {result&&!saved&&(
             <Btn accent full onClick={saveToLog} disabled={loading}>
               {loading?t("fv_povtoryaem"):t("fv_povtorit_sohranenie")}
@@ -9728,6 +9755,234 @@ function GamificationScreen({tgId,onBack,user}){
 
 // ── PlateauBlock — блок плато в ProgressScreen ───────────────────────────────
 // ── ReferralScreen ────────────────────────────────────────────────────────────
+// ── Premium ──────────────────────────────────────────────────────────────────
+// Статус Premium нужен нескольким экранам (меню, тренер, фото еды) — держим
+// одну копию на минуту, чтобы не спрашивать сервер при каждом переходе.
+let _premCache=null, _premAt=0, _premInflight=null;
+function fetchPremium(tgId,force=false){
+  if(!tgId)return Promise.resolve(null);
+  if(!force&&_premCache&&Date.now()-_premAt<60000)return Promise.resolve(_premCache);
+  if(_premInflight&&!force)return _premInflight;
+  const req=fetch(`${API}/premium/${tgId}`).then(r=>r.ok?r.json():null)
+    .then(d=>{if(d){_premCache=d;_premAt=Date.now();}return d;}).catch(()=>null)
+    .finally(()=>{if(_premInflight===req)_premInflight=null;});
+  _premInflight=req;
+  return req;
+}
+function usePremium(tgId){
+  const [p,setP]=useState(_premCache);
+  useEffect(()=>{let on=true;fetchPremium(tgId).then(d=>{if(on&&d)setP(d);});return()=>{on=false;};},[tgId]);
+  return [p,setP];
+}
+function fmtDay(iso){
+  // Год — только если не текущий: русское «2026 г.» перед точкой давало «г..»
+  const d=utcToLocal(iso);
+  if(!d)return "";
+  const opts={day:"numeric",month:"long"};
+  if(d.getFullYear()!==new Date().getFullYear())opts.year="numeric";
+  return d.toLocaleDateString(dateLocale(),opts);
+}
+/** Подсказка «с Premium можно больше» там, где упёрлись в лимит. Пока Premium
+ *  выключен (или уже есть) — ничего не показывает. */
+function PremiumNudge({tgId,kind,onNav,style={}}){
+  const [p]=usePremium(tgId);
+  if(!p||!p.visible||p.active||!onNav)return null;
+  const n=kind==="food"?p.perks?.food_premium:p.perks?.ai_premium;
+  return <Card accent onClick={()=>onNav("premium")} style={{marginTop:12,...style}} pad="12px 14px">
+    <div style={{display:"flex",alignItems:"center",gap:10}}>
+      <span style={{fontSize:18}}>⭐</span>
+      <span style={{fontSize:13,color:C.text,flex:1,lineHeight:1.4}}>{t(kind==="food"?"premium_nudge_food":"premium_nudge_ai").replace("{n}",n)}</span>
+      <span style={{fontSize:12,color:C.accent,fontFamily:"monospace",whiteSpace:"nowrap"}}>{t("premium_nudge_btn")} ›</span>
+    </div>
+  </Card>;
+}
+
+function PremiumScreen({tgId,onBack}){
+  const [p,setP]=usePremium(tgId);
+  const [busy,setBusy]=useState(null);   // "month" | "year" | "trial" | "sub"
+  const [msg,setMsg]=useState(null);     // {text, ok}
+  const [failed,setFailed]=useState(false);
+  useEffect(()=>{fetchPremium(tgId,true).then(d=>{if(d)setP(d);else setFailed(true);});},[tgId]);
+  const keep=d=>{if(d){_premCache=d;_premAt=Date.now();setP(d);}};
+
+  // Платёж принимает бот: после «paid» ждём, пока срок на сервере сдвинется.
+  async function waitActive(prevUntil){
+    for(let i=0;i<14;i++){
+      await new Promise(r=>setTimeout(r,1500));
+      const d=await fetchPremium(tgId,true);
+      if(d&&d.active&&d.until&&d.until!==prevUntil){keep(d);return d;}
+    }
+    return null;
+  }
+  async function buy(plan){
+    if(busy)return;
+    setBusy(plan);setMsg(null);
+    let handedOff=false;
+    try{
+      const r=await fetch(`${API}/premium/${tgId}/invoice`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({plan})});
+      if(r.status===409){setMsg({text:t("premium_already_sub")});fetchPremium(tgId,true).then(keep);return;}
+      if(!r.ok)throw new Error(r.status);
+      const {url}=await r.json();
+      const prevUntil=p?.until||null;
+      if(tg?.openInvoice){
+        handedOff=true;
+        tg.openInvoice(url,async(status)=>{
+          try{
+            if(status==="paid"){
+              haptic.notify("success");
+              setMsg({text:t("premium_paid_wait")});
+              const d=await waitActive(prevUntil);
+              setMsg(d?{text:t("premium_paid_ok").replace("{date}",fmtDay(d.until)),ok:true}:{text:t("premium_paid_late")});
+            }else if(status==="failed"){setMsg({text:t("premium_failed")});}
+          }finally{setBusy(null);}
+        });
+        return;
+      }
+      if(tg?.openTelegramLink)tg.openTelegramLink(url);else window.open(url,"_blank");
+    }catch{setMsg({text:t("premium_error")});}
+    finally{if(!handedOff)setBusy(null);}
+  }
+  async function trial(){
+    if(busy)return;
+    setBusy("trial");setMsg(null);
+    try{
+      const r=await fetch(`${API}/premium/${tgId}/trial`,{method:"POST"});
+      if(!r.ok)throw new Error(r.status);
+      const d=await r.json();keep(d);haptic.notify("success");
+      setMsg({text:t("premium_trial_until").replace("{date}",fmtDay(d.until)),ok:true});
+    }catch{setMsg({text:t("premium_error")});fetchPremium(tgId,true).then(keep);}
+    finally{setBusy(null);}
+  }
+  async function setRenew(renew){
+    if(busy)return;
+    setBusy("sub");setMsg(null);
+    try{
+      const r=await fetch(`${API}/premium/${tgId}/subscription`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({renew})});
+      if(!r.ok)throw new Error(r.status);
+      keep(await r.json());
+    }catch{setMsg({text:t("premium_error")});}
+    finally{setBusy(null);}
+  }
+
+  if(!p&&failed)return <div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/>
+    <div style={{fontSize:14,color:C.muted,marginTop:20}}>{t("home_load_error")}</div></div>;
+  if(!p)return <div style={{padding:"16px 16px 100px"}}><BackBtn onBack={onBack}/><Loader text={t("loading")}/></div>;
+
+  const month=p.plans?.find(x=>x.id==="month"), year=p.plans?.find(x=>x.id==="year");
+  const save=month&&year?Math.round((1-year.stars/(month.stars*12))*100):0;
+  const sub=p.subscription;
+  const status=p.source==="manual"?t("premium_manual")
+    :(p.source==="trial"?t("premium_trial_until"):t("premium_active_until")).replace("{date}",fmtDay(p.until));
+  const perks=[
+    {i:"🤖",l:t("premium_perk_ai").replace("{n}",p.perks?.ai_premium),n:t("premium_perk_now").replace("{n}",p.perks?.ai_free)},
+    {i:"📸",l:t("premium_perk_food").replace("{n}",p.perks?.food_premium),n:t("premium_perk_now").replace("{n}",p.perks?.food_free)},
+    {i:"🚀",l:t("premium_perk_support")},
+  ];
+  const plan=(pl,title,note,badge)=>pl&&<Card key={pl.id} accent={pl.id==="year"} style={{marginBottom:10}}>
+    <div style={{display:"flex",alignItems:"baseline",gap:8}}>
+      <div style={{fontSize:16,fontWeight:700,color:C.text}}>{title}</div>
+      {badge&&<span style={{fontSize:11,fontFamily:"monospace",color:C.bg,background:C.accent,borderRadius:6,padding:"2px 6px"}}>{badge}</span>}
+      <div style={{marginLeft:"auto"}}><Mono size={20}>{pl.stars} ⭐</Mono></div>
+    </div>
+    <div style={{fontSize:12,color:C.muted,marginTop:4,lineHeight:1.5}}>{note}</div>
+    <Btn accent={pl.id==="year"} full style={{marginTop:12}} disabled={!!busy||(pl.id==="month"&&!!sub)} onClick={()=>buy(pl.id)}>
+      {busy===pl.id?"…":(pl.id==="month"&&sub)?t("premium_already_sub"):t(p.active?"premium_extend":"premium_buy").replace("{n}",pl.stars)}
+    </Btn>
+  </Card>;
+
+  return <div style={{padding:"16px 16px 100px"}}>
+    <BackBtn onBack={onBack}/>
+    <Kicker>{t("premium_kicker")}</Kicker>
+    <Hero>{t("premium_title")}</Hero>
+    <div style={{fontSize:13,color:C.muted,lineHeight:1.55,marginTop:8,marginBottom:16}}>{t("premium_lead")}</div>
+
+    {p.active&&<Card accent style={{marginBottom:12}}>
+      <div style={{fontSize:15,fontWeight:600,color:C.accent}}>⭐ {status}</div>
+      {sub&&<div style={{fontSize:12,color:C.muted,marginTop:6,lineHeight:1.5}}>
+        {sub.renews?t("premium_renews").replace("{date}",fmtDay(sub.next_charge)):t("premium_renew_off").replace("{date}",fmtDay(p.until))}
+      </div>}
+      {sub&&<Btn full style={{marginTop:10}} disabled={!!busy} onClick={()=>setRenew(!sub.renews)}>
+        {busy==="sub"?"…":sub.renews?t("premium_cancel_btn"):t("premium_resume_btn")}
+      </Btn>}
+    </Card>}
+
+    <Card style={{marginBottom:16}}>
+      {perks.map((x,i)=><div key={i} style={{display:"flex",gap:10,alignItems:"flex-start",padding:"8px 0",borderTop:i?`0.5px solid ${C.border}`:"none"}}>
+        <span style={{fontSize:18,width:24,textAlign:"center"}}>{x.i}</span>
+        <div style={{flex:1}}>
+          <div style={{fontSize:14,color:C.text,lineHeight:1.4}}>{x.l}</div>
+          {x.n&&<div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginTop:2}}>{x.n}</div>}
+        </div>
+      </div>)}
+    </Card>
+
+    {p.source!=="manual"&&<>
+      {plan(month,t("premium_month"),t("premium_month_note"))}
+      {plan(year,t("premium_year"),t("premium_year_note"),save>0?t("premium_save").replace("{n}",save):null)}
+    </>}
+    {p.trial_available&&<Btn full style={{marginBottom:10}} disabled={!!busy} onClick={trial}>
+      {busy==="trial"?"…":t("premium_trial_btn").replace("{n}",p.trial_days)}
+    </Btn>}
+    {msg&&<Card accent={!!msg.ok} style={{marginBottom:12}} pad="12px 14px">
+      <div style={{fontSize:13,color:msg.ok?C.accent:C.text,lineHeight:1.5}}>{msg.text}</div>
+    </Card>}
+    <div style={{fontSize:11,color:C.muted,lineHeight:1.6,marginTop:8}}>{t("premium_note")}</div>
+  </div>;
+}
+
+// ── Карточка тренировки: в историю и в чат ───────────────────────────────────
+// Картинку рисует сервер; Telegram забирает её по подписанной ссылке.
+// Старый Telegram (без shareToStory/shareMessage) и компьютер — карточка
+// приходит в чат с ботом, оттуда её пересылают.
+function tgAtLeast(v){try{return !!tg?.isVersionAtLeast?.(v);}catch{return false;}}
+function ShareWorkout({tgId,workoutId,style={}}){
+  const [busy,setBusy]=useState(null);
+  const [note,setNote]=useState(null);
+  if(!tgId||!workoutId)return null;
+  async function sendToBot(){
+    const r=await fetch(`${API}/share/${tgId}/workout/${workoutId}/send`,{method:"POST"});
+    if(!r.ok)throw new Error(r.status);
+    setNote(t("share_sent_bot"));
+  }
+  async function story(){
+    if(busy)return;
+    setBusy("story");setNote(null);
+    try{
+      if(!(tg?.shareToStory&&tgAtLeast("7.8"))){await sendToBot();return;}
+      const r=await fetch(`${API}/share/${tgId}/workout/${workoutId}`,{method:"POST"});
+      if(!r.ok)throw new Error(r.status);
+      const d=await r.json();
+      const opts={text:d.story_text};
+      // Ссылка в истории — только у Telegram Premium, остальным Telegram откажет.
+      if(tg?.initDataUnsafe?.user?.is_premium)opts.widget_link={url:d.link,name:"GymBot"};
+      haptic.impact();
+      tg.shareToStory(d.story_url,opts);
+    }catch{setNote(t("share_error"));}
+    finally{setBusy(null);}
+  }
+  async function chat(){
+    if(busy)return;
+    setBusy("chat");setNote(null);
+    try{
+      if(!(tg?.shareMessage&&tgAtLeast("8.0"))){await sendToBot();return;}
+      const r=await fetch(`${API}/share/${tgId}/workout/${workoutId}/prepared`,{method:"POST"});
+      if(!r.ok)throw new Error(r.status);
+      const {id}=await r.json();
+      haptic.impact();
+      tg.shareMessage(id,()=>{});
+    }catch{setNote(t("share_error"));}
+    finally{setBusy(null);}
+  }
+  return <div style={{marginBottom:16,...style}}>
+    <Kicker>{t("share_kicker")}</Kicker>
+    <div style={{display:"flex",gap:8,marginTop:8}}>
+      <Btn full onClick={story} disabled={!!busy} style={{padding:"12px 8px"}}>{busy==="story"?"…":"📲 "+t("share_story")}</Btn>
+      <Btn full onClick={chat} disabled={!!busy} style={{padding:"12px 8px"}}>{busy==="chat"?"…":"💬 "+t("share_chat")}</Btn>
+    </div>
+    {note&&<div style={{fontSize:12,color:C.muted,marginTop:8,lineHeight:1.5}}>{note}</div>}
+  </div>;
+}
+
 function ReferralScreen({tgId,onBack}){
   const [data,setData]=useState(null);
   const [copied,setCopied]=useState(false);
@@ -10458,6 +10713,10 @@ export default function App(){
       const refCode=startParam.replace("ref_","");
       if(refCode)sessionStorage.setItem("gymbot_ref_code",refCode);
     }
+    if(startParam==="premium"){
+      // /premium в боте ведёт сюда
+      setTimeout(()=>push("menu","premium",{}),500);
+    }
     if(startParam==="profile"){
       // Кнопки бота "Создать/Обновить/Изменить профиль" ведут сразу в Mini App
       setTimeout(()=>push("menu","profile",{}),500);
@@ -10612,9 +10871,10 @@ export default function App(){
     if(screen==="plan_workout")return <PlanWorkoutScreen tgId={tgId} exercises={exercises} muscleGroups={muscleGroups} onBack={goBack}/>;
     if(screen==="goals")return <GoalsScreen tgId={tgId} onBack={goBack}/>;
     if(screen==="reminders")return <RemindersScreen tgId={tgId} onBack={goBack} onNav={handleNav}/>;
-    if(screen==="food_vision")return <FoodVisionScreen tgId={tgId} onBack={goBack} mealType={p.meal_type}/>;
+    if(screen==="food_vision")return <FoodVisionScreen tgId={tgId} onBack={goBack} mealType={p.meal_type} onNav={handleNav}/>;
     if(screen==="sport_log")return <SportLogScreen tgId={tgId} onBack={goBack} initialSport={p.initial_sport||null}/>;
     if(screen==="referral")return <ReferralScreen tgId={tgId} onBack={goBack}/>;
+    if(screen==="premium")return <PremiumScreen tgId={tgId} onBack={goBack}/>;
     if(screen==="achievements")return <AchievementsScreen tgId={tgId} onBack={goBack}/>;
     if(screen==="leaderboard")return <LeaderboardScreen tgId={tgId} onBack={goBack}/>;
     if(screen==="gamification")return <GamificationScreen tgId={tgId} onBack={goBack} user={user}/>;
