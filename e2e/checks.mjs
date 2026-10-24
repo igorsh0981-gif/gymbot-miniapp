@@ -77,4 +77,11 @@ export const CHECKS = {
                                  eq("повторы", r.reps, 1), eq("среди людей", r.community, 1), eq("без ранга", r.untracked, 1)),
   "47_strength_missing_profile": r => all(eq("кнопка", r.msg, 1)),
   "48_progress_strength_card": r => all(eq("открыли ранги", r.opened, 1)),
+  // сканер этикеток: распознали, порция с упаковки, сохранили с записью в дневник; не этикетка — понятное сообщение
+  "49_label_scan": r => all(eq("распознаваний", r.label, 1), eq("название", r.nameVal, "Йогурт питьевой"), eq("итог на порцию", r.total, 1),
+                            eq("сохранение", r.save && [r.save.name, r.save.brand, r.save.kcal, r.save.weight_g, r.save.meal_type],
+                               ["Йогурт питьевой", "Musaffo", 70, 250, "lunch"])),
+  "50_label_not_found": r => all(eq("сообщение", r.msg, 1), eq("сохранений", r.saves, 0)),
+  // местная кухня: категория, узбекские названия, порция
+  "51_food_search_national_uz": r => all(eq("порция", r.portion, 1), eq("кнопка сканера", r.scanBtn, 1), eq("запрос категории", r.query, 1)),
 };
