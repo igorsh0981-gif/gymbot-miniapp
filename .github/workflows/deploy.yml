@@ -15,7 +15,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Сначала сценарии приложения: если что-то сломалось, на Pages уходит прежняя версия
+  test:
+    uses: ./.github/workflows/tests.yml
+
   build:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

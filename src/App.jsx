@@ -462,6 +462,7 @@ const T = {
     sport_section:"Виды спорта", sport_desc:"Запись занятия с расчётом калорий",
     sport_section_title:"Виды спорта", sport_section_desc:"Запись занятия с расчётом калорий",
     resume_workout:"ПРОДОЛЖИТЬ ТРЕНИРОВКУ", resume_desc:"У тебя есть незавершённая тренировка",
+    workout_closed_elsewhere:"Прошлая тренировка уже завершена — на другом устройстве или автоматически. Можно начать новую.",
     finish_workout:"ЗАВЕРШИТЬ", set_done:"✓ ПОДХОД ВЫПОЛНЕН", set_done_label:"ПОДХОД ВЫПОЛНЕН",
     warmup_title:"РАЗМИНКА", warmup_skip:"ПРОПУСТИТЬ", warmup_done:"✓ РАЗМИНКА ВЫПОЛНЕНА",
     warmup_hint:"Кардио для разминки — опционально", warmup_badge:"🏃 РАЗМИНКА",
@@ -941,6 +942,8 @@ const T = {
     open_telegram:"Открой приложение через Telegram.",
     failed_load:"Не удалось загрузить",
     failed_recognize:"Не удалось распознать. Попробуй другое фото.",
+    food_limit_reached:"На сегодня распознавания по фото закончились ({limit} в день). Завтра снова можно, а пока блюдо можно внести вручную.",
+    food_quota_left:"Распознаваний на сегодня: {left} из {limit}",
     limit_exceeded:"Дневной лимит запросов исчерпан. Попробуй завтра.",ai_unavailable:"AI-тренер временно недоступен. Попробуй чуть позже — лимит запросов не списан.",last_time:"Прошлый раз",day_today_l:"сегодня",day_yesterday:"вчера",days_ago_n:"{n} дн. назад",set_save_failed:"Подход не сохранился — проверь связь и нажми ещё раз",sq_dropped:"Не сохранено подходов: {n} — тренировка уже закрыта на сервере",sq_waiting:"⏳ Ждут отправки: {n}. Уйдут сами, как появится связь",sq_finish_pending:"Ещё не отправлено подходов: {n}. Завершить сейчас? Они уйдут позже, но в итоги этой тренировки не попадут.",
     specify_name:"Укажите название",
     specify_name_cal:"Укажите название и калории",
@@ -1344,6 +1347,7 @@ const T = {
     sport_section:"Sports", sport_desc:"Log activity with calorie calculation",
     sport_section_title:"Sports", sport_section_desc:"Log activity with calorie calculation",
     resume_workout:"CONTINUE WORKOUT", resume_desc:"You have an unfinished workout",
+    workout_closed_elsewhere:"Your previous workout has already been finished — on another device or automatically. You can start a new one.",
     finish_workout:"FINISH", set_done:"✓ SET DONE", set_done_label:"SET DONE",
     warmup_title:"WARM UP", warmup_skip:"SKIP", warmup_done:"✓ WARM UP DONE",
     warmup_hint:"Cardio for warm-up — optional", warmup_badge:"🏃 WARM UP",
@@ -1823,6 +1827,8 @@ const T = {
     open_telegram:"Open via Telegram.",
     failed_load:"Failed to load",
     failed_recognize:"Failed to recognize. Try another photo.",
+    food_limit_reached:"You've used today's photo recognitions ({limit} a day). Try again tomorrow, or add the meal manually for now.",
+    food_quota_left:"Recognitions left today: {left} of {limit}",
     limit_exceeded:"Daily limit reached. Try tomorrow.",ai_unavailable:"The AI coach is temporarily unavailable. Try again a bit later — your request limit wasn't used.",last_time:"Last time",day_today_l:"today",day_yesterday:"yesterday",days_ago_n:"{n} days ago",set_save_failed:"Set not saved — check your connection and tap again",sq_dropped:"{n} set(s) not saved — the workout is already closed on the server",sq_waiting:"⏳ Waiting to send: {n}. They will go as soon as you are online",sq_finish_pending:"{n} set(s) not sent yet. Finish now? They will be sent later but won't count in this workout's summary.",
     specify_name:"Enter name",
     specify_name_cal:"Enter name and calories",
@@ -2222,6 +2228,7 @@ const T = {
     sport_section:"Sport turlari", sport_desc:"Kaloriya hisobi bilan mashg'ulotni yozish",
     sport_section_title:"Sport turlari", sport_section_desc:"Kaloriya hisobi bilan mashg'ulotni yozish",
     resume_workout:"MASHQNI DAVOM ETTIRISH", resume_desc:"Tugallanmagan mashqingiz bor",
+    workout_closed_elsewhere:"Oldingi mashq allaqachon yakunlangan — boshqa qurilmada yoki avtomatik. Yangisini boshlashingiz mumkin.",
     finish_workout:"TUGATISH", set_done:"✓ YONDASHUV BAJARILDI", set_done_label:"YONDASHUV BAJARILDI",
     warmup_title:"ISITISH", warmup_skip:"O'TKAZIB YUBORISH", warmup_done:"✓ ISITISH BAJARILDI",
     warmup_hint:"Isitish uchun kardio — ixtiyoriy", warmup_badge:"🏃 ISITISH",
@@ -2701,6 +2708,8 @@ const T = {
     open_telegram:"Telegram orqali oching.",
     failed_load:"Yuklab bo'lmadi",
     failed_recognize:"Tanib bo'lmadi. Boshqa foto urinib ko'ring.",
+    food_limit_reached:"Bugungi rasm orqali aniqlashlar tugadi (kuniga {limit} ta). Ertaga yana mumkin, hozircha taomni qo'lda kiritishingiz mumkin.",
+    food_quota_left:"Bugun qolgan aniqlashlar: {left} / {limit}",
     limit_exceeded:"Kunlik limit tugadi. Ertaga urinib ko'ring.",ai_unavailable:"AI-murabbiy vaqtincha ishlamayapti. Birozdan keyin urinib ko‘r — so‘rovlar limiti sarflanmadi.",last_time:"O‘tgan safar",day_today_l:"bugun",day_yesterday:"kecha",days_ago_n:"{n} kun oldin",set_save_failed:"Yondashuv saqlanmadi — aloqani tekshirib, qayta bos",sq_dropped:"Saqlanmagan yondashuvlar: {n} — mashg‘ulot serverda allaqachon yopilgan",sq_waiting:"⏳ Yuborilishini kutmoqda: {n}. Aloqa paydo bo‘lishi bilan o‘zi ketadi",sq_finish_pending:"Hali yuborilmagan yondashuvlar: {n}. Hozir tugatasizmi? Ular keyinroq ketadi, lekin bu mashg‘ulot natijalariga kirmaydi.",
     specify_name:"Nomni kiriting",
     specify_name_cal:"Nom va kaloriyalarni kiriting",
@@ -3100,6 +3109,7 @@ const T = {
     sport_section:"Спорт түрлері", sport_desc:"Калория есебімен сабақты жазу",
     sport_section_title:"Спорт түрлері", sport_section_desc:"Калория есебімен сабақты жазу",
     resume_workout:"ЖАТТЫҒУДЫ ЖАЛҒАСТЫРУ", resume_desc:"Аяқталмаған жаттығуыңыз бар",
+    workout_closed_elsewhere:"Алдыңғы жаттығу аяқталған — басқа құрылғыда немесе автоматты түрде. Жаңасын бастауға болады.",
     finish_workout:"АЯҚТАУ", set_done:"✓ ТӘСІЛ ОРЫНДАЛДЫ", set_done_label:"ТӘСІЛ ОРЫНДАЛДЫ",
     warmup_title:"ЖЫЛЫТУ", warmup_skip:"ӨТКІЗІП ЖІБЕРу", warmup_done:"✓ ЖЫЛЫТУ ОРЫНДАЛДЫ",
     warmup_hint:"Жылыту үшін кардио — міндетті емес", warmup_badge:"🏃 ЖЫЛЫТУ",
@@ -3579,6 +3589,8 @@ const T = {
     open_telegram:"Telegram арқылы ашыңыз.",
     failed_load:"Жүктеу мүмкін емес",
     failed_recognize:"Танып болмады. Басқа фото байқаңыз.",
+    food_limit_reached:"Бүгінгі суреттен танулар бітті (күніне {limit}). Ертең қайта болады, әзірге тағамды қолмен енгізуге болады.",
+    food_quota_left:"Бүгін қалған танулар: {left} / {limit}",
     limit_exceeded:"Күндік лимит таусылды. Ертең байқаңыз.",ai_unavailable:"AI-жаттықтырушы уақытша қолжетімсіз. Сәл кейінірек қайталап көр — сұраулар лимиті жұмсалмады.",last_time:"Өткен жолы",day_today_l:"бүгін",day_yesterday:"кеше",days_ago_n:"{n} күн бұрын",set_save_failed:"Тәсіл сақталмады — байланысты тексеріп, қайта бас",sq_dropped:"Сақталмаған тәсілдер: {n} — жаттығу серверде жабылып қойған",sq_waiting:"⏳ Жіберуді күтуде: {n}. Байланыс пайда болғанда өздері кетеді",sq_finish_pending:"Әлі жіберілмеген тәсілдер: {n}. Қазір аяқтайсыз ба? Олар кейін кетеді, бірақ осы жаттығудың қорытындысына кірмейді.",
     specify_name:"Атауды енгізіңіз",
     specify_name_cal:"Атау мен калорияларды енгізіңіз",
@@ -4108,6 +4120,25 @@ function DiskWait({onBack,text,onRetry}){
         {onRetry&&<Btn full onClick={onRetry} style={{marginTop:16}}>{t("retry")}</Btn>}
       </div>
       :<Loader text={text}/>}
+  </div>;
+}
+/** Нет связи с сервером при запуске: что случилось и кнопка повтора.
+ *  Повторяет и сам, как только браузер скажет, что связь вернулась. */
+function OfflineScreen({onRetry}){
+  // «online» приходит, только если пропала сама сеть. Когда лежит сервер
+  // (выкладка), браузер остаётся онлайн — поэтому ещё и раз в 15 секунд.
+  useEffect(()=>{
+    const on=()=>{if(document.visibilityState!=="hidden")onRetry();};
+    window.addEventListener("online",on);
+    const iv=setInterval(on,15000);
+    return()=>{window.removeEventListener("online",on);clearInterval(iv);};
+  },[]);
+  return <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:C.bg,padding:24,boxSizing:"border-box"}}>
+    <div style={{textAlign:"center",maxWidth:320}}>
+      <div style={{fontSize:32,marginBottom:12}} aria-hidden="true">📡</div>
+      <div style={{fontSize:14,color:C.muted,lineHeight:1.5,marginBottom:16}}>{t("home_load_error")}</div>
+      <Btn accent full onClick={onRetry}>{t("retry")}</Btn>
+    </div>
   </div>;
 }
 function BackBtn({onBack}){
@@ -6007,11 +6038,14 @@ function peekExDetails(id,lang){
 /** Техника всех упражнений тренировки — одним запросом на старте, чтобы
  *  шторка открывалась и там, где нет связи. Кладём в тот же кэш, откуда
  *  читает useExerciseText, и на диск. */
+const _primeInflight=new Set();   // `${id}|${lang}` — уже запрошены, ответ ещё не пришёл
 function primeExDetails(list,lang){
   const ids=[...new Set((list||[]).filter(exNeedsText).map(e=>e.id))]
-    .filter(id=>!peekExDetails(id,lang)).slice(0,30);
+    .filter(id=>!peekExDetails(id,lang)&&!_primeInflight.has(`${id}|${lang}`)).slice(0,30);
   if(!ids.length)return;
+  ids.forEach(id=>_primeInflight.add(`${id}|${lang}`));
   apiGet(`${API}/exercises/details?ids=${ids.join(",")}&lang=${encodeURIComponent(lang)}`)
+    .finally(()=>ids.forEach(id=>_primeInflight.delete(`${id}|${lang}`)))
     .then(d=>{
       for(const it of d?.items||[]){
         if(!it?.id)continue;
@@ -6338,21 +6372,48 @@ function ActiveWorkoutScreen({tgId,user=null,onUserUpdated=null,exercises,muscle
   // Запланированная тренировка после восстановления: проп сюда уже не придёт,
   // а без него план не закрывается по завершении.
   const [restoredPlannedId,setRestoredPlannedId]=useState(null);
+  // Тренировка с этого устройства на сервере уже закрыта — показываем пояснение
+  const [closedElsewhere,setClosedElsewhere]=useState(false);
+  // Текущий id тренировки для ответа, пришедшего позже: замыкание эффекта
+  // видит значение на момент отправки запроса, а не на момент ответа.
+  const workoutIdRef=useRef(null);
+  workoutIdRef.current=workoutId;
   useEffect(()=>{
     if(restored||!tgId)return;
     // Явный старт новой тренировки — восстанавливать нечего
     if(preselectedExIds?.length>0||preselectedGroupIds?.length>0||plannedWorkoutId){setRestored(true);return;}
     if(!exercises?.length||!customLoaded)return;   // ждём каталог и свои упражнения
     let alive=true;
+    const _readSv=()=>{try{const r=localStorage.getItem("gymbot_active_workout");return r?JSON.parse(r):null;}catch{return null;}};
+    // Какая тренировка лежала на устройстве, когда спросили сервер. Пока ответ
+    // летит (плохая связь в зале), человек мог начать новую — её не трогаем.
+    const askedFor=_readSv()?.workoutId||null;
     fetch(`${API}/workout/${tgId}/active`)
       .then(r=>r.ok?r.json():null)
       .then(d=>{
         if(!alive)return;
         setRestored(true);
+        const _now_sv=_readSv();
+        // Сервер ответил, что активной тренировки нет, а на устройстве лежит
+        // начатая (с id с сервера). Значит её завершили на другом устройстве
+        // или закрыла ночная уборка. Раньше копия жила дальше: показывалась
+        // вчерашняя тренировка, а сохранение состояния получало 404.
+        // d===null — сбой запроса, а не «нет тренировки»: тогда не трогаем.
+        if(d&&d.found===false){
+          // Стираем только ту тренировку, о которой спрашивали, и только если
+          // она всё ещё та же и на устройстве, и на экране.
+          if(askedFor&&_now_sv?.workoutId===askedFor&&workoutIdRef.current===askedFor){
+            try{localStorage.removeItem("gymbot_active_workout");}catch{}
+            setWorkoutId(null);setSelExs([]);setSets({});setCurIdx(0);
+            setWarmup(null);setWarmupDone(false);setExTips({});setLastSetAt(null);
+            setResumeBanner(false);setStep(initStep);setStartTime(Date.now());
+            setClosedElsewhere(true);
+          }
+          return;
+        }
         if(!d?.found)return;
         // Локальное состояние свежее серверного — значит человек прямо сейчас
         // тренируется на этом устройстве, перетирать нельзя.
-        const _now_sv=(()=>{try{const r=localStorage.getItem("gymbot_active_workout");return r?JSON.parse(r):null;}catch{return null;}})();
         const localAt=_now_sv?.savedAt||0;
         const srvAt=d.state_at?Date.parse(d.state_at+"Z"):0;
         // Локальное состояние считается годным, только если в нём есть состав.
@@ -6721,6 +6782,9 @@ ${exList}
       <BackBtn onBack={onBack}/>
       <Kicker>{t("choose_type_label")}</Kicker>
       <Hero style={{marginBottom:24}}>{t("choose_type")}</Hero>
+      {closedElsewhere&&<Card style={{marginBottom:16}}>
+        <div style={{fontSize:13,color:C.muted,lineHeight:1.5}}>{t("workout_closed_elsewhere")}</div>
+      </Card>}
       {resumeBanner&&<Card accent style={{marginBottom:16,cursor:"pointer"}} onClick={()=>{setResumeBanner(false);setStep(STEP.LG);}}>
         <div style={{display:"flex",alignItems:"center",gap:12}}>
           <span style={{fontSize:28}}>▶</span>
@@ -6991,6 +7055,7 @@ ${exList}
     const exMedia=ex.is_custom?ex:((exercises||[]).find(e=>e.id===ex.id)||ex);
     const lsCur=lastSets[ex.id];
     const lastIdx=lsCur?.sets?.length?Math.min(doneSets.length,lsCur.sets.length-1):-1;
+
     const lastAgo=lsCur?.date?fmtDayAgo(lsCur.date):"";
 
     return(
@@ -8610,7 +8675,12 @@ function FoodVisionScreen({tgId,onBack,mealType}){
   const [editing,setEditing]=useState(false);
   const [editText,setEditText]=useState("");
   const [recalculating,setRecalculating]=useState(false);
+  const [quota,setQuota]=useState(null);   // {used, limit} — распознаваний за сегодня
   const inputRef=useRef(null);
+  useEffect(()=>{
+    if(!tgId)return;
+    fetch(`${API}/food/quota/${tgId}`).then(r=>r.ok?r.json():null).then(q=>{if(q&&q.limit!=null)setQuota(q);}).catch(()=>{});
+  },[tgId]);
 
   // ── Кадрирование ──────────────────────────────────────────────────────────
   const [cropping,setCropping]=useState(false);
@@ -8702,8 +8772,17 @@ function FoodVisionScreen({tgId,onBack,mealType}){
       const res=await fetch(`${API}/food/analyze`,{method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify({image_base64:photo,tg_id:tgId,save:false})});
+      if(res.status===429){
+        // Лимит на сегодня: сервер говорит, сколько можно, — показываем это, а не «не удалось»
+        let q=null;try{q=(await res.json())?.detail;}catch{}
+        if(q&&q.limit!=null)setQuota({used:q.used,limit:q.limit});
+        setError(t("food_limit_reached").replace("{limit}",q?.limit??""));
+        return;
+      }
       if(!res.ok)throw new Error(res.status);
-      setResult(await res.json());
+      const d=await res.json();
+      if(d?.quota)setQuota(d.quota);
+      setResult(d);
     }catch(e){setError(e?.message==="503"?t("ai_unavailable"):t("failed_recognize"));}
     finally{setLoading(false);}
   }
@@ -8793,6 +8872,8 @@ function FoodVisionScreen({tgId,onBack,mealType}){
             {!result&&!loading&&<Btn accent full onClick={analyze} style={{flex:2}}>{t("analyze_btn2")}</Btn>}
           </div>
           {!result&&!loading&&<Btn full onClick={recropCurrentPhoto}>{t("fv_perekadrirovat")}</Btn>}
+          {quota&&!result&&<div style={{fontSize:11,color:C.muted,textAlign:"center",marginTop:8,fontFamily:"monospace"}}>
+            {t("food_quota_left").replace("{left}",Math.max(0,quota.limit-quota.used)).replace("{limit}",quota.limit)}</div>}
         </div>
       )}
       {loading&&<Card><div style={{textAlign:"center",padding:"16px 0",color:C.accent,fontFamily:"monospace",fontSize:12,letterSpacing:2}}>{t("analyzing_photo2")}</div></Card>}
@@ -10436,6 +10517,10 @@ export default function App(){
   if(user?._not_found)return<OnboardingScreen tgId={tgId} tgUser={tg?.initDataUnsafe?.user} onComplete={()=>{setUser(null);loadUser();}}/>;
   // Согласие у тех, кто зарегистрировался до его появления: новые дают его
   // в онбординге, а существующие иначе остались бы без отметки навсегда.
+  // Профиль не загрузился (нет связи, сервер недоступен). Раньше заглушка без
+  // отметок о согласии попадала на экран согласия, и человек думал, что оно
+  // слетело, а нажать «Принимаю» без сети всё равно нельзя.
+  if(user?._error)return<OfflineScreen onRetry={()=>{setUser(null);loadUser();}}/>;
   if(user&&!(user.consents?.terms&&user.consents?.basic))return<ConsentGateScreen tgId={tgId} onDone={()=>{setUser(null);loadUser();}}/>;
   // Загрузка
   if(!user)return<div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:C.bg}}><Loader text={t("loading")}/></div>;
