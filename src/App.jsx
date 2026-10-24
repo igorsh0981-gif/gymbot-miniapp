@@ -4868,7 +4868,7 @@ function MenuScreen({user,onNav,activeWorkout=false}){
     </div>
     {prem?.visible&&<Card accent onClick={()=>onNav("premium")} pad="13px 14px" style={{marginTop:8}}>
       <div style={{display:"flex",alignItems:"center",gap:9}}>
-        <span style={{fontSize:17}}>⭐</span>
+        <Icon name="star" size={18} fill="currentColor"/>
         <span style={{fontSize:14,color:C.text,fontWeight:600}}>{t("premium_menu")}</span>
         <span style={{marginLeft:"auto",fontSize:12,color:C.accent,fontFamily:"monospace",textAlign:"right"}}>
           {prem.active?(prem.until?fmtDay(prem.until):"✓"):t("premium_nudge_ai").replace("{n}",prem.perks?.ai_premium)}
@@ -4921,7 +4921,7 @@ function MoreScreen({user,onNav,onBack}){
     </div>
     {prem?.visible&&<Card accent onClick={()=>onNav("premium")} pad="12px 14px" style={{marginBottom:16}}>
       <div style={{display:"flex",alignItems:"center",gap:11}}>
-        <span style={{fontSize:16,width:20,textAlign:"center"}}>⭐</span>
+        <Icon name="star" size={18} fill="currentColor" style={{width:20}}/>
         <span style={{fontSize:14,color:C.text,fontWeight:600}}>{t("premium_menu")}</span>
         <span style={{marginLeft:"auto",fontSize:11,color:C.accent,fontFamily:"monospace"}}>
           {prem.active?(prem.until?fmtDay(prem.until):"✓"):""}
@@ -9765,6 +9765,33 @@ function GamificationScreen({tgId,onBack,user}){
 
 // ── PlateauBlock — блок плато в ProgressScreen ───────────────────────────────
 // ── ReferralScreen ────────────────────────────────────────────────────────────
+// ── Иконки Premium и «поделиться» ────────────────────────────────────────────
+// Свои линейные значки в цвет приложения вместо эмодзи: эмодзи на каждом
+// телефоне свои и спорят с остальным интерфейсом.
+const ICON_PATHS={
+  coach:<><path d="M5 4.5h14a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-7.5L7 21v-3.5H5a2 2 0 0 1-2-2v-9a2 2 0 0 1 2-2Z"/><circle cx="8.2" cy="11" r="1.05" fill="currentColor" stroke="none"/><circle cx="12" cy="11" r="1.05" fill="currentColor" stroke="none"/><circle cx="15.8" cy="11" r="1.05" fill="currentColor" stroke="none"/></>,
+  camera:<><path d="M3 8.6a2 2 0 0 1 2-2h2.6l1.6-2.2h5.6l1.6 2.2H19a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><circle cx="12" cy="13.1" r="3.6"/></>,
+  bolt:<path d="M13.4 2.8 5 13.6h6.4l-.8 7.6L19 10.4h-6.4l.8-7.6Z"/>,
+  star:<path d="m12 3.4 2.62 5.31 5.86.85-4.24 4.13 1 5.83L12 16.77l-5.24 2.75 1-5.83-4.24-4.13 5.86-.85Z"/>,
+  story:<><circle cx="12" cy="12" r="8.6" strokeDasharray="3.4 2.3"/><path d="M12 8.4v7.2M8.4 12h7.2"/></>,
+  send:<><path d="M20.6 3.4 3.4 10.7l6.9 2.7 2.7 6.9 7.6-16.9Z"/><path d="m10.3 13.4 4.6-4.6"/></>,
+};
+function Icon({name,size=22,color=C.accent,fill="none",style={}}){
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor" strokeWidth={1.8}
+    strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" style={{color,flexShrink:0,display:"block",...style}}>{ICON_PATHS[name]}</svg>;
+}
+/** Строка с «⭐» из перевода: звезду рисуем своим значком в цвет текста —
+ *  жёлтый эмодзи на салатовой кнопке выглядел грязно. */
+function withStar(str,size=15){
+  const parts=String(str).split("⭐");
+  return parts.map((x,i)=><Fragment key={i}>{x}{i<parts.length-1&&<Icon name="star" size={size} fill="currentColor" color="currentColor"
+    style={{display:"inline-block",verticalAlign:"-2px",margin:"0 1px"}}/>}</Fragment>);
+}
+function IconTile({name,size=40}){
+  return <div style={{width:size,height:size,borderRadius:10,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",
+    background:"rgba(200,255,0,0.08)",border:"0.5px solid rgba(200,255,0,0.28)"}}><Icon name={name} size={Math.round(size*0.55)}/></div>;
+}
+
 // ── Premium ──────────────────────────────────────────────────────────────────
 // Статус Premium нужен нескольким экранам (меню, тренер, фото еды) — держим
 // одну копию на минуту, чтобы не спрашивать сервер при каждом переходе.
@@ -9800,7 +9827,7 @@ function PremiumNudge({tgId,kind,onNav,style={}}){
   const n=kind==="food"?p.perks?.food_premium:p.perks?.ai_premium;
   return <Card accent onClick={()=>onNav("premium")} style={{marginTop:12,...style}} pad="12px 14px">
     <div style={{display:"flex",alignItems:"center",gap:10}}>
-      <span style={{fontSize:18}}>⭐</span>
+      <IconTile name="star" size={34}/>
       <span style={{fontSize:13,color:C.text,flex:1,lineHeight:1.4}}>{t(kind==="food"?"premium_nudge_food":"premium_nudge_ai").replace("{n}",n)}</span>
       <span style={{fontSize:12,color:C.accent,fontFamily:"monospace",whiteSpace:"nowrap"}}>{t("premium_nudge_btn")} ›</span>
     </div>
@@ -9886,19 +9913,21 @@ function PremiumScreen({tgId,onBack}){
   const status=p.source==="manual"?t("premium_manual")
     :(p.source==="trial"?t("premium_trial_until"):t("premium_active_until")).replace("{date}",fmtDay(p.until));
   const perks=[
-    {i:"🤖",l:t("premium_perk_ai").replace("{n}",p.perks?.ai_premium),n:t("premium_perk_now").replace("{n}",p.perks?.ai_free)},
-    {i:"📸",l:t("premium_perk_food").replace("{n}",p.perks?.food_premium),n:t("premium_perk_now").replace("{n}",p.perks?.food_free)},
-    {i:"🚀",l:t("premium_perk_support")},
+    {i:"coach",l:t("premium_perk_ai").replace("{n}",p.perks?.ai_premium),n:t("premium_perk_now").replace("{n}",p.perks?.ai_free)},
+    {i:"camera",l:t("premium_perk_food").replace("{n}",p.perks?.food_premium),n:t("premium_perk_now").replace("{n}",p.perks?.food_free)},
+    {i:"bolt",l:t("premium_perk_support")},
   ];
   const plan=(pl,title,note,badge)=>pl&&<Card key={pl.id} accent={pl.id==="year"} style={{marginBottom:10}}>
     <div style={{display:"flex",alignItems:"baseline",gap:8}}>
       <div style={{fontSize:16,fontWeight:700,color:C.text}}>{title}</div>
       {badge&&<span style={{fontSize:11,fontFamily:"monospace",color:C.bg,background:C.accent,borderRadius:6,padding:"2px 6px"}}>{badge}</span>}
-      <div style={{marginLeft:"auto"}}><Mono size={20}>{pl.stars} ⭐</Mono></div>
+      <div style={{marginLeft:"auto",display:"flex",alignItems:"center",gap:6}}>
+        <Mono size={20}>{pl.stars}</Mono><Icon name="star" size={18} fill="currentColor"/>
+      </div>
     </div>
     <div style={{fontSize:12,color:C.muted,marginTop:4,lineHeight:1.5}}>{note}</div>
     <Btn accent={pl.id==="year"} full style={{marginTop:12}} disabled={!!busy||(pl.id==="month"&&!!sub)} onClick={()=>buy(pl.id)}>
-      {busy===pl.id?"…":(pl.id==="month"&&sub)?t("premium_already_sub"):t(p.active?"premium_extend":"premium_buy").replace("{n}",pl.stars)}
+      {busy===pl.id?"…":(pl.id==="month"&&sub)?t("premium_already_sub"):withStar(t(p.active?"premium_extend":"premium_buy").replace("{n}",pl.stars))}
     </Btn>
   </Card>;
 
@@ -9909,7 +9938,9 @@ function PremiumScreen({tgId,onBack}){
     <div style={{fontSize:13,color:C.muted,lineHeight:1.55,marginTop:8,marginBottom:16}}>{t("premium_lead")}</div>
 
     {p.active&&<Card accent style={{marginBottom:12}}>
-      <div style={{fontSize:15,fontWeight:600,color:C.accent}}>⭐ {status}</div>
+      <div style={{display:"flex",alignItems:"center",gap:8,fontSize:15,fontWeight:600,color:C.accent}}>
+        <Icon name="star" size={18} fill="currentColor"/>{status}
+      </div>
       {sub&&<div style={{fontSize:12,color:C.muted,marginTop:6,lineHeight:1.5}}>
         {sub.renews?t("premium_renews").replace("{date}",fmtDay(sub.next_charge)):t("premium_renew_off").replace("{date}",fmtDay(p.until))}
       </div>}
@@ -9919,8 +9950,8 @@ function PremiumScreen({tgId,onBack}){
     </Card>}
 
     <Card style={{marginBottom:16}}>
-      {perks.map((x,i)=><div key={i} style={{display:"flex",gap:10,alignItems:"flex-start",padding:"8px 0",borderTop:i?`0.5px solid ${C.border}`:"none"}}>
-        <span style={{fontSize:18,width:24,textAlign:"center"}}>{x.i}</span>
+      {perks.map((x,i)=><div key={i} style={{display:"flex",gap:12,alignItems:"center",padding:"10px 0",borderTop:i?`0.5px solid ${C.border}`:"none"}}>
+        <IconTile name={x.i}/>
         <div style={{flex:1}}>
           <div style={{fontSize:14,color:C.text,lineHeight:1.4}}>{x.l}</div>
           {x.n&&<div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginTop:2}}>{x.n}</div>}
@@ -9991,8 +10022,12 @@ function ShareWorkout({tgId,workoutId,style={}}){
   return <div style={{marginBottom:16,...style}}>
     <Kicker>{t("share_kicker")}</Kicker>
     <div style={{display:"flex",gap:8,marginTop:8}}>
-      <Btn full onClick={story} disabled={!!busy} style={{padding:"12px 8px"}}>{busy==="story"?"…":"📲 "+t("share_story")}</Btn>
-      <Btn full onClick={chat} disabled={!!busy} style={{padding:"12px 8px"}}>{busy==="chat"?"…":"💬 "+t("share_chat")}</Btn>
+      <Btn full onClick={story} disabled={!!busy} style={{padding:"12px 8px",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
+        {busy==="story"?"…":<><Icon name="story" size={18}/>{t("share_story")}</>}
+      </Btn>
+      <Btn full onClick={chat} disabled={!!busy} style={{padding:"12px 8px",display:"flex",alignItems:"center",justifyContent:"center",gap:8}}>
+        {busy==="chat"?"…":<><Icon name="send" size={18}/>{t("share_chat")}</>}
+      </Btn>
     </div>
     {note&&<div style={{fontSize:12,color:C.muted,marginTop:8,lineHeight:1.5}}>{note}</div>}
   </div>;
