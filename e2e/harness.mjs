@@ -249,6 +249,8 @@ export async function setup(page, { lang = "ru", ls = null, setFails = false, cu
         (net.starts = net.starts || []).push(JSON.parse(req.postData() || "{}"));
         return json(route, { workout_id: 77 });
       }
+      if (p === `/referral/${TG_ID}`) return json(route, net.referral || { ref_code: "IGOR0001", ref_link: "https://t.me/GYMASH_bot?start=ref_IGOR0001",
+        referrals_count: 0, rewarded_count: 0, bonus_per_referral: 50, enabled: true, referrals: [] });
       if (p === `/social/${TG_ID}`) return json(route, net.social || { code: "IGOR0001", invite_link: "https://t.me/GYMASH_bot/gymapp?startapp=fr_IGOR0001", share_workouts: true, friends: [], teams: [] });
       const ivm = p.match(/^\/social\/\d+\/invite\/([A-Za-z0-9]+)$/);
       if (ivm) {
