@@ -90,7 +90,8 @@ export const CHECKS = {
                                    eq("старт с днём", r.start && [r.start.program_day, r.start.exercise_ids], [1, [101]])),
   "54_program_locked": r => all(eq("на Premium", r.toPremium, 1), eq("стартов", r.starts, 0)),
   // друзья, лента, команды
-  "55_social_accept_invite": r => all(eq("принят код", r.accepts, ["ANNA0002"]), eq("друг в списке", r.friendRow, 1), eq("приватность", r.privacy, 1)),
+  "55_social_accept_invite": r => all(eq("до согласия не принимаем", r.acceptsBefore, 0), eq("предпросмотр", r.previews, ["ANNA0002"]),
+                                      eq("принят код", r.accepts, ["ANNA0002"]), eq("друг в списке", r.friendRow, 1), eq("приватность", r.privacy, 1)),
   "56_social_feed_like": r => all(eq("отметка", r.likes, [901]), eq("ещё упражнения", r.more, 1), eq("сводка", r.meta, 1), eq("свои — «Вы»", r.you > 0 ? 1 : 0, 1)),
   "57_team_join_board": r => all(eq("вступление", r.joins, ["TEAM0007"]), eq("владелец", r.owner, 1), eq("позвать", r.invite, 1)),
   // «Что нового»: 5 слайдов (с Premium), кнопки «Далее»/«Готово», отметка на сервере и в телефоне, Назад Telegram закрывает,
@@ -117,5 +118,7 @@ export const CHECKS = {
                                   eq("запрос", r.privacy, [{ nudges_allowed: false }]), eq("смен ссылки", r.resets, 2), eq("подтверждений", r.confirms, 2),
                                   eq("текст подтверждения", /Старая ссылка перестанет работать/.test(r.confirmText), true),
                                   eq("новая ссылка", r.link, "https://t.me/GYMASH_bot/gymapp?startapp=fr_NEWC0DE1"), eq("без прокрутки вбок", r.overflow, false)),
+  "69_invite_decline": r => all(eq("не принято", r.accepts, 0), eq("карточка закрыта", r.card, 0)),
+  "70_team_hidden_member": r => all(eq("скрыл тренировки", r.hidden, 1), eq("без null", r.nullText, 0)),
   "66_friend_nudge_errors": r => all(eq("окно осталось", r.stillOpen, 1), eq("пустой — нельзя", r.disabled, true), eq("запросы", r.nudges, [3, 5])),
 };
