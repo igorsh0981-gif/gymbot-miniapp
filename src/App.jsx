@@ -1038,7 +1038,8 @@ const T = {
     // русский, поэтому интерфейс работает как раньше, а проверка паритета
     // по языкам показывает их как незакрытый долг и не даёт о них забыть.
     ref_step1:"Поделись ссылкой с другом",
-    ref_step2:"Друг регистрируется в GymBot",
+    ref_step2:"Друг регистрируется и проводит первую тренировку",
+    ref_pending:"ждёт 1-й тренировки",
     ref_step3:"Ты получаешь {n} баллов",
     ref_step4:"Друг получает бонус при старте",
     plan_time_taken:"На {dt} уже есть тренировка «{title}». Выбрать другое время?",
@@ -2182,7 +2183,8 @@ const T = {
     plan_time_taken:"There is already a workout “{title}” at {dt}. Choose another time?",
     prog_weight_range:"Weight chart: {a} to {b}",
     ref_step1:"Share the link with a friend",
-    ref_step2:"Your friend signs up for GymBot",
+    ref_step2:"Your friend signs up and finishes a first workout",
+    ref_pending:"awaiting 1st workout",
     ref_step3:"You get {n} points",
     ref_step4:"Your friend gets a starting bonus",
     sup_per_pack:"{n} servings per pack",
@@ -3079,7 +3081,8 @@ const T = {
     plan_time_taken:"{dt} vaqtiga «{title}» treningi allaqachon bor. Boshqa vaqt tanlaysanmi?",
     prog_weight_range:"Vazn grafigi: {a} dan {b} gacha",
     ref_step1:"Do‘sting bilan havolani ulash",
-    ref_step2:"Do‘sting GymBot’da ro‘yxatdan o‘tadi",
+    ref_step2:"Do‘sting ro‘yxatdan o‘tib, birinchi mashg‘ulotini o‘tkazadi",
+    ref_pending:"1-mashg‘ulotni kutmoqda",
     ref_step3:"Sen {n} ball olasan",
     ref_step4:"Do‘sting boshlang‘ich bonus oladi",
     sup_per_pack:"Qadoqda {n} porsiya",
@@ -3976,7 +3979,8 @@ const T = {
     plan_time_taken:"{dt} уақытына «{title}» жаттығуы бар. Басқа уақытты таңдайсың ба?",
     prog_weight_range:"Салмақ графигі: {a}-ден {b}-ге дейін",
     ref_step1:"Сілтемені досыңмен бөліс",
-    ref_step2:"Досың GymBot-та тіркеледі",
+    ref_step2:"Досың тіркеліп, алғашқы жаттығуын өткізеді",
+    ref_pending:"1-жаттығуды күтуде",
     ref_step3:"Сен {n} ұпай аласың",
     ref_step4:"Досың бастапқы бонус алады",
     sup_per_pack:"Қаптамада {n} порция",
@@ -11182,8 +11186,10 @@ ${data.ref_link}`;
           <div key={i} style={{display:"flex",justifyContent:"space-between",
             padding:"6px 0",borderBottom:i<data.referrals.length-1?`0.5px solid ${C.border}`:"none"}}>
             <span style={{fontSize:13,color:C.text}}>{r.name}{r.username?` @${r.username}`:""}</span>
-            <span style={{fontSize:11,color:C.muted,fontFamily:"monospace"}}>
-              {r.joined?new Date(r.joined).toLocaleDateString(dateLocale(),{day:"numeric",month:"short"}):"—"}
+            {/* Баллы приглашающему — после первой тренировки друга */}
+            <span style={{fontSize:11,fontFamily:"monospace",textAlign:"right",color:r.rewarded===false?C.muted:C.text}}>
+              {r.rewarded===false?t("ref_pending"):<><span style={{color:C.accent}}>+{data.bonus_per_referral}</span>{" · "}</>}
+              {r.rewarded===false?"":(r.joined?new Date(r.joined).toLocaleDateString(dateLocale(),{day:"numeric",month:"short"}):"—")}
             </span>
           </div>
         ))}

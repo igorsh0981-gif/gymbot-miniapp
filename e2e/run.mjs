@@ -587,6 +587,17 @@ await scenario("70_team_hidden_member", VIEWPORTS[0], { tab: "menu", screen: "so
   return { hidden: await page.getByText("скрыл(а) тренировки").count(), nullText: await page.getByText("null").count() };
 });
 
+// ── Приглашения: баллы — после первой тренировки друга; кто ещё не тренировался — «ждёт» ──
+await scenario("71_referral_pending", VIEWPORTS[0], { tab: "menu", screen: "referral",
+  net: { setMode: "ok", setBodies: [], counts: {}, referral: { ref_code: "IGOR0001", ref_link: "https://t.me/GYMASH_bot?start=ref_IGOR0001",
+    referrals_count: 2, rewarded_count: 1, bonus_per_referral: 50, enabled: true,
+    referrals: [{ name: "Анна", username: null, joined: "2026-10-20T10:00:00", rewarded: true },
+                { name: "Борис", username: null, joined: "2026-10-24T10:00:00", rewarded: false }] } } }, async (page) => {
+  await page.getByText("Борис").waitFor({ timeout: 5000 });
+  return { pending: await page.getByText("ждёт 1-й тренировки").count(), plus: await page.getByText("+50").count(),
+           step: await page.getByText("Друг регистрируется и проводит первую тренировку").count() };
+});
+
 await browser.close();
 fs.writeFileSync(path.join(OUT, "results.json"), JSON.stringify(results, null, 2));
 

@@ -120,5 +120,6 @@ export const CHECKS = {
                                   eq("новая ссылка", r.link, "https://t.me/GYMASH_bot/gymapp?startapp=fr_NEWC0DE1"), eq("без прокрутки вбок", r.overflow, false)),
   "69_invite_decline": r => all(eq("не принято", r.accepts, 0), eq("карточка закрыта", r.card, 0)),
   "70_team_hidden_member": r => all(eq("скрыл тренировки", r.hidden, 1), eq("без null", r.nullText, 0)),
+  "71_referral_pending": r => all(eq("ждёт тренировки", r.pending, 1), eq("начислено", r.plus, 1), eq("шаг 2", r.step, 1)),
   "66_friend_nudge_errors": r => all(eq("окно осталось", r.stillOpen, 1), eq("пустой — нельзя", r.disabled, true), eq("запросы", r.nudges, [3, 5])),
 };
