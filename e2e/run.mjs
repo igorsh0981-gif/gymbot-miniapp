@@ -194,7 +194,13 @@ async function setup(page, { lang = "ru", ls = null, setFails = false, curIdx = 
           body: ev({ type: "delta", text: "Хорошая работа: " }) + ev({ type: "delta", text: "жим прибавил 2,5 кг." }) + ev({ type: "done", answer: "Хорошая работа: жим прибавил 2,5 кг." }) });
       }
       if (p === "/ai/ask") { (net.aiCalls = net.aiCalls || []).push("ask"); return json(route, { answer: "Запасной разбор тренировки." }); }
-      if (p === "/workout/77/ai-review") { (net.saved = net.saved || []).push(url.searchParams.get("review")); return json(route, { ok: true }); }
+      if (p === "/workout/77/ai-review") {
+        // текст разбора — в теле запроса, не в адресе (адрес попадает в журнал сервера)
+        let rv = null; try { rv = JSON.parse(req.postData() || "{}").review ?? null; } catch {}
+        (net.saved = net.saved || []).push(rv);
+        (net.reviewInUrl = net.reviewInUrl || []).push(url.searchParams.has("review"));
+        return json(route, { ok: true });
+      }
       if (p === "/workout/555") return json(route, { id: 555, date: "2026-10-23T20:00:00", status: "finished", total_volume: 600,
         exercises: [{ name: "Жим штанги лёжа", sets: [{ set_number: 1, weight: 60, reps: 10, rpe: null }] }] });
       if (p === "/food/label") {
@@ -248,6 +254,14 @@ async function setup(page, { lang = "ru", ls = null, setFails = false, curIdx = 
         return json(route, { workout_id: 77 });
       }
       if (p === `/social/${TG_ID}`) return json(route, net.social || { code: "IGOR0001", invite_link: "https://t.me/GYMASH_bot/gymapp?startapp=fr_IGOR0001", share_workouts: true, friends: [], teams: [] });
+      const ivm = p.match(/^\/social\/\d+\/invite\/([A-Za-z0-9]+)$/);
+      if (ivm) {
+        (net.previews = net.previews || []).push(ivm[1]);
+        const code = ivm[1].toUpperCase();
+        if (code === "ANNA0002") return json(route, { kind: "friend", name: "Анна", already: false });
+        if (code === "TEAM0007") return json(route, { kind: "team", id: 7, name: "Зал №1", members: 3, already: false });
+        return json(route, { detail: { code: "bad_code" } }, 404);
+      }
       if (p === `/social/${TG_ID}/friends/accept`) {
         (net.accepts = net.accepts || []).push(JSON.parse(req.postData() || "{}").code);
         return json(route, { ok: true, already: false, friend: { id: 2, name: "Анна" } });
@@ -765,8 +779,12 @@ const FEED = { next_before: null, items: [
     exercises: ["Планка"], exercises_count: 1, sets: 3, records: [], likes: 0, liked: false } ] };
 await scenario("55_social_accept_invite", VIEWPORTS[1], { tab: "menu", screen: "social", params: { accept: "ANNA0002" },
   net: { setMode: "ok", setBodies: [], counts: {}, social: SOCIAL, feed: FEED } }, async (page, net) => {
+  await page.getByText("Анна приглашает вас в друзья").waitFor({ timeout: 5000 });
+  const acceptsBefore = (net.accepts || []).length;
+  await page.screenshot({ path: path.join(OUT, "55b_invite_confirm.png") });
+  await page.getByRole("button", { name: "Добавить в друзья" }).click();
   await page.getByText("Вы теперь друзья с Анна").waitFor({ timeout: 5000 });
-  return { accepts: net.accepts || [], friendRow: await page.getByText("4 трен. на этой неделе").count(),
+  return { acceptsBefore, previews: net.previews || [], accepts: net.accepts || [], friendRow: await page.getByText("4 трен. на этой неделе").count(),
            privacy: await page.getByText("Показывать мои тренировки друзьям").count() };
 });
 await scenario("56_social_feed_like", VIEWPORTS[0], { tab: "menu", screen: "social",
@@ -780,6 +798,9 @@ await scenario("56_social_feed_like", VIEWPORTS[0], { tab: "menu", screen: "soci
 });
 await scenario("57_team_join_board", VIEWPORTS[1], { tab: "menu", screen: "social", params: { join: "TEAM0007" },
   net: { setMode: "ok", setBodies: [], counts: {}, social: SOCIAL, feed: FEED } }, async (page, net) => {
+  await page.getByText("Приглашение в команду «Зал №1»").waitFor({ timeout: 5000 });
+  await page.getByText(/3 участн\. В команде видно/).waitFor({ timeout: 2000 });
+  await page.getByRole("button", { name: "Вступить", exact: true }).click();
   await page.getByText("Вы в команде «Зал №1»").waitFor({ timeout: 5000 });
   await page.getByText("РЕЙТИНГ НЕДЕЛИ").waitFor({ timeout: 4000 });
   return { joins: net.joins || [], owner: await page.getByText("владелец").count(), invite: await page.getByRole("button", { name: /Позвать в команду/ }).count() };
@@ -927,6 +948,20 @@ await scenario("68_friends_settings", VIEWPORTS[0], { tab: "menu", screen: "soci
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   return { off, before, after, privacy: net.privacy || [], resets: net.resets || 0, confirms: dialogs.length,
            confirmText: dialogs[0] || "", link: net.social.invite_link, overflow };
+});
+// ── Приглашение: «Не сейчас» ничего не принимает; в команде скрывший тренировки — без чисел ──
+await scenario("69_invite_decline", VIEWPORTS[0], { tab: "menu", screen: "social", params: { accept: "ANNA0002" },
+  net: { setMode: "ok", setBodies: [], counts: {}, social: SOCIAL, feed: FEED } }, async (page, net) => {
+  await page.getByRole("button", { name: "Не сейчас" }).click();
+  await page.waitForTimeout(300);
+  return { accepts: (net.accepts || []).length, card: await page.getByText("Анна приглашает вас в друзья").count() };
+});
+const TEAM_HIDDEN = { ...TEAM, board: [...TEAM.board, { id: 9, name: "Дана", is_me: false, is_owner: false, hidden: true, week: null, last_week: null, place: 4 }] };
+await scenario("70_team_hidden_member", VIEWPORTS[0], { tab: "menu", screen: "social", params: { join: "TEAM0007" },
+  net: { setMode: "ok", setBodies: [], counts: {}, social: { ...SOCIAL, teams: [TEAM_HIDDEN] }, feed: FEED } }, async (page, net) => {
+  await page.getByRole("button", { name: "Вступить", exact: true }).click();
+  await page.getByText("Дана").waitFor({ timeout: 5000 });
+  return { hidden: await page.getByText("скрыл(а) тренировки").count(), nullText: await page.getByText("null").count() };
 });
 
 await browser.close();
