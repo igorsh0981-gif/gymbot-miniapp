@@ -387,9 +387,11 @@ function hasResumableActiveWorkout(){
   }catch{return false;}
 }
 
+// muted — #8E8E8E, а не #888888: на карточке (#222) у #888 контраст 4,48:1 — чуть ниже
+// нормы WCAG AA 4,5:1 для обычного текста; #8E8E8E даёт 4,86:1, на глаз разницы нет.
 const C = {
   bg:"#0F0F0F", surface:"#1A1A1A", card:"#222222",
-  accent:"#C8FF00", text:"#FFFFFF", muted:"#888888",
+  accent:"#C8FF00", text:"#FFFFFF", muted:"#8E8E8E",
   border:"#2A2A2A", danger:"#FF4444", success:"#00CC66", warn:"#FFB800",
 };
 
@@ -1326,6 +1328,14 @@ const T = {
     ui_vybrano_grupp:"ВЫБРАНО ГРУПП:",
     ui_zamenit:"ЗАМЕНИТЬ",
     ui_zdes_mozhno_ispolzovat_otdelno:"Здесь можно использовать отдельно.",
+    // Подписи для экранного диктора (aria-label): кнопки-значки, поля без подписи
+    a11y_close:"Закрыть", a11y_delete:"Удалить", a11y_edit:"Изменить", a11y_send:"Отправить",
+    a11y_nav:"Разделы приложения", a11y_prev_day:"Предыдущий день", a11y_to_today:"К сегодняшнему дню", a11y_glass:"Стакан воды {n}",
+    a11y_by_photo:"Добавить по фото", a11y_by_search:"Найти продукт", a11y_voice_start:"Записать голосом", a11y_voice_stop:"Остановить запись",
+    a11y_weight_dec:"Вес −2,5 кг", a11y_weight_inc:"Вес +2,5 кг", a11y_reps_dec:"Повторения −1", a11y_reps_inc:"Повторения +1",
+    a11y_move_up:"Выше: {name}", a11y_move_down:"Ниже: {name}", a11y_replace:"Заменить: {name}", a11y_add_ex:"В тренировку: {name}",
+    a11y_warmup:"Разминка: {name}", a11y_zoom:"Масштаб", a11y_food_photo:"Фото блюда", a11y_profile:"Профиль и настройки",
+    a11y_deadline:"Срок",
   },
   en: {
     menu_nutrition:"Nutrition", menu_workout:"Workouts", menu_progress:"Progress",
@@ -2215,6 +2225,14 @@ const T = {
     ui_vybrano_grupp:"GROUPS SELECTED:",
     ui_zamenit:"REPLACE",
     ui_zdes_mozhno_ispolzovat_otdelno:"You can use it separately here.",
+    // Подписи для экранного диктора (aria-label): кнопки-значки, поля без подписи
+    a11y_close:"Close", a11y_delete:"Delete", a11y_edit:"Edit", a11y_send:"Send",
+    a11y_nav:"App sections", a11y_prev_day:"Previous day", a11y_to_today:"Back to today", a11y_glass:"Glass of water {n}",
+    a11y_by_photo:"Add from photo", a11y_by_search:"Find a product", a11y_voice_start:"Record voice", a11y_voice_stop:"Stop recording",
+    a11y_weight_dec:"Weight −2.5 kg", a11y_weight_inc:"Weight +2.5 kg", a11y_reps_dec:"Reps −1", a11y_reps_inc:"Reps +1",
+    a11y_move_up:"Move up: {name}", a11y_move_down:"Move down: {name}", a11y_replace:"Replace: {name}", a11y_add_ex:"Add to workout: {name}",
+    a11y_warmup:"Warm-up: {name}", a11y_zoom:"Zoom", a11y_food_photo:"Dish photo", a11y_profile:"Profile and settings",
+    a11y_deadline:"Deadline",
   },
   uz: {
     menu_nutrition:"Ovqatlanish", menu_workout:"Mashqlar", menu_progress:"Taraqqiyot",
@@ -3104,6 +3122,14 @@ const T = {
     ui_vybrano_grupp:"TANLANGAN GURUHLAR:",
     ui_zamenit:"ALMASHTIRISH",
     ui_zdes_mozhno_ispolzovat_otdelno:"Bu yerda alohida ishlatish mumkin.",
+    // Подписи для экранного диктора (aria-label): кнопки-значки, поля без подписи
+    a11y_close:"Yopish", a11y_delete:"O'chirish", a11y_edit:"O'zgartirish", a11y_send:"Yuborish",
+    a11y_nav:"Ilova bo'limlari", a11y_prev_day:"Oldingi kun", a11y_to_today:"Bugungi kunga", a11y_glass:"{n}-stakan suv",
+    a11y_by_photo:"Surat orqali qo'shish", a11y_by_search:"Mahsulot qidirish", a11y_voice_start:"Ovoz yozish", a11y_voice_stop:"Yozishni to'xtatish",
+    a11y_weight_dec:"Og'irlik −2,5 kg", a11y_weight_inc:"Og'irlik +2,5 kg", a11y_reps_dec:"Takrorlar −1", a11y_reps_inc:"Takrorlar +1",
+    a11y_move_up:"Yuqoriga: {name}", a11y_move_down:"Pastga: {name}", a11y_replace:"Almashtirish: {name}", a11y_add_ex:"Mashg'ulotga: {name}",
+    a11y_warmup:"Isitish: {name}", a11y_zoom:"Masshtab", a11y_food_photo:"Taom surati", a11y_profile:"Profil va sozlamalar",
+    a11y_deadline:"Muddat",
   },
   kz: {
     menu_nutrition:"Тамақтану", menu_workout:"Жаттығулар", menu_progress:"Прогресс",
@@ -3993,6 +4019,14 @@ const T = {
     ui_vybrano_grupp:"ТАҢДАЛҒАН ТОПТАР:",
     ui_zamenit:"АУЫСТЫРУ",
     ui_zdes_mozhno_ispolzovat_otdelno:"Мұнда бөлек қолдануға болады.",
+    // Подписи для экранного диктора (aria-label): кнопки-значки, поля без подписи
+    a11y_close:"Жабу", a11y_delete:"Жою", a11y_edit:"Өзгерту", a11y_send:"Жіберу",
+    a11y_nav:"Қолданба бөлімдері", a11y_prev_day:"Алдыңғы күн", a11y_to_today:"Бүгінгі күнге", a11y_glass:"{n}-стакан су",
+    a11y_by_photo:"Сурет арқылы қосу", a11y_by_search:"Өнімді іздеу", a11y_voice_start:"Дауыс жазу", a11y_voice_stop:"Жазуды тоқтату",
+    a11y_weight_dec:"Салмақ −2,5 кг", a11y_weight_inc:"Салмақ +2,5 кг", a11y_reps_dec:"Рет саны −1", a11y_reps_inc:"Рет саны +1",
+    a11y_move_up:"Жоғарыға: {name}", a11y_move_down:"Төменге: {name}", a11y_replace:"Ауыстыру: {name}", a11y_add_ex:"Жаттығуға: {name}",
+    a11y_warmup:"Жылыту: {name}", a11y_zoom:"Масштаб", a11y_food_photo:"Тағам суреті", a11y_profile:"Профиль және баптаулар",
+    a11y_deadline:"Мерзім",
   },
 };
 function t(key) { return T[LANG_STORE.current]?.[key] || T.ru[key] || key; }
@@ -4189,16 +4223,61 @@ function tSport(sport) {
 }
 
 
-const Hero = ({children,style={}}) => <div style={{fontWeight:700,fontSize:26,letterSpacing:-0.5,lineHeight:1.15,color:C.text,textTransform:"uppercase",...style}}>{children}</div>;
+// Заголовок экрана — для экранного диктора это заголовок первого уровня (навигация по заголовкам)
+const Hero = ({children,style={}}) => <div role="heading" aria-level={1} style={{fontWeight:700,fontSize:26,letterSpacing:-0.5,lineHeight:1.15,color:C.text,textTransform:"uppercase",...style}}>{children}</div>;
 const Kicker = ({children}) => <div style={{fontFamily:"monospace",fontSize:11,color:C.muted,letterSpacing:2,textTransform:"uppercase",marginBottom:4}}>{children}</div>;
 const Mono = ({children,color=C.accent,size=18}) => <span style={{fontFamily:"monospace",fontWeight:700,fontSize:size,color}}>{children}</span>;
 
-function Card({children,accent,danger,onClick,style={},pad="14px 16px"}){
+// ── Доступность ──────────────────────────────────────────────────────────────
+/** Текст только для экранного диктора: на экране его нет. */
+const SR_ONLY={position:"absolute",width:1,height:1,padding:0,margin:-1,overflow:"hidden",clip:"rect(0 0 0 0)",whiteSpace:"nowrap",border:0};
+/** Кликабельный не-<button> (карточка, строка): роль, фокус с клавиатуры, Enter и пробел.
+ *  Нажатие клавиши на вложенном поле или кнопке карточку не срабатывает. */
+function pressable(onClick,role="button"){
+  return {role,tabIndex:0,onClick,onKeyDown:e=>{
+    if(e.target!==e.currentTarget)return;
+    if(e.key==="Enter"||e.key===" "){e.preventDefault();onClick(e);}
+  }};
+}
+// Открытые окна по порядку: Escape закрывает только верхнее
+const _dialogStack=[];
+/** Окно поверх экрана: при открытии фокус внутрь (на ref), при закрытии — обратно,
+ *  Escape закрывает. Без этого диктор оставался на кнопке под затемнением. */
+function useDialogFocus(ref,onClose){
+  const closeRef=useRef(onClose);
+  closeRef.current=onClose;
+  useEffect(()=>{
+    const prev=document.activeElement;
+    const me={};
+    _dialogStack.push(me);
+    try{ref?.current?.focus({preventScroll:true});}catch{}
+    const onKey=e=>{if(e.key==="Escape"&&_dialogStack[_dialogStack.length-1]===me&&closeRef.current){e.preventDefault();closeRef.current();}};
+    document.addEventListener("keydown",onKey);
+    return()=>{
+      document.removeEventListener("keydown",onKey);
+      const i=_dialogStack.indexOf(me);if(i>=0)_dialogStack.splice(i,1);
+      try{if(prev&&prev!==document.body&&document.contains(prev))prev.focus({preventScroll:true});}catch{}
+    };
+  },[]);
+}
+
+/** Окно (role="dialog") с фокусом и Escape из useDialogFocus; вид задаёт style. */
+function ModalBox({label,onClose,style={},children}){
+  const ref=useRef(null);
+  useDialogFocus(ref,onClose);
+  return <div ref={ref} tabIndex={-1} role="dialog" aria-modal="true" aria-label={label} style={{...style,outline:"none"}}>{children}</div>;
+}
+
+/** Карточка. С onClick — кнопка для диктора и клавиатуры (role="button", Tab, Enter/пробел);
+ *  role="switch" и т.п. — своя роль; role={false} — только касание: внутри уже есть
+ *  свои кнопки (вложенные кнопки в кнопке диктор не видит). aria-* передаются как есть. */
+function Card({children,accent,danger,onClick,style={},pad="14px 16px",role,...aria}){
   const border = accent?C.accent:danger?C.danger:C.border;
-  return <div onClick={onClick} style={{background:C.card,border:`0.5px solid ${border}`,borderRadius:12,padding:pad,cursor:onClick?"pointer":"default",...style}}>{children}</div>;
+  const act=onClick&&role!==false?pressable(onClick,role||"button"):{onClick};
+  return <div {...aria} {...act} style={{background:C.card,border:`0.5px solid ${border}`,borderRadius:12,padding:pad,cursor:onClick?"pointer":"default",...style}}>{children}</div>;
 }
 function Loader({text=t("loading")}){
-  return <div style={{display:"flex",alignItems:"center",justifyContent:"center",height:"60vh"}}><div style={{textAlign:"center"}}><div style={{fontFamily:"monospace",fontSize:12,color:C.accent,letterSpacing:3}}>{text}</div><div style={{color:C.muted,fontSize:24,marginTop:8}}>◌</div></div></div>;
+  return <div role="status" style={{display:"flex",alignItems:"center",justifyContent:"center",height:"60vh"}}><div style={{textAlign:"center"}}><div style={{fontFamily:"monospace",fontSize:12,color:C.accent,letterSpacing:3}}>{text}</div><div aria-hidden="true" style={{color:C.muted,fontSize:24,marginTop:8}}>◌</div></div></div>;
 }
 /** Экран ждёт свежий профиль (на руках копия с прошлого запуска, без данных
  *  о здоровье). Сразу — загрузка; если за 5 секунд не пришёл — «нет связи»
@@ -4243,11 +4322,14 @@ function Btn({children,onClick,accent,danger,disabled,full,style={}}){
   const col=accent?C.bg:danger?C.danger:C.text;
   return <button onClick={onClick} disabled={disabled} style={{width:full?"100%":"auto",background:bg,border:`0.5px solid ${bc}`,borderRadius:10,padding:"13px 20px",color:col,fontWeight:700,fontSize:14,letterSpacing:0.5,textTransform:"uppercase",cursor:disabled?"not-allowed":"pointer",opacity:disabled?0.5:1,...style}}>{children}</button>;
 }
-function Sel({value,onChange,options}){
-  return <select value={value} onChange={e=>onChange(e.target.value)} style={{width:"100%",background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 14px",color:C.text,fontSize:13,fontFamily:"monospace",outline:"none",boxSizing:"border-box"}}>{options.map(o=><option key={o.value} value={o.value}>{o.label}</option>)}</select>;
+function Sel({value,onChange,options,label}){
+  return <select value={value} onChange={e=>onChange(e.target.value)} aria-label={label} style={{width:"100%",background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 14px",color:C.text,fontSize:13,fontFamily:"monospace",outline:"none",boxSizing:"border-box"}}>{options.map(o=><option key={o.value} value={o.value}>{o.label}</option>)}</select>;
 }
+// Серый и красный текст на подложке своего же цвета не дотягивали до 4,5:1 (4,0:1) —
+// у них текст светлее рамки на полтона. Остальные цвета проходят как есть.
+const TAG_TEXT={[C.muted]:"#A3A3A3",[C.danger]:"#FF6B6B"};
 function Tag({children,color=C.muted,bg}){
-  return <span style={{background:bg||`${color}22`,border:`0.5px solid ${color}`,borderRadius:16,padding:"4px 10px",fontSize:12,color,display:"inline-block"}}>{children}</span>;
+  return <span style={{background:bg||`${color}22`,border:`0.5px solid ${color}`,borderRadius:16,padding:"4px 10px",fontSize:12,color:TAG_TEXT[color]||color,display:"inline-block"}}>{children}</span>;
 }
 function ProgressBar({pct,color=C.accent}){
   return <div style={{background:C.border,borderRadius:4,height:6}}><div style={{width:`${Math.min(100,pct)}%`,height:"100%",background:pct>100?C.danger:color,borderRadius:4,transition:"width 0.4s"}}/></div>;
@@ -4404,11 +4486,14 @@ function RestTimer({onClose,autoStart=null,onRpe=null}){
   const pct=left!=null?Math.round((1-left/total)*100):0;
   const fmt=s=>{if(s==null)return"--:--";const m=Math.floor(s/60);const sec=s%60;return`${m}:${sec.toString().padStart(2,"0")}`;};
   const done=left===0;
+  const panelRef=useRef(null);
+  useDialogFocus(panelRef,()=>{reset();onClose();});
 
   return(
     <Fragment>
     <div style={{position:"fixed",bottom:0,left:0,right:0,top:0,zIndex:199,background:"rgba(0,0,0,0.6)"}} onClick={e=>{if(e.target===e.currentTarget){reset();onClose();}}}/>
-    <div style={{position:"fixed",bottom:"calc(70px + env(safe-area-inset-bottom))",left:16,right:16,background:C.surface,border:`0.5px solid ${done?C.success:C.accent}`,borderRadius:16,padding:"16px",zIndex:200,boxShadow:"0 -4px 24px rgba(0,0,0,0.4)"}}>
+    <div ref={panelRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="rest-timer-title"
+      style={{position:"fixed",bottom:"calc(70px + env(safe-area-inset-bottom))",left:16,right:16,background:C.surface,border:`0.5px solid ${done?C.success:C.accent}`,borderRadius:16,padding:"16px",zIndex:200,boxShadow:"0 -4px 24px rgba(0,0,0,0.4)",outline:"none"}}>
       {/* Прогресс-бар */}
       <div style={{background:C.border,borderRadius:4,height:4,marginBottom:12,overflow:"hidden"}}>
         <div style={{width:`${pct}%`,height:"100%",background:done?C.success:C.accent,borderRadius:4,transition:"width 1s linear"}}/>
@@ -4416,7 +4501,8 @@ function RestTimer({onClose,autoStart=null,onRpe=null}){
 
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:12}}>
         <div>
-          <div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:2}}>
+          {/* Диктор слышит только смену состояния («Отдых» → «Отдых окончен»), а не каждую секунду */}
+          <div id="rest-timer-title" aria-live="polite" style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:2}}>
             {done?t("rest_done"):left!=null?t("rest_label"):t("choose_time")}
           </div>
           <div style={{fontSize:36,fontFamily:"monospace",fontWeight:700,color:done?C.success:C.accent,lineHeight:1}}>
@@ -4430,7 +4516,7 @@ function RestTimer({onClose,autoStart=null,onRpe=null}){
               {running?t("pause_btn"):t("start_btn2")}
             </button>
           )}
-          <button onClick={()=>{reset();onClose();}}
+          <button onClick={()=>{reset();onClose();}} aria-label={t("a11y_close")}
             style={{background:"none",border:`0.5px solid ${C.border}`,borderRadius:10,padding:"8px 12px",color:C.muted,fontSize:13,cursor:"pointer"}}>
             ✕
           </button>
@@ -4475,12 +4561,12 @@ function RestTimer({onClose,autoStart=null,onRpe=null}){
 
 function NavBar({active,onChange}){
   const tabs=[{id:"menu",icon:"⊞",label:t("menu_tab_menu")},{id:"workout",icon:"▶",label:t("menu_tab_workout")},{id:"progress",icon:"↗",label:t("menu_tab_progress")},{id:"catalog",icon:"☰",label:t("menu_tab_catalog")},{id:"ai",icon:"●",label:t("menu_tab_ai")}];
-  return <div style={{position:"fixed",bottom:0,left:0,right:0,background:C.surface,borderTop:`0.5px solid ${C.border}`,display:"flex",padding:"8px 0 calc(8px + env(safe-area-inset-bottom))",zIndex:100}}>
-    {tabs.map(t=><button key={t.id} onClick={()=>onChange(t.id)} style={{flex:1,background:"none",border:"none",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:3,padding:"4px 0"}}>
-      <span style={{fontSize:18,color:active===t.id?C.accent:C.muted}}>{t.icon}</span>
+  return <nav aria-label={t("a11y_nav")} style={{position:"fixed",bottom:0,left:0,right:0,background:C.surface,borderTop:`0.5px solid ${C.border}`,display:"flex",padding:"8px 0 calc(8px + env(safe-area-inset-bottom))",zIndex:100}}>
+    {tabs.map(t=><button key={t.id} onClick={()=>onChange(t.id)} aria-current={active===t.id?"page":undefined} style={{flex:1,background:"none",border:"none",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:3,padding:"4px 0"}}>
+      <span aria-hidden="true" style={{fontSize:18,color:active===t.id?C.accent:C.muted}}>{t.icon}</span>
       <span style={{fontSize:10,fontFamily:"monospace",letterSpacing:0.5,color:active===t.id?C.accent:C.muted}}>{t.label}</span>
     </button>)}
-  </div>;
+  </nav>;
 }
 
 function ExerciseSelectCard({ex,sel,onToggle}){
@@ -4508,7 +4594,7 @@ function ExerciseSelectCard({ex,sel,onToggle}){
             style={{width:"100%",height:"100%",objectFit:"cover",display:"block",opacity:imgLoaded?1:0,transition:"opacity 0.25s ease"}}
             onLoad={()=>setImgLoaded(true)} onError={e=>e.target.style.display="none"}/>
           :<div style={{width:"100%",height:"100%",display:"flex",alignItems:"center",justifyContent:"center",fontSize:30}}>{ex.group_emoji||"💪"}</div>}
-        <button onClick={ev=>{ev.stopPropagation();onToggle();}} style={{position:"absolute",top:6,right:6,width:30,height:30,borderRadius:8,background:sel?C.accent:"rgba(0,0,0,0.55)",border:`0.5px solid ${sel?C.accent:C.border}`,color:sel?C.bg:"#fff",fontSize:16,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>
+        <button onClick={ev=>{ev.stopPropagation();onToggle();}} aria-label={t("a11y_add_ex").replace("{name}",tField(ex,"name"))} aria-pressed={!!sel} style={{position:"absolute",top:6,right:6,width:30,height:30,borderRadius:8,background:sel?C.accent:"rgba(0,0,0,0.55)",border:`0.5px solid ${sel?C.accent:C.border}`,color:sel?C.bg:"#fff",fontSize:16,fontWeight:700,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>
           {sel?`${sel.order}`:"+"}
         </button>
       </div>
@@ -4521,7 +4607,8 @@ function ExerciseSelectCard({ex,sel,onToggle}){
 }
 
 function ExCard({ex,onClick,badge,action}){
-  return <Card onClick={onClick} style={{marginBottom:8}}>
+  // С кнопкой-действием внутри карточка остаётся только для касания: вложенную кнопку диктор не увидел бы
+  return <Card onClick={onClick} role={action?false:undefined} style={{marginBottom:8}}>
     <div style={{display:"flex",gap:12,alignItems:"flex-start"}}>
       {ex.photo_url&&<img src={ex.photo_url} alt="" style={{width:56,height:56,borderRadius:8,objectFit:"cover",flexShrink:0}} onError={e=>e.target.style.display="none"}/>}
       <div style={{flex:1,minWidth:0}}>
@@ -4650,7 +4737,7 @@ function OnboardingScreen({tgId,tgUser,onComplete}){
           <div style={{fontFamily:"monospace",fontSize:10,color:C.muted,letterSpacing:2,marginBottom:16}}>{t("step_1_2")}</div>
           <Hero style={{marginBottom:8}}>{t("name_hint2")}</Hero>
           <div style={{fontSize:13,color:C.muted,marginBottom:28}}>{t("name_hint")}</div>
-          <input value={name} onChange={e=>setName(e.target.value)} placeholder={tgUser?.first_name||t("enter_name")} maxLength={40} autoFocus
+          <input value={name} onChange={e=>setName(e.target.value)} placeholder={tgUser?.first_name||t("enter_name")} maxLength={40} autoFocus aria-label={t("enter_name")}
             style={{width:"100%",background:C.card,border:`1px solid ${(name||"").trim()?C.accent:C.border}`,borderRadius:10,padding:"14px 16px",color:C.text,fontSize:18,outline:"none",fontFamily:"inherit",boxSizing:"border-box"}}/>
           {err&&<div style={{marginTop:12,padding:"10px 14px",background:"rgba(255,68,68,0.1)",border:`1px solid ${C.danger}`,borderRadius:8,color:C.danger,fontSize:13}}>{err}</div>}
           <div style={{flex:1}}/>
@@ -4662,13 +4749,13 @@ function OnboardingScreen({tgId,tgUser,onComplete}){
           <div style={{fontSize:13,color:C.muted,marginBottom:24}}>{t("ai_trainer_hint")}</div>
           <div style={{display:"flex",flexDirection:"column",gap:10,flex:1}}>
             {goals.map(g=>(
-              <div key={g.v} onClick={()=>setGoal(g.v)}
+              <div key={g.v} {...pressable(()=>setGoal(g.v))} aria-pressed={goal===g.v}
                 style={{display:"flex",alignItems:"center",gap:16,padding:"14px 16px",borderRadius:12,
                   border:`1px solid ${goal===g.v?C.accent:C.border}`,
                   background:goal===g.v?"rgba(200,255,0,0.06)":C.card,cursor:"pointer"}}>
-                <span style={{fontSize:24}}>{g.icon}</span>
+                <span aria-hidden="true" style={{fontSize:24}}>{g.icon}</span>
                 <span style={{fontSize:15,fontWeight:600,color:goal===g.v?C.accent:C.text}}>{g.label}</span>
-                {goal===g.v&&<span style={{marginLeft:"auto",color:C.accent,fontSize:18}}>✓</span>}
+                {goal===g.v&&<span aria-hidden="true" style={{marginLeft:"auto",color:C.accent,fontSize:18}}>✓</span>}
               </div>
             ))}
           </div>
@@ -4685,21 +4772,27 @@ function OnboardingScreen({tgId,tgUser,onComplete}){
 
 // ─── MENU ─────────────────────────────────────────────────────────────────────
 function ConsentCheck({item,checked,onToggle,onOpenTerms}){
+  // Касание — по всей строке, как раньше. Для диктора и клавиатуры флажок — сам квадрат
+  // (role="checkbox"): нажатие на него всплывает до строки, клавиши обрабатывает он сам.
+  const id=`consent-${item.k}`;
   return <div onClick={onToggle} style={{display:"flex",alignItems:"flex-start",gap:11,cursor:"pointer",
     padding:"12px 13px",background:C.card,border:`0.5px solid ${checked?C.accent:C.border}`,borderRadius:10}}>
-    <span style={{width:21,height:21,borderRadius:6,flexShrink:0,marginTop:1,
+    <span role="checkbox" aria-checked={!!checked} aria-required={item.req||undefined} tabIndex={0}
+      aria-labelledby={`${id}-l`} aria-describedby={`${id}-h`}
+      onKeyDown={e=>{if(e.key===" "||e.key==="Enter"){e.preventDefault();onToggle();}}}
+      style={{width:21,height:21,borderRadius:6,flexShrink:0,marginTop:1,
       background:checked?C.accent:C.bg,border:`1px solid ${checked?C.accent:C.border}`,
       display:"flex",alignItems:"center",justifyContent:"center",color:C.bg,fontSize:13,fontWeight:900}}>
       {checked?"✓":""}
     </span>
     <div style={{minWidth:0}}>
-      <div style={{fontSize:14,color:C.text,lineHeight:1.45}}>
+      <div id={`${id}-l`} style={{fontSize:14,color:C.text,lineHeight:1.45}}>
         {t(item.label)}
-        {item.req&&<span style={{color:C.accent,marginLeft:5}}>*</span>}
+        {item.req&&<span aria-hidden="true" style={{color:C.accent,marginLeft:5}}>*</span>}
       </div>
-      <div style={{fontSize:12,color:C.muted,lineHeight:1.45,marginTop:4}}>{t(item.hint)}</div>
-      {item.k==="terms"&&onOpenTerms&&<div onClick={e=>{e.stopPropagation();onOpenTerms();}}
-        style={{fontSize:12,color:C.accent,marginTop:6,cursor:"pointer"}}>{t("terms_read")} ›</div>}
+      <div id={`${id}-h`} style={{fontSize:12,color:C.muted,lineHeight:1.45,marginTop:4}}>{t(item.hint)}</div>
+      {item.k==="terms"&&onOpenTerms&&<button type="button" onClick={e=>{e.stopPropagation();onOpenTerms();}}
+        style={{display:"block",background:"none",border:"none",padding:0,font:"inherit",textAlign:"left",fontSize:12,color:C.accent,marginTop:6,cursor:"pointer"}}>{t("terms_read")} ›</button>}
     </div>
   </div>;
 }
@@ -4823,9 +4916,10 @@ function MenuScreen({user,onNav,activeWorkout=false}){
   const dots=Array.from({length:dotsTotal},(_,i)=>i<(week.done||0));
 
   return <div style={{padding:"16px 16px 100px"}}>
+    <h1 style={SR_ONLY}>GymBot</h1>
 
-    <div onClick={()=>onNav("profile")} style={{display:"flex",alignItems:"center",gap:10,marginBottom:16,cursor:"pointer"}}>
-      <div style={{width:34,height:34,borderRadius:"50%",background:C.card,border:`0.5px solid ${C.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,color:C.accent,flexShrink:0}}>
+    <div {...pressable(()=>onNav("profile"))} style={{display:"flex",alignItems:"center",gap:10,marginBottom:16,cursor:"pointer"}}>
+      <div aria-hidden="true" style={{width:34,height:34,borderRadius:"50%",background:C.card,border:`0.5px solid ${C.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,color:C.accent,flexShrink:0}}>
         {(u.first_name||"?").trim().charAt(0).toUpperCase()}
       </div>
       <div style={{minWidth:0}}>
@@ -4837,12 +4931,13 @@ function MenuScreen({user,onNav,activeWorkout=false}){
           {u.goal&&u.streak>0?" · ":""}
           {u.streak>0?`🔥 ${u.streak} ${t("home_days_streak")}`:""}
         </div>
+        <span style={SR_ONLY}>{t("a11y_profile")}</span>
       </div>
-      <div style={{marginLeft:"auto",width:34,height:34,borderRadius:"50%",background:C.card,border:`0.5px solid ${C.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,color:C.muted,flexShrink:0}}>⚙</div>
+      <div aria-hidden="true" style={{marginLeft:"auto",width:34,height:34,borderRadius:"50%",background:C.card,border:`0.5px solid ${C.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,color:C.muted,flexShrink:0}}>⚙</div>
     </div>
 
     <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:18}}>
-      <div style={{display:"flex",gap:4}}>
+      <div aria-hidden="true" style={{display:"flex",gap:4}}>
         {dots.map((f,i)=><span key={i} style={{width:7,height:7,borderRadius:"50%",background:f?C.accent:"#3A3A3A"}}/>)}
       </div>
       <span style={{fontSize:13,color:C.muted}}>
@@ -4876,24 +4971,24 @@ function MenuScreen({user,onNav,activeWorkout=false}){
           {card.exercises_count?`${card.exercises_count} ${t("home_exercises")}`:""}
         </span>
         {card.state==="recommendation"&&
-          <span onClick={()=>onNav("alternatives")} style={{marginLeft:"auto",fontSize:14,color:C.accent,cursor:"pointer"}}>{t("home_other_option")}</span>}
+          <button type="button" onClick={()=>onNav("alternatives")} style={{marginLeft:"auto",background:"none",border:"none",padding:0,font:"inherit",fontSize:14,color:C.accent,cursor:"pointer"}}>{t("home_other_option")}</button>}
       </div>
     </Card>}
 
     <div style={{display:"flex",justifyContent:"space-between",paddingBottom:14,borderBottom:`0.5px solid ${C.border}`,marginBottom:14}}>
-      <div onClick={()=>onNav("nutrition")} style={{cursor:"pointer",padding:"2px 4px"}}>
+      <div {...pressable(()=>onNav("nutrition"))} style={{cursor:"pointer",padding:"2px 4px"}}>
         <div style={{fontSize:13,color:C.muted,marginBottom:3}}>{t("home_food")}</div>
         <div style={{fontSize:17,color:C.text}}>{st.kcal_eaten||0} <span style={{fontSize:13,color:C.muted}}>/ {st.kcal_goal}</span></div>
       </div>
       {/* Тап по расходу показывает, откуда он взялся — историю за день,
           а не экран записи нового занятия, как было раньше */}
-      <div onClick={()=>onNav("my_workouts")} style={{cursor:"pointer",padding:"2px 4px"}}>
+      <div {...pressable(()=>onNav("my_workouts"))} style={{cursor:"pointer",padding:"2px 4px"}}>
         <div style={{fontSize:13,color:C.muted,marginBottom:3}}>{t("home_burned")}</div>
         <div style={{fontSize:17,color:(st.kcal_burned||0)>=(st.burn_goal||400)?C.accent:C.text}}>
           {st.kcal_burned||0} <span style={{fontSize:13,color:C.muted}}>/ {st.burn_goal}</span>
         </div>
       </div>
-      <div onClick={()=>onNav((st.days_since_checkin===null||st.days_since_checkin>=7)?"checkin":"measurements")} style={{cursor:"pointer",padding:"2px 4px"}}>
+      <div {...pressable(()=>onNav((st.days_since_checkin===null||st.days_since_checkin>=7)?"checkin":"measurements"))} style={{cursor:"pointer",padding:"2px 4px"}}>
         <div style={{fontSize:13,color:C.muted,marginBottom:3}}>{t("home_weight")}</div>
         <div style={{fontSize:17,color:C.text}}>{st.weight?st.weight:"—"} <span style={{fontSize:13,color:C.muted}}>{t("home_kg")}</span></div>
         {(st.days_since_checkin===null||st.days_since_checkin>=7)&&
@@ -4909,7 +5004,7 @@ function MenuScreen({user,onNav,activeWorkout=false}){
         {icon:"⊞",label:t("home_services"),s:"more"},
       ].map(it=><Card key={it.s} onClick={()=>onNav(it.s)} pad="13px 14px">
         <div style={{display:"flex",alignItems:"center",gap:9}}>
-          <span style={{fontSize:17}}>{it.icon}</span>
+          <span aria-hidden="true" style={{fontSize:17}}>{it.icon}</span>
           <span style={{fontSize:14,color:C.text}}>{it.label}</span>
         </div>
       </Card>)}
@@ -4917,9 +5012,9 @@ function MenuScreen({user,onNav,activeWorkout=false}){
     <ProgramHomeCard tgId={tgId} onNav={onNav}/>
     <Card onClick={()=>onNav("social")} pad="13px 14px" style={{marginTop:8}}>
       <div style={{display:"flex",alignItems:"center",gap:9}}>
-        <span style={{fontSize:17}}>👥</span>
+        <span aria-hidden="true" style={{fontSize:17}}>👥</span>
         <span style={{fontSize:14,color:C.text}}>{t("soc_menu")}</span>
-        <span style={{marginLeft:"auto",color:C.muted,fontSize:16}}>›</span>
+        <span aria-hidden="true" style={{marginLeft:"auto",color:C.muted,fontSize:16}}>›</span>
       </div>
     </Card>
     {prem?.visible&&<Card accent onClick={()=>onNav("premium")} pad="13px 14px" style={{marginTop:8}}>
@@ -4970,15 +5065,16 @@ function MoreScreen({user,onNav,onBack}){
   ];
   return <div style={{padding:"16px 16px 100px"}}>
     <BackBtn onBack={onBack}/>
-    <div onClick={()=>onNav("profile")} style={{display:"flex",alignItems:"center",gap:12,marginBottom:20,cursor:"pointer"}}>
-      <div style={{width:44,height:44,borderRadius:"50%",background:C.card,border:`0.5px solid ${C.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:C.accent}}>
+    <h1 style={SR_ONLY}>{t("home_services")}</h1>
+    <div {...pressable(()=>onNav("profile"))} style={{display:"flex",alignItems:"center",gap:12,marginBottom:20,cursor:"pointer"}}>
+      <div aria-hidden="true" style={{width:44,height:44,borderRadius:"50%",background:C.card,border:`0.5px solid ${C.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18,color:C.accent}}>
         {(user?.first_name||"?").trim().charAt(0).toUpperCase()}
       </div>
       <div>
         <div style={{fontSize:17,fontWeight:600,color:C.text}}>{user?.first_name||t("onb_atlet")}</div>
         <div style={{fontSize:13,color:C.muted}}>{t("more_edit_profile")}</div>
       </div>
-      <span style={{marginLeft:"auto",color:C.muted,fontSize:20}}>›</span>
+      <span aria-hidden="true" style={{marginLeft:"auto",color:C.muted,fontSize:20}}>›</span>
     </div>
     {prem?.visible&&<Card accent onClick={()=>onNav("premium")} pad="12px 14px" style={{marginBottom:16}}>
       <div style={{display:"flex",alignItems:"center",gap:11}}>
@@ -4995,9 +5091,9 @@ function MoreScreen({user,onNav,onBack}){
       <div style={{display:"flex",flexDirection:"column",gap:6,marginTop:8}}>
         {g.items.map(it=><Card key={it.s} onClick={()=>onNav(it.s)} pad="12px 14px">
           <div style={{display:"flex",alignItems:"center",gap:11}}>
-            <span style={{fontSize:16,width:20,textAlign:"center"}}>{it.icon}</span>
+            <span aria-hidden="true" style={{fontSize:16,width:20,textAlign:"center"}}>{it.icon}</span>
             <span style={{fontSize:14,color:C.text}}>{it.label}</span>
-            <span style={{marginLeft:"auto",color:C.muted,fontSize:16}}>›</span>
+            <span aria-hidden="true" style={{marginLeft:"auto",color:C.muted,fontSize:16}}>›</span>
           </div>
         </Card>)}
       </div>
@@ -5137,7 +5233,7 @@ function TrainingPrefsScreen({tgId,onBack}){
     <Kicker>{t("prefs_freq")}</Kicker>
     <div style={{fontSize:13,color:C.muted,marginTop:6,marginBottom:10}}>{t("prefs_freq_hint")}</div>
     <div style={{display:"flex",gap:6,marginBottom:24}}>
-      {[2,3,4,5,6].map(n=><div key={n} onClick={()=>save({target:n})}
+      {[2,3,4,5,6].map(n=><div key={n} {...pressable(()=>save({target:n}))} aria-pressed={cur.target===n}
         style={{flex:1,padding:"12px 0",textAlign:"center",borderRadius:10,cursor:"pointer",
           background:cur.target===n?C.accent:C.card,border:`0.5px solid ${cur.target===n?C.accent:C.border}`,
           color:cur.target===n?C.bg:C.text,fontSize:16,fontWeight:600}}>{n}</div>)}
@@ -5146,7 +5242,7 @@ function TrainingPrefsScreen({tgId,onBack}){
     <Kicker>{t("prefs_split")}</Kicker>
     <div style={{fontSize:13,color:C.muted,marginTop:6,marginBottom:10}}>{t("prefs_split_hint")}</div>
     <div style={{display:"flex",flexDirection:"column",gap:6}}>
-      {splits.map(s=><Card key={s.key} accent={cur.split_type===s.key} onClick={()=>save({split_type:s.key})} pad="13px 16px">
+      {splits.map(s=><Card key={s.key} accent={cur.split_type===s.key} aria-pressed={cur.split_type===s.key} onClick={()=>save({split_type:s.key})} pad="13px 16px">
         <div style={{display:"flex",alignItems:"center"}}>
           <div>
             <div style={{fontSize:15,color:cur.split_type===s.key?C.accent:C.text}}>{s.name}</div>
@@ -5157,8 +5253,10 @@ function TrainingPrefsScreen({tgId,onBack}){
       </Card>)}
     </div>
 
-    {saving&&<div style={{marginTop:14,fontSize:13,color:C.muted}}>{t("prefs_saving")}</div>}
-    {saved&&!saving&&<div style={{marginTop:14,fontSize:13,color:C.accent}}>{t("prefs_saved")}</div>}
+    <div role="status">
+      {saving&&<div style={{marginTop:14,fontSize:13,color:C.muted}}>{t("prefs_saving")}</div>}
+      {saved&&!saving&&<div style={{marginTop:14,fontSize:13,color:C.accent}}>{t("prefs_saved")}</div>}
+    </div>
   </div>;
 }
 
@@ -5199,7 +5297,7 @@ function UserSupplementsBlock({tgId}){
   return<div style={{marginBottom:16}}>
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
       <Kicker>{t("supps_label")}</Kicker>
-      <button onClick={()=>setAdding(!adding)}
+      <button onClick={()=>setAdding(!adding)} aria-expanded={adding} aria-label={adding?t("a11y_close"):undefined}
         style={{background:"none",border:`0.5px solid ${C.accent}`,borderRadius:6,padding:"3px 10px",
           color:C.accent,fontSize:11,cursor:"pointer",fontFamily:"monospace"}}>
         {adding?"✕":t("usup_dobavit")}
@@ -5212,7 +5310,7 @@ function UserSupplementsBlock({tgId}){
           background:C.card,border:`0.5px solid ${C.border}`,borderRadius:20,padding:"5px 10px"}}>
           <span style={{fontSize:12,color:C.text}}>{tSport(s)||s.name}</span>
           {s.dose&&<span style={{fontSize:10,color:C.muted}}>{s.dose}</span>}
-          <button onClick={()=>remove(s.id)}
+          <button onClick={()=>remove(s.id)} aria-label={`${t("a11y_delete")}: ${tSport(s)||s.name}`}
             style={{background:"none",border:"none",color:C.danger,cursor:"pointer",fontSize:12,padding:0,lineHeight:1}}>✕</button>
         </div>)}
       </div>}
@@ -5297,7 +5395,7 @@ function ProfileScreen({user,tgId,onBack,onUserUpdated,onNav}){
     <Hero>{user.first_name||t("onb_atlet")}</Hero>
     {user.username&&<div style={{color:C.muted,fontSize:13,marginTop:4,fontFamily:"monospace"}}>@{user.username}</div>}
     <div style={{height:16}}/>
-    {saved&&<div style={{background:"#00CC6622",border:`0.5px solid ${C.success}`,borderRadius:10,padding:"10px 14px",marginBottom:12,fontFamily:"monospace",fontSize:12,color:C.success}}>{t("status_saved")}</div>}
+    {saved&&<div role="status" style={{background:"#00CC6622",border:`0.5px solid ${C.success}`,borderRadius:10,padding:"10px 14px",marginBottom:12,fontFamily:"monospace",fontSize:12,color:C.success}}>{t("status_saved")}</div>}
     {!editing?<>
       <Card style={{marginBottom:12}}>
         {rows.map((r,i)=><div key={i} style={{display:"flex",justifyContent:"space-between",padding:"8px 0",borderBottom:i<rows.length-1?`0.5px solid ${C.border}`:"none"}}>
@@ -5319,11 +5417,11 @@ function ProfileScreen({user,tgId,onBack,onUserUpdated,onNav}){
       <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:16}}>
         {[{label:t("field_age_y"),key:"age",placeholder:"45"},{label:t("field_weight_kg"),key:"weight",placeholder:"86"},{label:t("field_height_cm"),key:"height",placeholder:"186"}].map(f=><Card key={f.key}>
           <div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{f.label.toUpperCase()}</div>
-          <input type="number" value={form[f.key]} onChange={e=>setForm(p=>({...p,[f.key]:e.target.value}))} placeholder={f.placeholder} style={{background:"none",border:"none",color:C.accent,fontSize:22,fontFamily:"monospace",fontWeight:700,width:"100%",outline:"none"}}/>
+          <input type="number" value={form[f.key]} onChange={e=>setForm(p=>({...p,[f.key]:e.target.value}))} placeholder={f.placeholder} aria-label={f.label} style={{background:"none",border:"none",color:C.accent,fontSize:22,fontFamily:"monospace",fontWeight:700,width:"100%",outline:"none"}}/>
         </Card>)}
-        <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("gender_label")}</div><Sel value={form.gender} onChange={v=>setForm(p=>({...p,gender:v}))} options={[{value:"male",label:t("gender_male")},{value:"female",label:t("gender_female")}]}/></Card>
-        <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("level_section")}</div><Sel value={form.fitness_level} onChange={v=>setForm(p=>({...p,fitness_level:v}))} options={[{value:"beginner",label:t("lvl_novichok")},{value:"intermediate",label:t("level_intermediate")},{value:"advanced",label:t("level_advanced")}]}/></Card>
-        <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("goal_section")}</div><Sel value={form.desired_result} onChange={v=>setForm(p=>({...p,desired_result:v}))} options={[{value:"lose_weight",label:t("goal_lose")},{value:"gain_muscle",label:t("goal_muscle")},{value:"gain_strength",label:t("goal_strength")},{value:"improve_endurance",label:t("goal_endurance")},{value:"stay_healthy",label:t("goal_health")}]}/></Card>
+        <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("gender_label")}</div><Sel value={form.gender} label={t("gender_label")} onChange={v=>setForm(p=>({...p,gender:v}))} options={[{value:"male",label:t("gender_male")},{value:"female",label:t("gender_female")}]}/></Card>
+        <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("level_section")}</div><Sel value={form.fitness_level} label={t("level_section")} onChange={v=>setForm(p=>({...p,fitness_level:v}))} options={[{value:"beginner",label:t("lvl_novichok")},{value:"intermediate",label:t("level_intermediate")},{value:"advanced",label:t("level_advanced")}]}/></Card>
+        <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("goal_section")}</div><Sel value={form.desired_result} label={t("goal_section")} onChange={v=>setForm(p=>({...p,desired_result:v}))} options={[{value:"lose_weight",label:t("goal_lose")},{value:"gain_muscle",label:t("goal_muscle")},{value:"gain_strength",label:t("goal_strength")},{value:"improve_endurance",label:t("goal_endurance")},{value:"stay_healthy",label:t("goal_health")}]}/></Card>
         <Card style={{marginBottom:12}}>
           <Kicker style={{marginBottom:10}}>{t("ai_style_label")}</Kicker>
             <div style={{display:"flex",flexDirection:"column",gap:8}}>
@@ -5334,11 +5432,11 @@ function ProfileScreen({user,tgId,onBack,onUserUpdated,onNav}){
               ].map(t=>{
                 const isSelected = form.ai_tone===t.v || (!form.ai_tone && t.v==="expert");
                 return(
-                  <div key={t.v} onClick={()=>setForm(p=>({...p,ai_tone:t.v}))}
+                  <div key={t.v} {...pressable(()=>setForm(p=>({...p,ai_tone:t.v})))} aria-pressed={isSelected}
                     style={{display:"flex",alignItems:"center",gap:12,padding:"10px 12px",borderRadius:10,
                       border:`1px solid ${isSelected?C.accent:C.border}`,
                       background:isSelected?"rgba(200,255,0,0.08)":"none",cursor:"pointer"}}>
-                    <span style={{fontSize:20}}>{t.icon}</span>
+                    <span aria-hidden="true" style={{fontSize:20}}>{t.icon}</span>
                     <div style={{flex:1}}>
                       <div style={{fontSize:13,fontWeight:600,color:isSelected?C.accent:C.text}}>{t.label}</div>
                       <div style={{fontSize:11,color:C.muted}}>{t.desc}</div>
@@ -5386,27 +5484,27 @@ function ProfileScreen({user,tgId,onBack,onUserUpdated,onNav}){
                   {given?new Date(given).toLocaleString():t("consent_not_given")}
                 </div>
               </div>
-              {given&&!it.req&&<span onClick={()=>{
+              {given&&!it.req&&<button type="button" aria-label={`${t("consent_withdraw")}: ${t(it.label)}`} onClick={()=>{
                 if(!window.confirm(t(it.k==="ai"?"consent_wd_ai_confirm":"consent_wd_health_confirm")))return;
                 fetch(`${API}/consent/${tgId}/withdraw`,{method:"POST",headers:{"Content-Type":"application/json"},
                   body:JSON.stringify({kind:it.k})})
                   .then(r=>{if(!r.ok)throw new Error();return r.json();})
                   .then(()=>onUserUpdated&&onUserUpdated())
                   .catch(()=>window.alert(t("home_load_error")));
-              }} style={{fontSize:12,color:C.danger,cursor:"pointer",flexShrink:0,marginTop:2}}>
+              }} style={{background:"none",border:"none",padding:0,font:"inherit",fontSize:12,color:C.danger,cursor:"pointer",flexShrink:0,marginTop:2}}>
                 {t("consent_withdraw")}
-              </span>}
-              {!given&&<span onClick={()=>{
+              </button>}
+              {!given&&<button type="button" aria-label={`${t("consent_give")}: ${t(it.label)}`} onClick={()=>{
                 fetch(`${API}/consent/${tgId}`,{method:"POST",headers:{"Content-Type":"application/json"},
                   body:JSON.stringify({kinds:[it.k],
                     platform:(tg?.platform||"unknown")+(tg?.version?` ${tg.version}`:"")})})
                   .then(r=>{if(!r.ok)throw new Error();return r.json();})
                   .then(()=>onUserUpdated&&onUserUpdated())
                   .catch(()=>window.alert(t("home_load_error")));
-              }} style={{fontSize:12,color:C.accent,cursor:"pointer",flexShrink:0,marginTop:2,
+              }} style={{background:"none",font:"inherit",fontSize:12,color:C.accent,cursor:"pointer",flexShrink:0,marginTop:2,
                 border:`0.5px solid ${C.accent}`,borderRadius:6,padding:"3px 10px"}}>
                 {t("consent_give")}
-              </span>}
+              </button>}
               {given&&it.req&&<span style={{fontSize:11,color:C.muted,flexShrink:0,marginTop:3}}>{t("consent_req_note")}</span>}
             </div>
           </Card>;
@@ -5418,7 +5516,7 @@ function ProfileScreen({user,tgId,onBack,onUserUpdated,onNav}){
         здесь или по предложению после первой тренировки. */}
     {!editing&&<div style={{marginTop:20}}>
       <Kicker>{t("rest_notify_title")}</Kicker>
-      <Card style={{marginTop:8}} pad="12px 14px" onClick={()=>{
+      <Card style={{marginTop:8}} pad="12px 14px" role="switch" aria-checked={!!user.rest_notify} onClick={()=>{
         if(!tgId)return;
         const next=!user.rest_notify;
         fetch(`${API}/user/${tgId}`,{method:"PUT",headers:{"Content-Type":"application/json"},
@@ -5433,7 +5531,7 @@ function ProfileScreen({user,tgId,onBack,onUserUpdated,onNav}){
             </div>
             <div style={{fontSize:11,color:C.muted,marginTop:4,lineHeight:1.45}}>{t("rest_notify_hint")}</div>
           </div>
-          <div style={{flexShrink:0,width:44,height:26,borderRadius:13,padding:2,
+          <div aria-hidden="true" style={{flexShrink:0,width:44,height:26,borderRadius:13,padding:2,
             background:user.rest_notify?C.accent:"#3A3A3A",transition:"background .15s"}}>
             <div style={{width:22,height:22,borderRadius:"50%",background:user.rest_notify?C.bg:"#8A8A8A",
               transform:user.rest_notify?"translateX(18px)":"translateX(0)",transition:"transform .15s"}}/>
@@ -5541,21 +5639,24 @@ function SportEditModal({session,tgId,onClose,onSaved,onDeleted}){
     }catch{}finally{setSaving(false);}
   }
 
+  const sheetRef=useRef(null);
+  useDialogFocus(sheetRef,onClose);
   return(
     <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.7)",
       zIndex:300,display:"flex",alignItems:"flex-end",padding:"0"}}>
-      <div style={{background:C.surface,borderRadius:"16px 16px 0 0",padding:"20px 16px 40px",
-        width:"100%",border:`0.5px solid ${C.border}`}}>
+      <div ref={sheetRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="sport-edit-title"
+        style={{background:C.surface,borderRadius:"16px 16px 0 0",padding:"20px 16px 40px",
+        width:"100%",border:`0.5px solid ${C.border}`,outline:"none"}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
-          <div style={{fontWeight:700,fontSize:16,color:C.text}}>{session.sport_label}</div>
-          <button onClick={onClose} style={{background:"none",border:"none",color:C.muted,fontSize:20,cursor:"pointer"}}>✕</button>
+          <div id="sport-edit-title" style={{fontWeight:700,fontSize:16,color:C.text}}>{session.sport_label}</div>
+          <button onClick={onClose} aria-label={t("a11y_close")} style={{background:"none",border:"none",color:C.muted,fontSize:20,cursor:"pointer"}}>✕</button>
         </div>
 
         <div style={{marginBottom:12}}>
           <Kicker>{t("sport_duration")}</Kicker>
           <div style={{display:"flex",gap:8,marginTop:6,flexWrap:"wrap"}}>
             {[30,45,60,90,120].map(d=>(
-              <button key={d} onClick={()=>setDuration(String(d))}
+              <button key={d} onClick={()=>setDuration(String(d))} aria-pressed={duration===String(d)}
                 style={{padding:"6px 14px",borderRadius:8,fontSize:12,cursor:"pointer",
                   background:duration===String(d)?C.accent:C.card,
                   border:`0.5px solid ${duration===String(d)?C.accent:C.border}`,
@@ -5563,7 +5664,7 @@ function SportEditModal({session,tgId,onClose,onSaved,onDeleted}){
                 {d}
               </button>
             ))}
-            <input type="number" value={duration} onChange={e=>setDuration(e.target.value)}
+            <input type="number" value={duration} onChange={e=>setDuration(e.target.value)} aria-label={t("sport_duration")}
               style={{width:60,background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,
                 padding:"6px 8px",color:C.text,fontSize:12,outline:"none",textAlign:"center"}}/>
           </div>
@@ -5573,7 +5674,7 @@ function SportEditModal({session,tgId,onClose,onSaved,onDeleted}){
           <Kicker>{t("sport_intensity")}</Kicker>
           <div style={{display:"flex",gap:8,marginTop:6}}>
             {[{v:"low",l:t("intensity_low")},{v:"medium",l:t("intensity_medium")},{v:"high",l:t("intensity_high")}].map(i=>(
-              <button key={i.v} onClick={()=>setIntensity(i.v)}
+              <button key={i.v} onClick={()=>setIntensity(i.v)} aria-pressed={intensity===i.v}
                 style={{flex:1,padding:"8px 4px",borderRadius:8,fontSize:11,cursor:"pointer",
                   background:intensity===i.v?C.accent:C.card,
                   border:`0.5px solid ${intensity===i.v?C.accent:C.border}`,
@@ -5586,7 +5687,7 @@ function SportEditModal({session,tgId,onClose,onSaved,onDeleted}){
 
         <div style={{marginBottom:12}}>
           <Kicker>{t("score_opt")}</Kicker>
-          <input value={score} onChange={e=>setScore(e.target.value)}
+          <input value={score} onChange={e=>setScore(e.target.value)} aria-label={t("score_opt")}
             placeholder={t("score_example")}
             style={{width:"100%",background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,
               padding:"8px 12px",color:C.text,fontSize:13,outline:"none",
@@ -5595,7 +5696,7 @@ function SportEditModal({session,tgId,onClose,onSaved,onDeleted}){
 
         <div style={{marginBottom:16}}>
           <Kicker>{t("notes_section")}</Kicker>
-          <textarea value={notes} onChange={e=>setNotes(e.target.value)}
+          <textarea value={notes} onChange={e=>setNotes(e.target.value)} aria-label={t("notes_section")}
             placeholder={t("spedit_partnery_oschuscheniya")}
             style={{width:"100%",background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,
               padding:"8px 12px",color:C.text,fontSize:13,outline:"none",resize:"none",
@@ -5666,13 +5767,13 @@ function AddCustomExerciseInline({tgId,muscleGroups,onAdded}){
           padding:"8px 12px",color:C.text,fontSize:13,outline:"none",
           marginBottom:8,boxSizing:"border-box",marginTop:8}}/>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:6,marginBottom:8}}>
-        <select value={f.muscle_group_id} onChange={e=>setF(p=>({...p,muscle_group_id:e.target.value}))}
+        <select value={f.muscle_group_id} onChange={e=>setF(p=>({...p,muscle_group_id:e.target.value}))} aria-label={t("exercise_group")}
           style={{background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"8px 10px",
             color:C.text,fontSize:12,outline:"none"}}>
           <option value="">{t("exercise_group")}</option>
           {(muscleGroups||[]).map(g=><option key={g.id} value={g.id}>{g.emoji} {tField(g,"name")}</option>)}
         </select>
-        <select value={f.difficulty} onChange={e=>setF(p=>({...p,difficulty:e.target.value}))}
+        <select value={f.difficulty} onChange={e=>setF(p=>({...p,difficulty:e.target.value}))} aria-label={t("difficulty_label")}
           style={{background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"8px 10px",
             color:C.text,fontSize:12,outline:"none"}}>
           <option value="easy">{t("difficulty_easy")}</option>
@@ -5688,7 +5789,7 @@ function AddCustomExerciseInline({tgId,muscleGroups,onAdded}){
           style={{background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,
             padding:"8px 10px",color:C.text,fontSize:12,outline:"none",textAlign:"center"}}/>
       </div>
-      {err&&<div style={{color:C.danger,fontSize:12,fontFamily:"monospace",marginBottom:6}}>{err}</div>}
+      {err&&<div role="alert" style={{color:C.danger,fontSize:12,fontFamily:"monospace",marginBottom:6}}>{err}</div>}
       <div style={{display:"flex",gap:8}}>
         <Btn full onClick={()=>setOpen(false)} style={{flex:1}}>{t("cancel_btn2")}</Btn>
         <Btn accent full onClick={save} disabled={saving||!f.name.trim()} style={{flex:2}}>
@@ -5724,7 +5825,7 @@ function AddExerciseDuringWorkout({allExercises,muscleGroups,tgId,onAdd}){
     <div style={{marginTop:8,background:C.surface,border:`0.5px solid ${C.border}`,borderRadius:12,padding:12}}>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
         <Kicker>{t("add_exercise_btn")}</Kicker>
-        <button onClick={()=>{setOpen(false);setSearch("");setGroupId(null);}}
+        <button onClick={()=>{setOpen(false);setSearch("");setGroupId(null);}} aria-label={t("a11y_close")}
           style={{background:"none",border:"none",color:C.muted,cursor:"pointer",fontSize:16}}>✕</button>
       </div>
       <input value={search} onChange={e=>setSearch(e.target.value)}
@@ -5733,12 +5834,12 @@ function AddExerciseDuringWorkout({allExercises,muscleGroups,tgId,onAdd}){
           padding:"8px 12px",color:C.text,fontSize:12,outline:"none",
           boxSizing:"border-box",marginBottom:8}}/>
       <div style={{display:"flex",gap:4,overflowX:"auto",paddingBottom:4,marginBottom:8}}>
-        <button onClick={()=>setGroupId(null)}
+        <button onClick={()=>setGroupId(null)} aria-pressed={!groupId}
           style={{flexShrink:0,padding:"4px 10px",borderRadius:12,fontSize:10,cursor:"pointer",
             background:!groupId?C.accent:C.card,border:`0.5px solid ${!groupId?C.accent:C.border}`,
             color:!groupId?C.bg:C.muted,fontFamily:"monospace"}}>{t("all_btn")}</button>
         {(muscleGroups||[]).map(g=>(
-          <button key={g.id} onClick={()=>setGroupId(groupId===g.id?null:g.id)}
+          <button key={g.id} onClick={()=>setGroupId(groupId===g.id?null:g.id)} aria-pressed={groupId===g.id} aria-label={tField(g,"name")}
             style={{flexShrink:0,padding:"4px 10px",borderRadius:12,fontSize:10,cursor:"pointer",
               background:groupId===g.id?C.accent:C.card,border:`0.5px solid ${groupId===g.id?C.accent:C.border}`,
               color:groupId===g.id?C.bg:C.muted,fontFamily:"monospace",display:"inline-flex",alignItems:"center",gap:4}}>
@@ -5957,7 +6058,7 @@ function WorkoutHistoryScreen({workouts,onNav,tgId,refreshToken=0}){
     <div style={{height:12}}/>
     <div style={{display:"flex",gap:0,marginBottom:16,border:`0.5px solid ${C.border}`,borderRadius:10,overflow:"hidden"}}>
       {[{id:"planned",label:t("planned_tab")},{id:"sport",label:t("sport_tab")},{id:"history",label:t("archive_tab")}].map(t=>(
-        <button key={t.id} onClick={()=>setActiveTab(t.id)} style={{flex:1,padding:"10px 4px",background:activeTab===t.id?C.accent:C.card,border:"none",color:activeTab===t.id?C.bg:C.muted,fontFamily:"monospace",fontSize:10,fontWeight:700,cursor:"pointer",letterSpacing:0.5}}>
+        <button key={t.id} onClick={()=>setActiveTab(t.id)} aria-pressed={activeTab===t.id} style={{flex:1,padding:"10px 4px",background:activeTab===t.id?C.accent:C.card,border:"none",color:activeTab===t.id?C.bg:C.muted,fontFamily:"monospace",fontSize:10,fontWeight:700,cursor:"pointer",letterSpacing:0.5}}>
           {t.label}
         </button>
       ))}
@@ -6006,15 +6107,15 @@ function WorkoutHistoryScreen({workouts,onNav,tgId,refreshToken=0}){
              const past=sportSessions.filter(s=>s.session_date<today);
              return(<>
              {future.map(s=>(
-              <Card key={s.id} onClick={()=>setEditSport(s)} style={{cursor:"pointer",marginBottom:8}}>
+              <Card key={s.id} onClick={()=>setEditSport(s)} role={false} style={{cursor:"pointer",marginBottom:8}}>
                 <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
                   <div style={{flex:1}}>
                     <div style={{fontWeight:600,fontSize:15,color:C.text}}>{s.sport_label}</div>
                     <div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginTop:2}}>{fmtDate(s.session_date)}</div>
                   </div>
                   <div style={{display:"flex",gap:6,alignItems:"center"}}>
-                    <span style={{fontSize:10,color:C.accent,fontFamily:"monospace"}}>{t("edit_arrow")}</span>
-                    <button onClick={e=>{e.stopPropagation();delSport(s.id);}} disabled={deleting===s.id}
+                    <button type="button" onClick={e=>{e.stopPropagation();setEditSport(s);}} style={{background:"none",border:"none",padding:0,font:"inherit",fontSize:10,color:C.accent,fontFamily:"monospace",cursor:"pointer"}}>{t("edit_arrow")}</button>
+                    <button onClick={e=>{e.stopPropagation();delSport(s.id);}} disabled={deleting===s.id} aria-label={`${t("a11y_delete")}: ${s.sport_label}`}
                       style={{background:"none",border:`0.5px solid ${C.danger}`,borderRadius:6,padding:"3px 8px",color:C.danger,fontSize:11,cursor:"pointer",flexShrink:0}}>
                       {deleting===s.id?"...":"✕"}
                     </button>
@@ -6054,7 +6155,7 @@ function WorkoutHistoryScreen({workouts,onNav,tgId,refreshToken=0}){
     {activeTab==="planned"&&(
       !planned?<Loader text={t("wh_plan")}/>:<>
         {(planned.planned||[]).filter(pw=>pw.status==="scheduled"||pw.status==="reminded").length===0&&<Card style={{marginBottom:12}}><div style={{textAlign:"center",padding:"12px 0",color:C.muted,fontSize:14}}>{t("no_planned")}</div></Card>}
-        {(planned.planned||[]).filter(pw=>pw.status==="scheduled"||pw.status==="reminded").map(pw=><Card key={pw.id} style={{marginBottom:8}} onClick={()=>onNav("planned_detail",{pwId:pw.id})}>
+        {(planned.planned||[]).filter(pw=>pw.status==="scheduled"||pw.status==="reminded").map(pw=><Card key={pw.id} style={{marginBottom:8}} role={false} onClick={()=>onNav("planned_detail",{pwId:pw.id})}>
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
             <div style={{flex:1}}>
               <div style={{fontWeight:600,fontSize:14,color:C.text}}>{pw.title}</div>
@@ -6062,10 +6163,11 @@ function WorkoutHistoryScreen({workouts,onNav,tgId,refreshToken=0}){
             </div>
             <div style={{display:"flex",gap:8,alignItems:"center"}}>
               <span style={{fontSize:11,fontFamily:"monospace",color:statusColor[pw.status]||C.muted}}>{pw.status?.toUpperCase()}</span>
-              <button onClick={e=>{e.stopPropagation();delPlanned(pw.id);}} disabled={deleting===pw.id} style={{background:"none",border:`0.5px solid ${C.danger}`,borderRadius:6,padding:"3px 8px",color:C.danger,fontSize:11,cursor:"pointer"}}>{deleting===pw.id?"...":"✗"}</button>
+              <button onClick={e=>{e.stopPropagation();delPlanned(pw.id);}} disabled={deleting===pw.id} aria-label={`${t("a11y_delete")}: ${pw.title}`} style={{background:"none",border:`0.5px solid ${C.danger}`,borderRadius:6,padding:"3px 8px",color:C.danger,fontSize:11,cursor:"pointer"}}>{deleting===pw.id?"...":"✗"}</button>
             </div>
           </div>
-          <div style={{marginTop:8,fontSize:11,color:C.accent,fontFamily:"monospace"}}>{t("open_plan")}</div>
+          <button type="button" onClick={e=>{e.stopPropagation();onNav("planned_detail",{pwId:pw.id});}} aria-label={`${t("open_plan")} ${pw.title}`}
+            style={{display:"block",background:"none",border:"none",padding:0,font:"inherit",textAlign:"left",marginTop:8,fontSize:11,color:C.accent,fontFamily:"monospace",cursor:"pointer"}}>{t("open_plan")}</button>
         </Card>)}
         <Btn full onClick={()=>onNav("plan_workout")} style={{marginTop:8}}>{t("add_plan2")}</Btn>
         {planned.archive?.length>0&&<>
@@ -6295,11 +6397,9 @@ function ExerciseInfoSheet({ex,onClose}){
   const [videoFailed,setVideoFailed]=useState(false);
   const [photoFailed,setPhotoFailed]=useState(false);
   const full=useExerciseText(ex);
+  // Фокус на крестик и обратно, Escape — общим порядком окон (таймер отдыха бывает поверх)
+  useDialogFocus(closeRef,()=>onCloseRef.current());
   useEffect(()=>{
-    const prevFocus=document.activeElement;
-    try{closeRef.current?.focus({preventScroll:true});}catch{}
-    const onKey=e=>{if(e.key==="Escape")onCloseRef.current();};
-    document.addEventListener("keydown",onKey);
     const prevOverflow=document.body.style.overflow;
     document.body.style.overflow="hidden";
     const bb=tg?.BackButton;
@@ -6308,10 +6408,8 @@ function ExerciseInfoSheet({ex,onClose}){
     const onBack=()=>onCloseRef.current();
     if(bbOk){try{bb.onClick(onBack);bb.show();}catch{}}
     return()=>{
-      document.removeEventListener("keydown",onKey);
       document.body.style.overflow=prevOverflow;
       if(bbOk){try{bb.offClick(onBack);bb.hide();}catch{}}
-      try{prevFocus?.focus?.({preventScroll:true});}catch{}
     };
   },[]);
   if(!ex)return null;
@@ -6889,7 +6987,7 @@ ${exList}
   if(step===STEP.FN)return(
     <div style={{padding:"16px 16px 100px"}}>
       <div style={{textAlign:"center",paddingTop:32,paddingBottom:24}}>
-        <div style={{fontSize:60}}>🏆</div>
+        <div aria-hidden="true" style={{fontSize:60}}>🏆</div>
         <Hero style={{textAlign:"center",marginTop:16}}>{t("workout_done")}</Hero>
         <div style={{color:C.muted,fontSize:14,marginTop:8}}>{t("great_work")}</div>
         <div style={{marginTop:8,fontFamily:"monospace",color:C.accent,fontSize:20}}>{workoutDurationMin()} {t("minutes_label")}</div>
@@ -6943,7 +7041,7 @@ ${exList}
       {aiReview===null&&aiReviewStream?(
         <Card accent style={{marginBottom:16}}>
           <Kicker>{t("ai_review_title")}</Kicker>
-          <div style={{fontSize:14,color:C.text,lineHeight:1.7,marginTop:8,whiteSpace:"pre-wrap"}}>{aiReviewStream}<span style={{color:C.accent}}>▍</span></div>
+          <div style={{fontSize:14,color:C.text,lineHeight:1.7,marginTop:8,whiteSpace:"pre-wrap"}}>{aiReviewStream}<span aria-hidden="true" style={{color:C.accent}}>▍</span></div>
         </Card>
       ):aiReview===null?(
         <Card accent style={{marginBottom:16}}>
@@ -7014,7 +7112,7 @@ ${exList}
       <div style={{fontSize:12,color:C.muted,marginBottom:12}}>{t("gym_desc")}</div>
       <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:12}}>
         {(muscleGroups||[]).filter(g=>g.id!==9).map(g=>(
-          <div key={g.id} onClick={()=>{setSelGroups(new Set([g.id]));setStep(STEP.SG);}}
+          <div key={g.id} {...pressable(()=>{setSelGroups(new Set([g.id]));setStep(STEP.SG);})}
             style={{background:C.card,border:`0.5px solid ${C.border}`,borderRadius:12,padding:"14px 6px",textAlign:"center",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:6}}>
             {g.icon_url?<img src={g.icon_url} alt="" style={{width:28,height:28,objectFit:"cover",borderRadius:6}}/>:<div style={{fontSize:24}}>{g.emoji}</div>}
             <div style={{fontSize:9,fontFamily:"monospace",fontWeight:700,color:C.text,lineHeight:1.2}}>{(tField(g,"name")).toUpperCase()}</div>
@@ -7079,9 +7177,9 @@ ${exList}
         {muscleGroups?.map(g=>{
           const sel=selGroups.has(g.id);
           return(
-            <div key={g.id} onClick={()=>{setSelGroups(prev=>{const n=new Set(prev);if(n.has(g.id))n.delete(g.id);else n.add(g.id);return n;}); setExSearch("");}}
+            <div key={g.id} {...pressable(()=>{setSelGroups(prev=>{const n=new Set(prev);if(n.has(g.id))n.delete(g.id);else n.add(g.id);return n;}); setExSearch("");})} aria-pressed={sel}
               style={{position:"relative",background:sel?C.accent:C.card,border:`0.5px solid ${sel?C.accent:C.border}`,borderRadius:12,padding:"14px 6px",textAlign:"center",cursor:"pointer",display:"flex",flexDirection:"column",alignItems:"center",gap:6}}>
-              {sel&&<span style={{position:"absolute",top:6,right:6,width:16,height:16,borderRadius:4,background:C.bg,color:C.accent,fontSize:11,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center"}}>✓</span>}
+              {sel&&<span aria-hidden="true" style={{position:"absolute",top:6,right:6,width:16,height:16,borderRadius:4,background:C.bg,color:C.accent,fontSize:11,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center"}}>✓</span>}
               {g.icon_url?<img src={g.icon_url} alt="" style={{width:32,height:32,objectFit:"cover",borderRadius:6}}/>:<div style={{fontSize:26}}>{g.emoji}</div>}
               <div style={{fontSize:10,fontFamily:"monospace",fontWeight:700,color:sel?C.bg:C.text,lineHeight:1.2}}>{(tField(g,"name")).toUpperCase()}</div>
             </div>
@@ -7185,7 +7283,7 @@ ${exList}
       {cardioExs.map(ex=>(
         <ExCard key={ex.id} ex={ex}
           action={
-            <button onClick={()=>setWarmup(warmup?.id===ex.id?null:ex)} style={{flexShrink:0,width:32,height:32,borderRadius:8,background:warmup?.id===ex.id?C.accent:C.card,border:`0.5px solid ${warmup?.id===ex.id?C.accent:C.border}`,color:warmup?.id===ex.id?C.bg:C.muted,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>
+            <button onClick={()=>setWarmup(warmup?.id===ex.id?null:ex)} aria-label={t("a11y_warmup").replace("{name}",tField(ex,"name"))} aria-pressed={warmup?.id===ex.id} style={{flexShrink:0,width:32,height:32,borderRadius:8,background:warmup?.id===ex.id?C.accent:C.card,border:`0.5px solid ${warmup?.id===ex.id?C.accent:C.border}`,color:warmup?.id===ex.id?C.bg:C.muted,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>
               {warmup?.id===ex.id?"✓":"+"}
             </button>}/>
       ))}
@@ -7211,10 +7309,10 @@ ${exList}
                 <div style={{fontSize:11,color:C.muted}}>{ex.group_icon_url?<img src={ex.group_icon_url} alt="" style={{width:14,height:14,objectFit:"cover",borderRadius:3,verticalAlign:"middle",marginRight:3}}/>:ex.group_emoji+" "}{tGroup(ex)}</div>
               </div>
               <div style={{display:"flex",gap:4,alignItems:"center"}}>
-                <button onClick={()=>setReplaceIdx(i)} style={{background:"none",border:`0.5px solid ${C.border}`,borderRadius:4,color:C.muted,width:28,height:26,cursor:"pointer",fontSize:12}}>↔</button>
+                <button onClick={()=>setReplaceIdx(i)} aria-label={t("a11y_replace").replace("{name}",tField(ex,"name"))} style={{background:"none",border:`0.5px solid ${C.border}`,borderRadius:4,color:C.muted,width:28,height:26,cursor:"pointer",fontSize:12}}>↔</button>
                 <div style={{display:"flex",flexDirection:"column",gap:2}}>
-                  <button onClick={()=>moveEx(i,-1)} disabled={i===0} style={{background:"none",border:`0.5px solid ${C.border}`,borderRadius:3,color:C.muted,width:28,height:22,cursor:"pointer",fontSize:11}}>↑</button>
-                  <button onClick={()=>moveEx(i,1)} disabled={i===selExs.length-1} style={{background:"none",border:`0.5px solid ${C.border}`,borderRadius:3,color:C.muted,width:28,height:22,cursor:"pointer",fontSize:11}}>↓</button>
+                  <button onClick={()=>moveEx(i,-1)} disabled={i===0} aria-label={t("a11y_move_up").replace("{name}",tField(ex,"name"))} style={{background:"none",border:`0.5px solid ${C.border}`,borderRadius:3,color:C.muted,width:28,height:22,cursor:"pointer",fontSize:11}}>↑</button>
+                  <button onClick={()=>moveEx(i,1)} disabled={i===selExs.length-1} aria-label={t("a11y_move_down").replace("{name}",tField(ex,"name"))} style={{background:"none",border:`0.5px solid ${C.border}`,borderRadius:3,color:C.muted,width:28,height:22,cursor:"pointer",fontSize:11}}>↓</button>
                 </div>
               </div>
             </div>
@@ -7362,11 +7460,11 @@ ${exList}
               <div style={{textAlign:"center",flex:1,minWidth:0}}>
                 <div style={{fontSize:10,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("weight_kg")}</div>
                 <div style={{display:"flex",alignItems:"center",gap:6,justifyContent:"center"}}>
-                  <button onClick={()=>{haptic.select();setLocalSet(p=>({...p,weight:String(Math.max(0,parseFloat(p.weight||0)-2.5))}));}}
+                  <button onClick={()=>{haptic.select();setLocalSet(p=>({...p,weight:String(Math.max(0,parseFloat(p.weight||0)-2.5))}));}} aria-label={t("a11y_weight_dec")}
                     style={{width:36,height:36,borderRadius:8,background:C.card,border:`0.5px solid ${C.border}`,color:C.muted,fontSize:16,cursor:"pointer",flexShrink:0}}>−</button>
                   <input type="number" value={localSet.weight} onChange={e=>setLocalSet(p=>({...p,weight:e.target.value}))} placeholder="0" aria-label={t("weight_kg")}
                     style={{background:"none",border:"none",color:C.accent,fontSize:"clamp(22px, 6.6vw, 32px)",fontFamily:"monospace",fontWeight:700,flex:1,minWidth:0,width:"100%",padding:0,outline:"none",textAlign:"center"}}/>
-                  <button onClick={()=>{haptic.select();setLocalSet(p=>({...p,weight:String(parseFloat(p.weight||0)+2.5)}));}}
+                  <button onClick={()=>{haptic.select();setLocalSet(p=>({...p,weight:String(parseFloat(p.weight||0)+2.5)}));}} aria-label={t("a11y_weight_inc")}
                     style={{width:36,height:36,borderRadius:8,background:C.card,border:`0.5px solid ${C.border}`,color:C.muted,fontSize:16,cursor:"pointer",flexShrink:0}}>+</button>
                 </div>
                 {suggestWeight&&doneSets.length===0&&(
@@ -7385,11 +7483,11 @@ ${exList}
               <div style={{textAlign:"center",flex:1,minWidth:0}}>
                 <div style={{fontSize:10,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("reps_label")}</div>
                 <div style={{display:"flex",alignItems:"center",gap:6,justifyContent:"center"}}>
-                  <button onClick={()=>{haptic.select();setLocalSet(p=>({...p,reps:String(Math.max(1,parseInt(p.reps||0)-1))}));}}
+                  <button onClick={()=>{haptic.select();setLocalSet(p=>({...p,reps:String(Math.max(1,parseInt(p.reps||0)-1))}));}} aria-label={t("a11y_reps_dec")}
                     style={{width:36,height:36,borderRadius:8,background:C.card,border:`0.5px solid ${C.border}`,color:C.muted,fontSize:16,cursor:"pointer",flexShrink:0}}>−</button>
                   <input type="number" inputMode="numeric" value={localSet.reps} onChange={e=>setLocalSet(p=>({...p,reps:e.target.value}))} placeholder="0" aria-label={t("reps_label")}
                     style={{background:"none",border:"none",color:C.accent,fontSize:"clamp(22px, 6.6vw, 32px)",fontFamily:"monospace",fontWeight:700,flex:1,minWidth:0,width:"100%",padding:0,outline:"none",textAlign:"center"}}/>
-                  <button onClick={()=>{haptic.select();setLocalSet(p=>({...p,reps:String(parseInt(p.reps||0)+1)}));}}
+                  <button onClick={()=>{haptic.select();setLocalSet(p=>({...p,reps:String(parseInt(p.reps||0)+1)}));}} aria-label={t("a11y_reps_inc")}
                     style={{width:36,height:36,borderRadius:8,background:C.card,border:`0.5px solid ${C.border}`,color:C.muted,fontSize:16,cursor:"pointer",flexShrink:0}}>+</button>
                 </div>
               </div>
@@ -7401,7 +7499,7 @@ ${exList}
         {!lgReplaceMode&&cType==="time"&&(
           <Card accent style={{marginBottom:12,padding:"16px",textAlign:"center"}}>
             <div style={{fontSize:10,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("time_sec")}</div>
-            <input type="number" value={localSet.time} onChange={e=>setLocalSet(p=>({...p,time:e.target.value}))} placeholder="0"
+            <input type="number" value={localSet.time} onChange={e=>setLocalSet(p=>({...p,time:e.target.value}))} placeholder="0" aria-label={t("time_sec")}
               style={{background:"none",border:"none",color:C.accent,fontSize:40,fontFamily:"monospace",fontWeight:700,width:"100%",outline:"none",textAlign:"center"}}/>
           </Card>
         )}
@@ -7412,13 +7510,13 @@ ${exList}
             <div style={{display:"flex",gap:16}}>
               <div style={{flex:1,textAlign:"center"}}>
                 <div style={{fontSize:10,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("time_min_section")}</div>
-                <input type="number" value={localSet.time} onChange={e=>setLocalSet(p=>({...p,time:e.target.value}))} placeholder="0"
+                <input type="number" value={localSet.time} onChange={e=>setLocalSet(p=>({...p,time:e.target.value}))} placeholder="0" aria-label={t("time_min_section")}
                   style={{background:"none",border:"none",color:C.accent,fontSize:32,fontFamily:"monospace",fontWeight:700,width:"100%",outline:"none",textAlign:"center"}}/>
               </div>
               <div style={{width:1,background:C.border}}/>
               <div style={{flex:1,textAlign:"center"}}>
                 <div style={{fontSize:10,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("dist_short")}</div>
-                <input type="number" step="0.1" value={localSet.distance} onChange={e=>setLocalSet(p=>({...p,distance:e.target.value}))} placeholder="0"
+                <input type="number" step="0.1" value={localSet.distance} onChange={e=>setLocalSet(p=>({...p,distance:e.target.value}))} placeholder="0" aria-label={t("dist_short")}
                   style={{background:"none",border:"none",color:C.accent,fontSize:32,fontFamily:"monospace",fontWeight:700,width:"100%",outline:"none",textAlign:"center"}}/>
               </div>
             </div>
@@ -7565,7 +7663,7 @@ function MyWorkoutsDetailScreen({tgId,onBack,onNav}){
     <Kicker>{t("upcoming_label")}</Kicker>
     {data.planned.length===0?<Card style={{marginBottom:16}}><div style={{textAlign:"center",padding:"12px 0",color:C.muted,fontSize:14}}>{t("no_planned")}</div></Card>:
     <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:16}}>
-      {data.planned.map(pw=><Card key={pw.id} onClick={()=>onNav("planned_detail",{pwId:pw.id})}>
+      {data.planned.map(pw=><Card key={pw.id} role={false} onClick={()=>onNav("planned_detail",{pwId:pw.id})}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
           <div style={{flex:1}}>
             <div style={{fontWeight:600,fontSize:14,color:C.text}}>{pw.title}</div>
@@ -7573,10 +7671,11 @@ function MyWorkoutsDetailScreen({tgId,onBack,onNav}){
           </div>
           <div style={{display:"flex",gap:8,alignItems:"center"}}>
             <span style={{fontSize:11,fontFamily:"monospace",color:statusColor[pw.status]||C.muted}}>{pw.status?.toUpperCase()}</span>
-            <button onClick={e=>{e.stopPropagation();del(pw.id);}} disabled={deleting===pw.id} style={{background:"none",border:`0.5px solid ${C.danger}`,borderRadius:6,padding:"3px 8px",color:C.danger,fontSize:11,cursor:"pointer"}}>{deleting===pw.id?"...":"✗"}</button>
+            <button onClick={e=>{e.stopPropagation();del(pw.id);}} disabled={deleting===pw.id} aria-label={`${t("a11y_delete")}: ${pw.title}`} style={{background:"none",border:`0.5px solid ${C.danger}`,borderRadius:6,padding:"3px 8px",color:C.danger,fontSize:11,cursor:"pointer"}}>{deleting===pw.id?"...":"✗"}</button>
           </div>
         </div>
-        <div style={{marginTop:8,fontSize:11,color:C.accent,fontFamily:"monospace"}}>{t("open_plan")}</div>
+        <button type="button" onClick={e=>{e.stopPropagation();onNav("planned_detail",{pwId:pw.id});}} aria-label={`${t("open_plan")} ${pw.title}`}
+          style={{display:"block",background:"none",border:"none",padding:0,font:"inherit",textAlign:"left",marginTop:8,fontSize:11,color:C.accent,fontFamily:"monospace",cursor:"pointer"}}>{t("open_plan")}</button>
       </Card>)}
     </div>}
     {data.archive.length>0&&<><Kicker>{t("archive_section")}</Kicker><div style={{display:"flex",flexDirection:"column",gap:8}}>
@@ -7661,9 +7760,9 @@ function PlannedDetailScreen({pwId,tgId,onBack,exercises=[],muscleGroups=[],read
     </>:<>
       <Hero>{t("edit_btn")}</Hero>
       <div style={{display:"flex",flexDirection:"column",gap:10,marginTop:16,marginBottom:16}}>
-        <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("name_section")}</div><input value={form.title} onChange={e=>setForm(p=>({...p,title:e.target.value}))} style={{background:"none",border:"none",color:C.text,fontSize:16,width:"100%",outline:"none"}}/></Card>
-        <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("sport_date")}</div><div style={{display:"flex",alignItems:"center",gap:8}}><input type="date" value={form.date} onChange={e=>setForm(p=>({...p,date:e.target.value}))} style={{colorScheme:"dark",background:"none",border:"none",color:C.accent,fontSize:18,fontFamily:"monospace",fontWeight:700,outline:"none",flex:1,WebkitAppearance:"none",appearance:"none"}}/><span style={{fontSize:20,flexShrink:0}}>📅</span></div></Card>
-        <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("time_label2")}</div><div style={{display:"flex",alignItems:"center",gap:8}}><input type="time" value={form.time} onChange={e=>setForm(p=>({...p,time:e.target.value}))} style={{colorScheme:"dark",background:"none",border:"none",color:C.accent,fontSize:18,fontFamily:"monospace",fontWeight:700,outline:"none",flex:1,WebkitAppearance:"none",appearance:"none"}}/><span style={{fontSize:20,flexShrink:0}}>⏰</span></div></Card>
+        <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("name_section")}</div><input value={form.title} onChange={e=>setForm(p=>({...p,title:e.target.value}))} aria-label={t("name_section")} style={{background:"none",border:"none",color:C.text,fontSize:16,width:"100%",outline:"none"}}/></Card>
+        <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("sport_date")}</div><div style={{display:"flex",alignItems:"center",gap:8}}><input type="date" value={form.date} onChange={e=>setForm(p=>({...p,date:e.target.value}))} aria-label={t("sport_date")} style={{colorScheme:"dark",background:"none",border:"none",color:C.accent,fontSize:18,fontFamily:"monospace",fontWeight:700,outline:"none",flex:1,WebkitAppearance:"none",appearance:"none"}}/><span style={{fontSize:20,flexShrink:0}}>📅</span></div></Card>
+        <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("time_label2")}</div><div style={{display:"flex",alignItems:"center",gap:8}}><input type="time" value={form.time} onChange={e=>setForm(p=>({...p,time:e.target.value}))} aria-label={t("time_label2")} style={{colorScheme:"dark",background:"none",border:"none",color:C.accent,fontSize:18,fontFamily:"monospace",fontWeight:700,outline:"none",flex:1,WebkitAppearance:"none",appearance:"none"}}/><span style={{fontSize:20,flexShrink:0}}>⏰</span></div></Card>
       </div>
       <div style={{marginBottom:16}}>
         <Kicker>{t("exercises_section")}</Kicker>
@@ -7679,7 +7778,7 @@ function PlannedDetailScreen({pwId,tgId,onBack,exercises=[],muscleGroups=[],read
             return<div key={id} style={{display:"flex",alignItems:"center",gap:4,background:C.card,
               border:`0.5px solid ${C.border}`,borderRadius:8,padding:"4px 8px",fontSize:11}}>
               <span style={{color:C.text}}>{tField(ex,"name")}</span>
-              <button onClick={()=>setEditExIds(p=>p.filter(i=>i!==id))}
+              <button onClick={()=>setEditExIds(p=>p.filter(i=>i!==id))} aria-label={`${t("a11y_delete")}: ${tField(ex,"name")}`}
                 style={{background:"none",border:"none",color:C.danger,cursor:"pointer",fontSize:12,padding:0}}>✕</button>
             </div>;
           })}
@@ -7757,10 +7856,10 @@ function PlanWorkoutScreen({tgId,exercises,muscleGroups,onBack}){
         {muscleGroups?.map(g=>{
           const sel=selGroups.has(g.id);
           return(
-            <Card key={g.id} accent={sel} onClick={()=>setSelGroups(p=>{const n=new Set(p);if(n.has(g.id))n.delete(g.id);else n.add(g.id);return n;})}>
+            <Card key={g.id} accent={sel} aria-pressed={sel} onClick={()=>setSelGroups(p=>{const n=new Set(p);if(n.has(g.id))n.delete(g.id);else n.add(g.id);return n;})}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                 <div><span style={{fontSize:22,marginRight:12}}>{g.icon_url?<img src={g.icon_url} alt="" style={{width:26,height:26,objectFit:"cover",borderRadius:5,verticalAlign:"middle"}}/>:g.emoji}</span><span style={{fontSize:15,fontWeight:600,color:sel?C.accent:C.text}}>{tField(g,"name")}</span></div>
-                <span style={{width:22,height:22,borderRadius:6,background:sel?C.accent:C.card,border:`0.5px solid ${sel?C.accent:C.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,color:sel?C.bg:C.muted,flexShrink:0}}>{sel?"✓":""}</span>
+                <span aria-hidden="true" style={{width:22,height:22,borderRadius:6,background:sel?C.accent:C.card,border:`0.5px solid ${sel?C.accent:C.border}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:14,color:sel?C.bg:C.muted,flexShrink:0}}>{sel?"✓":""}</span>
               </div>
             </Card>
           );
@@ -7813,7 +7912,7 @@ function PlanWorkoutScreen({tgId,exercises,muscleGroups,onBack}){
     {selExs.length>0&&<div style={{marginBottom:12}}><Kicker>{t("aw_vybrano")}{selExs.length})</Kicker><div style={{display:"flex",flexWrap:"wrap",gap:6}}>{selExs.map((e,i)=><Tag key={e.id} color={C.accent}>{i+1}. {e.name.split(" ").slice(0,2).join(" ")}</Tag>)}</div></div>}
     {filtered.slice(0,50).map(ex=>{const sel=selExs.find(e=>e.id===ex.id);return<ExCard key={ex.id} ex={ex} badge={getDiff(ex.difficulty)}
       onClick={()=>setViewEx(ex)}
-      action={<button onClick={e=>{e.stopPropagation();toggle(ex);}} style={{flexShrink:0,width:32,height:32,borderRadius:8,background:sel?C.accent:C.card,border:`0.5px solid ${sel?C.accent:C.border}`,color:sel?C.bg:C.muted,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>{sel?`${selExs.indexOf(sel)+1}`:"+"}</button>}/>;
+      action={<button onClick={e=>{e.stopPropagation();toggle(ex);}} aria-label={t("a11y_add_ex").replace("{name}",tField(ex,"name"))} aria-pressed={!!sel} style={{flexShrink:0,width:32,height:32,borderRadius:8,background:sel?C.accent:C.card,border:`0.5px solid ${sel?C.accent:C.border}`,color:sel?C.bg:C.muted,fontSize:16,cursor:"pointer",display:"flex",alignItems:"center",justifyContent:"center"}}>{sel?`${selExs.indexOf(sel)+1}`:"+"}</button>}/>;
     })}
     {selExs.length>0&&<div style={{position:"sticky",bottom:80,marginTop:12}}><Btn accent full onClick={()=>setStep(2)}>{t("next_datetime")}</Btn></div>}
   </div>;
@@ -7822,9 +7921,9 @@ function PlanWorkoutScreen({tgId,exercises,muscleGroups,onBack}){
     <BackBtn onBack={()=>setStep(1)}/><Kicker>{t("plan_s3")}</Kicker><Hero>{t("time_label2")}</Hero>
     <div style={{height:16}}/>
     <div style={{display:"flex",flexDirection:"column",gap:10,marginBottom:16}}>
-      <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("name_opt_section")}</div><input value={form.title} onChange={e=>setForm(p=>({...p,title:e.target.value}))} placeholder={selExs.slice(0,2).map(e=>e.name.split(" ")[0]).join("+")||t("my_workout_name")} style={{background:"none",border:"none",color:C.text,fontSize:16,width:"100%",outline:"none"}}/></Card>
-      <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("sport_date")}</div><div style={{display:"flex",alignItems:"center",gap:8}}><input id="plan-date-input" type="date" value={form.date} min={localToday()} onChange={e=>setForm(p=>({...p,date:e.target.value}))} style={{colorScheme:"dark",background:"none",border:"none",color:C.accent,fontSize:20,fontFamily:"monospace",fontWeight:700,outline:"none",flex:1,WebkitAppearance:"none",appearance:"none"}}/><span style={{fontSize:22,flexShrink:0}}>📅</span></div></Card>
-      <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("time_label2")}</div><div style={{display:"flex",alignItems:"center",gap:8}}><input id="plan-time-input" type="time" value={form.time} onChange={e=>setForm(p=>({...p,time:e.target.value}))} style={{colorScheme:"dark",background:"none",border:"none",color:C.accent,fontSize:20,fontFamily:"monospace",fontWeight:700,outline:"none",flex:1,WebkitAppearance:"none",appearance:"none"}}/><span style={{fontSize:22,flexShrink:0}}>⏰</span></div></Card>
+      <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("name_opt_section")}</div><input value={form.title} onChange={e=>setForm(p=>({...p,title:e.target.value}))} placeholder={selExs.slice(0,2).map(e=>e.name.split(" ")[0]).join("+")||t("my_workout_name")} aria-label={t("name_opt_section")} style={{background:"none",border:"none",color:C.text,fontSize:16,width:"100%",outline:"none"}}/></Card>
+      <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("sport_date")}</div><div style={{display:"flex",alignItems:"center",gap:8}}><input id="plan-date-input" type="date" value={form.date} min={localToday()} onChange={e=>setForm(p=>({...p,date:e.target.value}))} aria-label={t("sport_date")} style={{colorScheme:"dark",background:"none",border:"none",color:C.accent,fontSize:20,fontFamily:"monospace",fontWeight:700,outline:"none",flex:1,WebkitAppearance:"none",appearance:"none"}}/><span style={{fontSize:22,flexShrink:0}}>📅</span></div></Card>
+      <Card><div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("time_label2")}</div><div style={{display:"flex",alignItems:"center",gap:8}}><input id="plan-time-input" type="time" value={form.time} onChange={e=>setForm(p=>({...p,time:e.target.value}))} aria-label={t("time_label2")} style={{colorScheme:"dark",background:"none",border:"none",color:C.accent,fontSize:20,fontFamily:"monospace",fontWeight:700,outline:"none",flex:1,WebkitAppearance:"none",appearance:"none"}}/><span style={{fontSize:22,flexShrink:0}}>⏰</span></div></Card>
     </div>
     <div style={{marginBottom:16}}><Kicker>{t("pw_uprazhneniya")}{selExs.length})</Kicker>{selExs.map((e,i)=><div key={e.id} style={{padding:"6px 0",borderBottom:`0.5px solid ${C.border}`,display:"flex",gap:10}}><Mono color={C.accent} size={13}>{i+1}</Mono><span style={{fontSize:13,color:C.text}}>{tField(e,"name")}</span></div>)}</div>
     <Btn accent full onClick={save} disabled={saving||!form.date}>{saving?t("saving"):t("plan_zaplanirovat")}</Btn>
@@ -7898,7 +7997,7 @@ function WeightChart({logs}){
           legend:{display:false},
           tooltip:{
             backgroundColor:"#222222",
-            titleColor:"#888888",
+            titleColor:C.muted,
             bodyColor:"#C8FF00",
             borderColor:"#2A2A2A",
             borderWidth:1,
@@ -7906,12 +8005,12 @@ function WeightChart({logs}){
         },
         scales:{
           x:{
-            ticks:{color:"#888888",font:{size:10},maxRotation:45},
+            ticks:{color:C.muted,font:{size:10},maxRotation:45},
             grid:{color:"rgba(255,255,255,0.05)"},
           },
           y:{
             min:minW,max:maxW,
-            ticks:{color:"#888888",font:{size:10},callback:v=>`${v} ${t("home_kg")}`},
+            ticks:{color:C.muted,font:{size:10},callback:v=>`${v} ${t("home_kg")}`},
             grid:{color:"rgba(255,255,255,0.05)"},
           }
         }
@@ -8209,7 +8308,7 @@ function ProgramActiveCard({act,onOpen,onStart}){
   const pct=act.total?Math.round(act.done/act.total*100):0;
   return <Card accent style={{marginBottom:14}}>
     <Kicker style={{margin:0}}>{t("prog_active")}</Kicker>
-    <div onClick={onOpen} style={{fontSize:17,fontWeight:700,color:C.text,marginTop:6,cursor:onOpen?"pointer":"default"}}>{act.title}</div>
+    <div {...(onOpen?pressable(onOpen):{})} style={{fontSize:17,fontWeight:700,color:C.text,marginTop:6,cursor:onOpen?"pointer":"default"}}>{act.title}</div>
     <div style={{display:"flex",fontSize:12,color:C.muted,marginTop:4,fontFamily:"monospace"}}>
       <span>{t("prog_progress").replace("{n}",Math.min(act.done+1,act.total)).replace("{t}",act.total)}</span>
       {act.week&&<span style={{marginLeft:"auto"}}>{t("prog_week").replace("{n}",act.week)}</span>}
@@ -8390,7 +8489,7 @@ function FeedItem({it,tgId,onLiked}){
     {it.records.map((r,i)=><div key={i} style={{fontSize:12,color:C.accent,marginTop:6}}>
       🏆 {t("soc_record").replace("{ex}",trEx(r.exercise)).replace("{w}",fmtKg(r.weight)).replace("{p}",fmtKg(r.prev))}</div>)}
     <div style={{display:"flex",marginTop:10}}>
-      <button onClick={like} disabled={busy||it.is_me&&false} style={{background:it.liked?C.accent:"transparent",color:it.liked?C.bg:C.text,
+      <button onClick={like} disabled={busy||it.is_me&&false} aria-pressed={!!it.liked} style={{background:it.liked?C.accent:"transparent",color:it.liked?C.bg:C.text,
         border:`0.5px solid ${it.liked?C.accent:C.border}`,borderRadius:16,padding:"5px 12px",fontSize:13,cursor:"pointer"}}>
         👏 {it.likes>0?it.likes:""}</button>
     </div>
@@ -8440,6 +8539,9 @@ function NudgeSheet({tgId,friend,onClose,onDone}){
   const [err,setErr]=useState(null);
   const closeRef=useRef(onClose);
   closeRef.current=onClose;
+  // Фокус на окно (не на поле — иначе сразу выезжает клавиатура), Escape закрывает
+  const dlgRef=useRef(null);
+  useDialogFocus(dlgRef,()=>closeRef.current());
   useEffect(()=>{
     const prevOverflow=document.body.style.overflow;
     document.body.style.overflow="hidden";
@@ -8469,9 +8571,9 @@ function NudgeSheet({tgId,friend,onClose,onDone}){
   }
   const sugg=["nudge_s1","nudge_s2","nudge_s3"].map(k=>t(k));
   return <div onClick={onClose} style={{position:"fixed",inset:0,zIndex:150,background:"rgba(0,0,0,0.6)",display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
-    <div role="dialog" aria-modal="true" aria-labelledby="nudge-title" onClick={e=>e.stopPropagation()}
+    <div ref={dlgRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="nudge-title" onClick={e=>e.stopPropagation()}
       style={{width:"100%",maxWidth:560,maxHeight:"88vh",overflowY:"auto",background:C.surface,borderRadius:"18px 18px 0 0",borderTop:`0.5px solid ${C.border}`,
-        padding:"8px 16px calc(20px + env(safe-area-inset-bottom, 0px))",boxSizing:"border-box"}}>
+        padding:"8px 16px calc(20px + env(safe-area-inset-bottom, 0px))",boxSizing:"border-box",outline:"none"}}>
       <div aria-hidden="true" style={{width:36,height:4,borderRadius:2,background:C.border,margin:"0 auto 12px"}}/>
       <Kicker>{t("nudge_kicker")}</Kicker>
       <div id="nudge-title" style={{fontSize:18,fontWeight:700,color:C.text}}>{t("nudge_title")}</div>
@@ -8481,7 +8583,7 @@ function NudgeSheet({tgId,friend,onClose,onDone}){
           fontSize:15,lineHeight:1.45,fontFamily:"inherit",resize:"none",outline:"none",boxSizing:"border-box"}}/>
       <div style={{display:"flex",justifyContent:"flex-end",fontSize:11,color:C.muted,fontFamily:"monospace",marginTop:4}}>{text.length}/200</div>
       <div style={{display:"flex",flexWrap:"wrap",gap:6,marginTop:6}}>
-        {sugg.map((x,i)=><button key={i} type="button" onClick={()=>{setText(x);setErr(null);}}
+        {sugg.map((x,i)=><button key={i} type="button" onClick={()=>{setText(x);setErr(null);}} aria-pressed={text===x}
           style={{background:text===x?"rgba(200,255,0,0.12)":C.card,border:`0.5px solid ${text===x?C.accent:C.border}`,color:text===x?C.accent:C.text,
             borderRadius:14,padding:"7px 10px",fontSize:12,cursor:"pointer",fontFamily:"inherit",textAlign:"left"}}>{x}</button>)}
       </div>
@@ -8547,7 +8649,7 @@ function SocialFriends({tgId,data,reload,onBanner}){
                 borderRadius:14,padding:"6px 10px",fontSize:12,fontWeight:600,cursor:"pointer",fontFamily:"inherit",whiteSpace:"nowrap"}}>{t("nudge_btn")}</button>
             :f.nudged_at?<span style={{fontSize:12,color:C.muted,whiteSpace:"nowrap"}}>{t("nudge_done")}</span>
             :f.inactive===true&&f.nudges_off&&<span style={{fontSize:12,color:C.muted,whiteSpace:"nowrap"}}>{t("nudge_off")}</span>}
-          <span onClick={()=>remove(f)} style={{fontSize:12,color:C.muted,cursor:"pointer"}}>{t("soc_remove")}</span>
+          <button type="button" onClick={()=>remove(f)} aria-label={`${t("soc_remove")}: ${f.name}`} style={{background:"none",border:"none",padding:0,font:"inherit",fontSize:12,color:C.muted,cursor:"pointer"}}>{t("soc_remove")}</button>
         </div>
       </Card>)}
     {nudging&&<NudgeSheet tgId={tgId} friend={nudging} onClose={()=>setNudging(null)}
@@ -8591,7 +8693,7 @@ function TeamBoard({team,tgId,onChanged}){
           <div style={{fontSize:10,color:C.muted,fontFamily:"monospace"}}>{m.hidden?t("soc_hidden"):t("soc_last_week").replace("{n}",m.last_week)}</div>
         </div>
         <Mono size={16}>{m.hidden?"—":m.week}</Mono>
-        {team.is_owner&&!m.is_me&&<span onClick={()=>kick(m)} style={{fontSize:11,color:C.muted,cursor:"pointer",marginLeft:4}}>✕</span>}
+        {team.is_owner&&!m.is_me&&<button type="button" onClick={()=>kick(m)} aria-label={`${t("soc_remove")}: ${m.name}`} style={{background:"none",border:"none",padding:0,font:"inherit",fontSize:11,color:C.muted,cursor:"pointer",marginLeft:4}}>✕</button>}
       </div>)}
     </Card>
     {team.is_owner&&<Btn full style={{marginBottom:8}} onClick={rename}>{t("soc_team_rename")}</Btn>}
@@ -8606,7 +8708,7 @@ function SocialTeams({tgId,data,reload,openTeamId,setOpenTeamId}){
   const [busy,setBusy]=useState(false);
   const team=data.teams.find(x=>x.id===openTeamId);
   if(team)return <div>
-    <div onClick={()=>setOpenTeamId(null)} style={{fontSize:12,color:C.muted,cursor:"pointer",marginBottom:10,fontFamily:"monospace"}}>← {t("tab_teams")}</div>
+    <button type="button" onClick={()=>setOpenTeamId(null)} style={{display:"block",background:"none",border:"none",padding:0,font:"inherit",textAlign:"left",fontSize:12,color:C.muted,cursor:"pointer",marginBottom:10,fontFamily:"monospace"}}>← {t("tab_teams")}</button>
     <TeamBoard team={team} tgId={tgId} onChanged={tm=>{if(!tm)setOpenTeamId(null);reload();}}/>
   </div>;
   async function create(){
@@ -8641,15 +8743,15 @@ function SocialTeams({tgId,data,reload,openTeamId,setOpenTeamId}){
         <span style={{color:C.muted}}>›</span>
       </div>
     </Card>)}
-    {msg&&<div style={{fontSize:13,color:C.danger,margin:"8px 0"}}>{msg}</div>}
+    {msg&&<div role="alert" style={{fontSize:13,color:C.danger,margin:"8px 0"}}>{msg}</div>}
     <Card style={{marginTop:12}} pad="12px 14px">
       <Kicker style={{margin:0}}>{t("soc_team_create")}</Kicker>
-      <input value={name} onChange={e=>setName(e.target.value)} maxLength={60} placeholder={t("soc_team_name")} style={{...inp,marginTop:8}}/>
+      <input value={name} onChange={e=>setName(e.target.value)} maxLength={60} placeholder={t("soc_team_name")} aria-label={t("soc_team_name")} style={{...inp,marginTop:8}}/>
       <Btn accent full style={{marginTop:8}} disabled={busy||name.trim().length<2} onClick={create}>{t("soc_team_create")}</Btn>
     </Card>
     <Card style={{marginTop:8}} pad="12px 14px">
       <Kicker style={{margin:0}}>{t("soc_team_join")}</Kicker>
-      <input value={code} onChange={e=>setCode(e.target.value.toUpperCase())} maxLength={12} placeholder={t("soc_team_code")} style={{...inp,marginTop:8,fontFamily:"monospace",letterSpacing:2}}/>
+      <input value={code} onChange={e=>setCode(e.target.value.toUpperCase())} maxLength={12} placeholder={t("soc_team_code")} aria-label={t("soc_team_code")} style={{...inp,marginTop:8,fontFamily:"monospace",letterSpacing:2}}/>
       <Btn full style={{marginTop:8}} disabled={busy||code.trim().length<4} onClick={join}>{t("soc_team_join")}</Btn>
     </Card>
   </div>;
@@ -8713,7 +8815,7 @@ function SocialScreen({tgId,onBack,accept=null,join=null,tab:tab0=null}){
     <Kicker>{t("soc_kicker")}</Kicker>
     <Hero>{t("soc_title")}</Hero>
     {banner&&<Card accent={!!banner.ok} style={{marginTop:12}} pad="11px 14px">
-      <div style={{fontSize:13,color:banner.ok?C.accent:C.text}}>{banner.text}</div></Card>}
+      <div role="status" style={{fontSize:13,color:banner.ok?C.accent:C.text}}>{banner.text}</div></Card>}
     {invite&&<Card accent style={{marginTop:12}}>
       <div role="heading" aria-level={2} style={{fontSize:16,fontWeight:700,color:C.text}}>
         {invite.kind==="friend"?t("soc_inv_friend_t").replace("{name}",invite.name):t("soc_inv_team_t").replace("{name}",invite.name)}</div>
@@ -8724,7 +8826,7 @@ function SocialScreen({tgId,onBack,accept=null,join=null,tab:tab0=null}){
       <Btn full style={{marginTop:8}} disabled={inviteBusy} onClick={()=>setInvite(null)}>{t("soc_inv_later")}</Btn>
     </Card>}
     <div style={{display:"flex",gap:6,margin:"14px 0"}}>
-      {tabs.map(([k,l])=><button key={k} onClick={()=>{setTab(k);if(k!=="teams")setOpenTeamId(null);}} style={{flex:1,padding:"8px 0",borderRadius:16,fontSize:13,cursor:"pointer",
+      {tabs.map(([k,l])=><button key={k} onClick={()=>{setTab(k);if(k!=="teams")setOpenTeamId(null);}} aria-pressed={tab===k} style={{flex:1,padding:"8px 0",borderRadius:16,fontSize:13,cursor:"pointer",
         background:tab===k?C.accent:C.card,color:tab===k?C.bg:C.muted,border:`0.5px solid ${tab===k?C.accent:C.border}`,fontFamily:"inherit"}}>{l}</button>)}
     </div>
     {tab==="feed"&&<SocialFeed tgId={tgId}/>}
@@ -8811,14 +8913,14 @@ function ProgressScreen({stats,tgId,onNav}){
     {/* График по неделям */}
     {weekly.length>0&&<Card style={{marginBottom:16}}>
       <Kicker>{t("weekly_activity")}</Kicker>
-      <div style={{fontFamily:"monospace",fontSize:22,color:C.accent,letterSpacing:2,margin:"8px 0"}}>{spark||t("no_sets_data")}</div>
+      <div role={spark?"img":undefined} aria-label={spark?`${t("workouts_week")}: ${weekly.join(", ")}`:undefined} style={{fontFamily:"monospace",fontSize:22,color:C.accent,letterSpacing:2,margin:"8px 0"}}>{spark||t("no_sets_data")}</div>
       <div style={{fontSize:11,color:C.muted,fontFamily:"monospace"}}>{t("workouts_week")}</div>
     </Card>}
 
     {/* Прогресс по группам мышц */}
     <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
       <Kicker>{t("muscle_progress")}</Kicker>
-      <select value={days} onChange={e=>setDays(Number(e.target.value))}
+      <select value={days} onChange={e=>setDays(Number(e.target.value))} aria-label={t("muscle_progress")}
         style={{background:C.card,border:`0.5px solid ${C.border}`,borderRadius:6,
           padding:"4px 8px",color:C.accent,fontSize:11,fontFamily:"monospace",outline:"none"}}>
         <option value={30}>{t("day_30")}</option>
@@ -8833,12 +8935,12 @@ function ProgressScreen({stats,tgId,onNav}){
       <>
         {/* Кнопки групп мышц */}
         <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}>
-          <button onClick={()=>setActiveGroup(null)}
+          <button onClick={()=>setActiveGroup(null)} aria-pressed={!activeGroup}
             style={{padding:"6px 12px",borderRadius:20,fontSize:11,cursor:"pointer",
               background:!activeGroup?C.accent:C.card,
               border:`0.5px solid ${!activeGroup?C.accent:C.border}`,
               color:!activeGroup?C.bg:C.muted,fontFamily:"monospace"}}>{t("all_btn")}</button>
-          {groups.map(([name,g])=><button key={name} onClick={()=>setActiveGroup(activeGroup===name?null:name)}
+          {groups.map(([name,g])=><button key={name} onClick={()=>setActiveGroup(activeGroup===name?null:name)} aria-pressed={activeGroup===name}
             style={{padding:"6px 12px",borderRadius:20,fontSize:11,cursor:"pointer",
               background:activeGroup===name?C.accent:C.card,
               border:`0.5px solid ${activeGroup===name?C.accent:C.border}`,
@@ -8982,8 +9084,8 @@ function CatalogScreen({exercises,muscleGroups,onNav}){
     </div>}
     <input value={search} onChange={e=>setSearch(e.target.value)} placeholder={t("search_placeholder")} style={{width:"100%",background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 14px",color:C.text,fontSize:13,fontFamily:"monospace",letterSpacing:1,boxSizing:"border-box",marginBottom:12,outline:"none"}}/>
     <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:8,marginBottom:12}}>
-      <button onClick={()=>setActiveGroup(null)} style={{flexShrink:0,padding:"6px 12px",borderRadius:20,background:!activeGroup?C.accent:C.card,color:!activeGroup?C.bg:C.muted,border:`0.5px solid ${!activeGroup?C.accent:C.border}`,fontSize:11,fontFamily:"monospace",cursor:"pointer",fontWeight:700}}>{t("all_btn")}</button>
-      {muscleGroups?.map(g=><button key={g.id} onClick={()=>setActiveGroup(g.id===activeGroup?null:g.id)} style={{flexShrink:0,padding:"6px 12px",borderRadius:20,background:activeGroup===g.id?C.accent:C.card,color:activeGroup===g.id?C.bg:C.muted,border:`0.5px solid ${activeGroup===g.id?C.accent:C.border}`,fontSize:11,fontFamily:"monospace",cursor:"pointer",display:"inline-flex",alignItems:"center",gap:5}}>{g.icon_url?<img src={g.icon_url} alt="" style={{width:16,height:16,objectFit:"cover",borderRadius:3}}/>:g.emoji} {(tField(g,"name")).toUpperCase()}</button>)}
+      <button onClick={()=>setActiveGroup(null)} aria-pressed={!activeGroup} style={{flexShrink:0,padding:"6px 12px",borderRadius:20,background:!activeGroup?C.accent:C.card,color:!activeGroup?C.bg:C.muted,border:`0.5px solid ${!activeGroup?C.accent:C.border}`,fontSize:11,fontFamily:"monospace",cursor:"pointer",fontWeight:700}}>{t("all_btn")}</button>
+      {muscleGroups?.map(g=><button key={g.id} onClick={()=>setActiveGroup(g.id===activeGroup?null:g.id)} aria-pressed={activeGroup===g.id} style={{flexShrink:0,padding:"6px 12px",borderRadius:20,background:activeGroup===g.id?C.accent:C.card,color:activeGroup===g.id?C.bg:C.muted,border:`0.5px solid ${activeGroup===g.id?C.accent:C.border}`,fontSize:11,fontFamily:"monospace",cursor:"pointer",display:"inline-flex",alignItems:"center",gap:5}}>{g.icon_url?<img src={g.icon_url} alt="" style={{width:16,height:16,objectFit:"cover",borderRadius:3}}/>:g.emoji} {(tField(g,"name")).toUpperCase()}</button>)}
     </div>
     <div style={{fontSize:10,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{filtered.length}  {t("exercises_label")}</div>
     <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
@@ -9076,7 +9178,7 @@ function VoiceRecorder({tgId,onTranscribed,disabled=false}){
 
   return(
     <div style={{display:"flex",alignItems:"center",gap:8}}>
-      {error&&<div style={{fontSize:11,color:C.danger,flex:1}}>{error}</div>}
+      {error&&<div role="alert" style={{fontSize:11,color:C.danger,flex:1}}>{error}</div>}
       {loading&&<div style={{fontSize:11,color:C.muted,fontFamily:"monospace",flex:1}}>{t("recognizing")}</div>}
       {recording&&!loading&&(
         <div style={{fontSize:12,color:C.danger,fontFamily:"monospace",flex:1}}>
@@ -9086,6 +9188,7 @@ function VoiceRecorder({tgId,onTranscribed,disabled=false}){
       <button
         onClick={recording?stopRec:startRec}
         disabled={disabled||loading}
+        aria-label={t(recording?"a11y_voice_stop":"a11y_voice_start")}
         style={{
           width:44,height:44,borderRadius:"50%",
           background:recording?C.danger:C.card,
@@ -9417,7 +9520,9 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
         </div>
       </Card>}
 
-      <div style={{display:"flex",flexDirection:"column",gap:8}}>
+      {/* role="log": новый ответ тренера диктор прочтёт сам; пока ответ печатается
+          (aria-busy) — молчит, иначе зачитывал бы каждый кусок потока */}
+      <div role="log" aria-busy={loading} style={{display:"flex",flexDirection:"column",gap:8}}>
         {chatHistory.map((msg,i)=>(
           <div key={i} style={{display:"flex",flexDirection:"column",alignItems:msg.role==="user"?"flex-end":"flex-start"}}>
             <div style={{
@@ -9436,7 +9541,7 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
           <div style={{maxWidth:"85%",padding:"10px 14px",borderRadius:12,background:C.card,border:`0.5px solid ${C.border}`}}>
             <div style={{fontSize:10,color:C.accent,fontFamily:"monospace",marginBottom:4}}>{t("ai_coach_label")}</div>
             <div style={{fontSize:13,color:C.text,lineHeight:1.6,whiteSpace:"pre-wrap"}}>
-              {streamText}<span style={{color:C.accent}}>▍</span>
+              {streamText}<span aria-hidden="true" style={{color:C.accent}}>▍</span>
             </div>
           </div>
         </div>}
@@ -9472,8 +9577,8 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
               el.style.height=Math.min(el.scrollHeight,120)+"px";
             }}
             onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();ask(q);if(qTaRef.current){qTaRef.current.style.height="auto";}}}}
-            placeholder={t("ai_sprosi_chto_ugodno")} style={{flex:1,background:"none",border:"none",padding:"10px 14px",color:C.text,fontSize:13,fontFamily:"monospace",outline:"none",resize:"none",maxHeight:120,lineHeight:1.4}}/>
-          <button onClick={()=>{ask(q);if(qTaRef.current){qTaRef.current.style.height="auto";}}} disabled={loading||!q.trim()}
+            placeholder={t("ai_sprosi_chto_ugodno")} aria-label={t("ai_sprosi_chto_ugodno")} style={{flex:1,background:"none",border:"none",padding:"10px 14px",color:C.text,fontSize:13,fontFamily:"monospace",outline:"none",resize:"none",maxHeight:120,lineHeight:1.4}}/>
+          <button onClick={()=>{ask(q);if(qTaRef.current){qTaRef.current.style.height="auto";}}} disabled={loading||!q.trim()} aria-label={t("a11y_send")}
             style={{background:C.accent,border:"none",borderRadius:"0 8px 8px 0",padding:"10px 16px",color:C.bg,fontWeight:700,fontSize:14,cursor:"pointer",opacity:loading||!q.trim()?0.5:1,alignSelf:"stretch"}}>→</button>
         </div>
       </div>
@@ -9511,17 +9616,17 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
     </button>}
     {showDatePicker&&(
       <div style={{position:"fixed",top:0,left:0,right:0,bottom:0,background:"rgba(0,0,0,0.7)",zIndex:300,display:"flex",alignItems:"center",justifyContent:"center",padding:16}}>
-        <div style={{background:C.surface,borderRadius:16,padding:20,width:"100%",maxWidth:360}}>
+        <ModalBox label={t("when_workout2")} onClose={()=>setShowDatePicker(false)} style={{background:C.surface,borderRadius:16,padding:20,width:"100%",maxWidth:360}}>
           <div style={{fontSize:14,fontWeight:700,color:C.text,marginBottom:16,fontFamily:"monospace"}}>{t("when_workout2")}</div>
           <div style={{marginBottom:12}}>
             <div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:6}}>{t("sport_date")}</div>
-            <input type="date" value={planDate} min={localToday()}
+            <input type="date" value={planDate} min={localToday()} aria-label={t("sport_date")}
               onChange={e=>setPlanDate(e.target.value)}
               style={{colorScheme:"dark",width:"100%",background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 12px",color:C.accent,fontSize:16,fontFamily:"monospace",outline:"none"}}/>
           </div>
           <div style={{marginBottom:20}}>
             <div style={{fontSize:11,color:C.muted,fontFamily:"monospace",marginBottom:6}}>{t("time_label2")}</div>
-            <input type="time" value={planTime}
+            <input type="time" value={planTime} aria-label={t("time_label2")}
               onChange={e=>setPlanTime(e.target.value)}
               style={{colorScheme:"dark",width:"100%",background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 12px",color:C.accent,fontSize:16,fontFamily:"monospace",outline:"none"}}/>
           </div>
@@ -9529,7 +9634,7 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
             <Btn full onClick={()=>setShowDatePicker(false)} style={{flex:1}}>{t("cancel_btn2")}</Btn>
             <Btn accent full onClick={confirmSaveWorkoutPlan} style={{flex:2}}>{t("save_confirm")}</Btn>
           </div>
-        </div>
+        </ModalBox>
       </div>
     )}
   </div>;
@@ -9714,9 +9819,9 @@ function FoodVisionScreen({tgId,onBack,mealType,onNav}){
       <Kicker>{t("ai_nutrition_title")}</Kicker>
       <Hero>{t("photo_kbju_title2")}</Hero>
       {onNav&&<div style={{display:"flex",gap:6,marginTop:10}}>
-        <span style={{padding:"6px 14px",borderRadius:16,fontSize:12,fontFamily:"monospace",background:C.accent,color:C.bg}}>{t("fv_mode_dish")}</span>
-        <span onClick={()=>onNav("label_scan",{meal_type:mealType})} style={{padding:"6px 14px",borderRadius:16,fontSize:12,cursor:"pointer",
-          fontFamily:"monospace",border:`0.5px solid ${C.border}`,color:C.muted}}>🏷 {t("fv_mode_label")}</span>
+        <span aria-current="page" style={{padding:"6px 14px",borderRadius:16,fontSize:12,fontFamily:"monospace",background:C.accent,color:C.bg}}>{t("fv_mode_dish")}</span>
+        <button type="button" onClick={()=>onNav("label_scan",{meal_type:mealType})} style={{background:"none",font:"inherit",padding:"6px 14px",borderRadius:16,fontSize:12,cursor:"pointer",
+          fontFamily:"monospace",border:`0.5px solid ${C.border}`,color:C.muted}}><span aria-hidden="true">🏷</span> {t("fv_mode_label")}</button>
       </div>}
       <div style={{color:C.muted,fontSize:13,marginTop:4,marginBottom:20}}>{t("photo_kbju_hint")}</div>
       <input ref={inputRef} type="file" accept="image/*"
@@ -9733,8 +9838,8 @@ function FoodVisionScreen({tgId,onBack,mealType,onNav}){
               onTouchStart={onDragStart} onTouchMove={onDragMove} onTouchEnd={onDragEnd}/>
           </div>
           <div style={{display:"flex",alignItems:"center",gap:10,marginBottom:14,padding:"0 4px"}}>
-            <span style={{fontSize:16}}>🔍</span>
-            <input type="range" min="1" max="3" step="0.05" value={zoom}
+            <span aria-hidden="true" style={{fontSize:16}}>🔍</span>
+            <input type="range" min="1" max="3" step="0.05" value={zoom} aria-label={t("a11y_zoom")}
               onChange={e=>{const z=parseFloat(e.target.value);setZoom(z);setOffset(o=>clampOffset(o,z));}}
               style={{flex:1,accentColor:C.accent}}/>
           </div>
@@ -9752,7 +9857,7 @@ function FoodVisionScreen({tgId,onBack,mealType,onNav}){
         </div>
       ):(
         <div style={{marginBottom:16}}>
-          <img src={preview} alt="food" style={{width:"100%",borderRadius:12,maxHeight:280,objectFit:"contain",background:C.bg,marginBottom:10}}/>
+          <img src={preview} alt={t("a11y_food_photo")} style={{width:"100%",borderRadius:12,maxHeight:280,objectFit:"contain",background:C.bg,marginBottom:10}}/>
           <div style={{display:"flex",gap:8,marginBottom:8}}>
             <Btn full onClick={()=>inputRef.current?.click()} style={{flex:1}}>{t("other_photo2")}</Btn>
             {!result&&!loading&&<Btn accent full onClick={analyze} style={{flex:2}}>{t("analyze_btn2")}</Btn>}
@@ -9765,7 +9870,7 @@ function FoodVisionScreen({tgId,onBack,mealType,onNav}){
       {loading&&<Card><div style={{textAlign:"center",padding:"16px 0",color:C.accent,fontFamily:"monospace",fontSize:12,letterSpacing:2}}>{t("analyzing_photo2")}</div></Card>}
       {error&&(
         <Card>
-          <div style={{color:C.danger,fontSize:13,textAlign:"center",padding:"8px 0",marginBottom:result?8:0}}>{error}</div>
+          <div role="alert" style={{color:C.danger,fontSize:13,textAlign:"center",padding:"8px 0",marginBottom:result?8:0}}>{error}</div>
           {foodLimitHit&&<PremiumNudge tgId={tgId} kind="food" onNav={onNav} style={{marginTop:4}}/>}
           {result&&!saved&&(
             <Btn accent full onClick={saveToLog} disabled={loading}>
@@ -9805,7 +9910,7 @@ function FoodVisionScreen({tgId,onBack,mealType,onNav}){
               <div style={{fontSize:12,color:C.muted,marginBottom:8}}>
                 {t("ui_napishi_pravilnoe_nazvanie_ili")}
               </div>
-              <input value={editText} maxLength={500} onChange={e=>setEditText(e.target.value)}
+              <input value={editText} maxLength={500} onChange={e=>setEditText(e.target.value)} aria-label={t("ui_napishi_pravilnoe_nazvanie_ili")}
                 placeholder={t("fv_naprimer_risovaya_kasha_s")}
                 style={{width:"100%",background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,
                   padding:"10px 12px",color:C.text,fontSize:13,outline:"none",marginBottom:10}}/>
@@ -9818,7 +9923,7 @@ function FoodVisionScreen({tgId,onBack,mealType,onNav}){
             </Card>
           )}
           {saved?(
-            <div style={{background:"#00CC6622",border:`0.5px solid ${C.success}`,borderRadius:10,
+            <div role="status" style={{background:"#00CC6622",border:`0.5px solid ${C.success}`,borderRadius:10,
               padding:"12px",fontSize:13,color:C.success,fontFamily:"monospace",textAlign:"center"}}>
               {t("saved_to_diary")}
             </div>
@@ -9938,9 +10043,9 @@ function NutritionScreen({tgId,onBack,onNav}){
     <BackBtn onBack={onBack}/><Kicker>{t("menu_nutrition")}</Kicker><Hero>{t("nutrition_title")}</Hero>
 
     <div style={{display:"flex",alignItems:"center",gap:8,marginTop:8,marginBottom:16}}>
-      <button onClick={()=>setViewDate(shiftDay(viewDate,-1))} style={{background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"6px 14px",color:C.text,cursor:"pointer",fontSize:16}}>‹</button>
-      <div style={{flex:1,textAlign:"center",fontFamily:"monospace",fontSize:12,color:isToday?C.accent:C.muted}}>{isToday?t("today"):new Date(viewDate+"T12:00:00").toLocaleDateString(dateLocale(),{day:"numeric",month:"short"})}</div>
-      {!isToday&&<button onClick={()=>setViewDate(localToday())} style={{background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"6px 14px",color:C.text,cursor:"pointer",fontSize:16}}>›</button>}
+      <button onClick={()=>setViewDate(shiftDay(viewDate,-1))} aria-label={t("a11y_prev_day")} style={{background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"6px 14px",color:C.text,cursor:"pointer",fontSize:16}}>‹</button>
+      <div aria-live="polite" style={{flex:1,textAlign:"center",fontFamily:"monospace",fontSize:12,color:isToday?C.accent:C.muted}}>{isToday?t("today"):new Date(viewDate+"T12:00:00").toLocaleDateString(dateLocale(),{day:"numeric",month:"short"})}</div>
+      {!isToday&&<button onClick={()=>setViewDate(localToday())} aria-label={t("a11y_to_today")} style={{background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"6px 14px",color:C.text,cursor:"pointer",fontSize:16}}>›</button>}
     </div>
 
     <Card accent style={{marginBottom:12}}>
@@ -9962,6 +10067,7 @@ function NutritionScreen({tgId,onBack,onNav}){
       <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:glasses===0&&isToday?8:0}}>
         {Array.from({length:waterGoal},(_,i)=>(
           <button key={i} onClick={()=>isToday&&setWater(i<glasses?i:i+1)}
+            aria-label={t("a11y_glass").replace("{n}",i+1)} aria-pressed={i<glasses} aria-disabled={!isToday||undefined}
             style={{width:36,height:36,borderRadius:8,
               border:`0.5px solid ${i<glasses?"rgba(0,180,255,0.5)":C.border}`,
               background:i<glasses?"rgba(0,180,255,0.25)":"rgba(0,180,255,0.05)",
@@ -9971,7 +10077,7 @@ function NutritionScreen({tgId,onBack,onNav}){
           </button>
         ))}
       </div>
-      {glasses===0&&isToday&&<div style={{fontSize:11,color:"rgba(0,180,255,0.5)",fontFamily:"monospace"}}>{t("water_tap_hint")}</div>}
+      {glasses===0&&isToday&&<div style={{fontSize:11,color:"rgba(0,180,255,0.85)",fontFamily:"monospace"}}>{t("water_tap_hint")}</div>}
     </Card>
 
     {MEALS.map(meal=>{
@@ -9979,16 +10085,16 @@ function NutritionScreen({tgId,onBack,onNav}){
       return<Card key={meal.type} style={{marginBottom:12}}>
         <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:ml.length>0?10:0}}>
           <div style={{display:"flex",alignItems:"center",gap:8}}>
-            <span style={{fontSize:20}}>{meal.icon}</span>
+            <span aria-hidden="true" style={{fontSize:20}}>{meal.icon}</span>
             <div>
               <div style={{fontWeight:600,fontSize:14,color:C.text}}>{meal.label}</div>
               {ml.length>0&&<div style={{fontSize:10,color:C.muted,fontFamily:"monospace"}}>{mt.kcal} {t("kcal_unit")} · {t("u_prot")}{Math.round(mt.protein)} {t("u_fat")}{Math.round(mt.fat)} {t("u_carb")}{Math.round(mt.carb)}</div>}
             </div>
           </div>
           {isToday&&<div style={{display:"flex",gap:6}}>
-            <button onClick={()=>onNav&&onNav("food_vision",{meal_type:meal.type})} style={{background:"none",border:`0.5px solid ${C.border}`,borderRadius:8,padding:"5px 8px",color:C.muted,fontSize:13,cursor:"pointer"}}>📷</button>
-            <button onClick={()=>onNav&&onNav("food_search",{meal_type:meal.type})} style={{background:"none",border:`0.5px solid ${C.border}`,borderRadius:8,padding:"5px 8px",color:C.muted,fontSize:13,cursor:"pointer"}}>🔍</button>
-            <button onClick={()=>{setAdding(adding===meal.type?null:meal.type);setForm({meal_name:"",kcal:"",protein:"",fat:"",carb:""}); }} style={{background:adding===meal.type?"rgba(200,255,0,0.1)":"none",border:`0.5px solid ${adding===meal.type?C.accent:C.border}`,borderRadius:8,padding:"5px 10px",color:adding===meal.type?C.accent:C.muted,fontSize:12,cursor:"pointer"}}>{adding===meal.type?"✕":t("add_meal")}</button>
+            <button onClick={()=>onNav&&onNav("food_vision",{meal_type:meal.type})} aria-label={`${t("a11y_by_photo")}: ${meal.label}`} style={{background:"none",border:`0.5px solid ${C.border}`,borderRadius:8,padding:"5px 8px",color:C.muted,fontSize:13,cursor:"pointer"}}>📷</button>
+            <button onClick={()=>onNav&&onNav("food_search",{meal_type:meal.type})} aria-label={`${t("a11y_by_search")}: ${meal.label}`} style={{background:"none",border:`0.5px solid ${C.border}`,borderRadius:8,padding:"5px 8px",color:C.muted,fontSize:13,cursor:"pointer"}}>🔍</button>
+            <button onClick={()=>{setAdding(adding===meal.type?null:meal.type);setForm({meal_name:"",kcal:"",protein:"",fat:"",carb:""}); }} aria-expanded={adding===meal.type} aria-label={adding===meal.type?t("a11y_close"):undefined} style={{background:adding===meal.type?"rgba(200,255,0,0.1)":"none",border:`0.5px solid ${adding===meal.type?C.accent:C.border}`,borderRadius:8,padding:"5px 10px",color:adding===meal.type?C.accent:C.muted,fontSize:12,cursor:"pointer"}}>{adding===meal.type?"✕":t("add_meal")}</button>
           </div>}
         </div>
         {ml.map(l=>(
@@ -10000,14 +10106,14 @@ function NutritionScreen({tgId,onBack,onNav}){
             </div>
             <div style={{display:"flex",alignItems:"center",gap:8,flexShrink:0}}>
               <Mono size={13}>{l.kcal} <span style={{fontSize:10,color:C.muted,fontWeight:400}}>{t("kcal_short")}</span></Mono>
-              {l.id&&isToday&&<button onClick={()=>{setEditingLog(editingLog===l.id?null:l.id);setEditLogText("");setEditLogWeight(300);}} style={{background:"none",border:`0.5px solid ${C.border}`,borderRadius:6,padding:"2px 7px",color:C.muted,fontSize:11,cursor:"pointer"}}>✏️</button>}
-              {l.id&&isToday&&<button onClick={()=>deleteLog(l.id)} style={{background:"none",border:`0.5px solid ${C.danger}`,borderRadius:6,padding:"2px 7px",color:C.danger,fontSize:11,cursor:"pointer"}}>✕</button>}
+              {l.id&&isToday&&<button onClick={()=>{setEditingLog(editingLog===l.id?null:l.id);setEditLogText("");setEditLogWeight(300);}} aria-label={`${t("a11y_edit")}: ${l.meal_name}`} aria-expanded={editingLog===l.id} style={{background:"none",border:`0.5px solid ${C.border}`,borderRadius:6,padding:"2px 7px",color:C.muted,fontSize:11,cursor:"pointer"}}>✏️</button>}
+              {l.id&&isToday&&<button onClick={()=>deleteLog(l.id)} aria-label={`${t("a11y_delete")}: ${l.meal_name}`} style={{background:"none",border:`0.5px solid ${C.danger}`,borderRadius:6,padding:"2px 7px",color:C.danger,fontSize:11,cursor:"pointer"}}>✕</button>}
             </div>
           </div>
           {editingLog===l.id&&(
             <div style={{padding:"8px 0",borderTop:`0.5px solid ${C.border}`}}>
               <div style={{fontSize:11,color:C.muted,marginBottom:6}}>{t("nut_isprav_nazvanie_sostav_kbzhu")}</div>
-              <input value={editLogText} maxLength={500} onChange={e=>setEditLogText(e.target.value)}
+              <input value={editLogText} maxLength={500} onChange={e=>setEditLogText(e.target.value)} aria-label={t("nut_isprav_nazvanie_sostav_kbzhu")}
                 placeholder={t("nut_naprimer_risovaya_kasha_s")}
                 style={{width:"100%",background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"8px 12px",color:C.text,fontSize:13,outline:"none",marginBottom:8}}/>
               <div style={{display:"flex",gap:8}}>
@@ -10036,20 +10142,20 @@ function NutritionScreen({tgId,onBack,onNav}){
     })}
 
     {isToday&&<Card style={{marginBottom:12}}>
-      <button onClick={()=>{setAiOpen(!aiOpen);setAiAnswer(null);setAiQ("");}}
+      <button onClick={()=>{setAiOpen(!aiOpen);setAiAnswer(null);setAiQ("");}} aria-expanded={aiOpen}
         style={{width:"100%",background:"none",border:"none",display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",padding:0}}>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
           <span style={{fontSize:20}}>💬</span>
           <div style={{fontWeight:600,fontSize:14,color:C.text,textAlign:"left"}}>{t("ask_trainer")}</div>
         </div>
-        <span style={{color:C.accent,fontSize:16}}>{aiOpen?"∧":"∨"}</span>
+        <span aria-hidden="true" style={{color:C.accent,fontSize:16}}>{aiOpen?"∧":"∨"}</span>
       </button>
       {aiOpen&&<div style={{marginTop:12,paddingTop:12,borderTop:`0.5px solid ${C.border}`}}>
         <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:8}}>
           <VoiceRecorder tgId={tgId} disabled={aiLoading} onTranscribed={text=>setAiQ(prev=>prev?prev+" "+text:text)}/>
           <div style={{fontSize:11,color:C.muted}}>{t("or_write")}</div>
         </div>
-        <textarea value={aiQ} onChange={e=>setAiQ(e.target.value)}
+        <textarea value={aiQ} onChange={e=>setAiQ(e.target.value)} aria-label={t("ask_trainer")}
           placeholder={t("nut_naprimer_chto_mne_ne")}
           style={{width:"100%",background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,
             padding:"10px 12px",color:C.text,fontSize:13,outline:"none",resize:"none",
@@ -10057,7 +10163,7 @@ function NutritionScreen({tgId,onBack,onNav}){
         <Btn accent full onClick={askAI} disabled={aiLoading||!aiQ.trim()}>
           {aiLoading?t("ai_thinking"):t("ai_ask")}
         </Btn>
-        {aiAnswer&&<div style={{marginTop:12,padding:"12px 14px",background:C.bg,borderRadius:8,
+        {aiAnswer&&<div role="status" style={{marginTop:12,padding:"12px 14px",background:C.bg,borderRadius:8,
           border:`0.5px solid ${C.border}`,fontSize:13,color:C.text,lineHeight:1.6,whiteSpace:"pre-wrap"}}>
           {aiAnswer}
         </div>}
@@ -10165,7 +10271,7 @@ function LabelScanScreen({tgId,onBack,onNav,mealType}){
   }
   const field=(k,label,num)=><div style={{flex:1,minWidth:0}}>
     <div style={{fontSize:10,color:C.muted,fontFamily:"monospace",marginBottom:4}}>{label}</div>
-    <input value={form[k]} inputMode={num?"decimal":undefined} onChange={e=>{const v=e.target.value;setForm(f=>({...f,[k]:v}));}}
+    <input value={form[k]} inputMode={num?"decimal":undefined} onChange={e=>{const v=e.target.value;setForm(f=>({...f,[k]:v}));}} aria-label={label}
       style={{width:"100%",background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"9px 8px",color:C.text,
         fontSize:14,outline:"none",boxSizing:"border-box",fontFamily:num?"monospace":"inherit"}}/>
   </div>;
@@ -10180,7 +10286,7 @@ function LabelScanScreen({tgId,onBack,onNav,mealType}){
       <div style={{fontSize:46,marginBottom:10}}>🏷</div>
       <Btn accent full style={{pointerEvents:"none"}}>{t("label_photo_btn")}</Btn>
     </div>:<div style={{marginBottom:12}}>
-      <img src={preview} alt="label" style={{width:"100%",borderRadius:12,maxHeight:260,objectFit:"contain",background:C.bg,marginBottom:10}}/>
+      <img src={preview} alt={t("label_title")} style={{width:"100%",borderRadius:12,maxHeight:260,objectFit:"contain",background:C.bg,marginBottom:10}}/>
       <div style={{display:"flex",gap:8}}>
         <Btn full onClick={()=>inputRef.current?.click()} style={{flex:1}}>{t("other_photo2")}</Btn>
         {!form&&<Btn accent full onClick={read} disabled={loading} style={{flex:2}}>{loading?"…":t("label_read_btn")}</Btn>}
@@ -10190,7 +10296,7 @@ function LabelScanScreen({tgId,onBack,onNav,mealType}){
     </div>}
     {loading&&<Card style={{marginBottom:12}}><div style={{textAlign:"center",padding:"14px 0",color:C.accent,fontFamily:"monospace",fontSize:12,letterSpacing:2}}>{t("label_reading")}</div></Card>}
     {error&&<Card style={{marginBottom:12}}>
-      <div style={{color:C.danger,fontSize:13,textAlign:"center",lineHeight:1.5}}>{error}</div>
+      <div role="alert" style={{color:C.danger,fontSize:13,textAlign:"center",lineHeight:1.5}}>{error}</div>
       {limitHit&&<PremiumNudge tgId={tgId} kind="food" onNav={onNav} style={{marginTop:8}}/>}
     </Card>}
     {form&&<Fragment>
@@ -10217,13 +10323,13 @@ function LabelScanScreen({tgId,onBack,onNav,mealType}){
               color:weight===String(x)?C.bg:C.text,fontFamily:"monospace"}}>
               {x===form.serving_g?`${x}${t("u_g")} · ${t("label_pack_portion")}`:`${x}${t("u_g")}`}</button>)}
         </div>
-        <input type="number" value={weight} onChange={e=>setWeight(e.target.value)}
+        <input type="number" value={weight} onChange={e=>setWeight(e.target.value)} aria-label={t("label_portion")}
           style={{width:"100%",background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 14px",color:C.text,
             fontSize:14,outline:"none",boxSizing:"border-box",marginBottom:10}}/>
         {tot&&<div style={{fontSize:12,color:C.muted,fontFamily:"monospace",marginBottom:12}}>
           {t("label_total").replace("{w}",w)}: <span style={{color:C.accent}}>{tot.kcal} {t("kcal_short")}</span> · {t("u_prot")}{tot.p} · {t("u_fat")}{tot.f} · {t("u_carb")}{tot.c}
         </div>}
-        <div style={{marginBottom:14}}><Kicker>{t("meal_section")}</Kicker><Sel value={meal} onChange={setMeal} options={MEAL_OPTS}/></div>
+        <div style={{marginBottom:14}}><Kicker>{t("meal_section")}</Kicker><Sel value={meal} label={t("meal_section")} onChange={setMeal} options={MEAL_OPTS}/></div>
         <Btn accent full disabled={!valid||saving||w<=0} onClick={()=>save(true)}>{saving?t("saving"):t("label_save_log")}</Btn>
         <Btn full style={{marginTop:8}} disabled={!valid||saving} onClick={()=>save(false)}>{t("label_save_only")}</Btn>
       </Fragment>}
@@ -10339,7 +10445,7 @@ function FoodSearchScreen({tgId,onBack,onNav,mealType}){
             </button>
           ))}
         </div>
-        <input type="number" value={weight} onChange={e=>setWeight(e.target.value)}
+        <input type="number" value={weight} onChange={e=>setWeight(e.target.value)} aria-label={t("field_weight_g")}
           style={{width:"100%",background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,
             padding:"10px 14px",color:C.text,fontSize:14,outline:"none",boxSizing:"border-box"}}/>
       </div>
@@ -10530,7 +10636,7 @@ function SportLogScreen({tgId,onBack,initialSport=null}){
 
     <div style={{marginBottom:14}}>
       <Kicker>{t("sport_date")}</Kicker>
-      <input type="date" value={date} onChange={e=>setDate(e.target.value)}
+      <input type="date" value={date} onChange={e=>setDate(e.target.value)} aria-label={t("sport_date")}
         style={{colorScheme:"dark",width:"100%",background:C.card,border:`0.5px solid ${C.border}`,
           borderRadius:8,padding:"10px 14px",color:C.accent,fontSize:14,
           fontFamily:"monospace",outline:"none",marginTop:6}}/>
@@ -10746,7 +10852,7 @@ function TermsView({tgId,section}){
   const pay=month&&year?t("terms_p_pay").replace("{pm}",month.stars).replace("{py}",year.stars):t("terms_p_pay_np");
   const trialDays=p?.trial_days??7;
   const prem=["terms_p_what",null,"terms_p_month","terms_p_year",trialDays>0?"terms_p_trial":null,"terms_p_refund","terms_p_account"];
-  const H=({children})=><div style={{fontSize:15,fontWeight:700,color:C.text,margin:"22px 0 8px"}}>{children}</div>;
+  const H=({children})=><div role="heading" aria-level={2} style={{fontSize:15,fontWeight:700,color:C.text,margin:"22px 0 8px"}}>{children}</div>;
   const P=({children})=><div style={{fontSize:13,color:C.muted,lineHeight:1.65,marginBottom:10,whiteSpace:"pre-line"}}>{children}</div>;
   return <div>
     <Kicker>{t("terms_kicker")}</Kicker>
@@ -10769,10 +10875,10 @@ function TermsScreen({tgId,section,onBack}){
 
 // Поверх онбординга и экрана согласия: там ещё нет навигации по экранам.
 function TermsOverlay({tgId,onClose}){
-  return <div style={{position:"fixed",inset:0,zIndex:1000,background:C.bg,overflowY:"auto",padding:"18px 16px 110px"}}>
+  return <ModalBox label={t("terms_title")} onClose={onClose} style={{position:"fixed",inset:0,zIndex:1000,background:C.bg,overflowY:"auto",padding:"18px 16px 110px"}}>
     <TermsView tgId={tgId}/>
     <Btn accent full style={{marginTop:18}} onClick={onClose}>{t("terms_close")}</Btn>
-  </div>;
+  </ModalBox>;
 }
 
 function PremiumScreen({tgId,onBack,onNav}){
@@ -10908,11 +11014,11 @@ function PremiumScreen({tgId,onBack,onNav}){
       {busy==="trial"?"…":t("premium_trial_btn").replace("{n}",p.trial_days)}
     </Btn>}
     {msg&&<Card accent={!!msg.ok} style={{marginBottom:12}} pad="12px 14px">
-      <div style={{fontSize:13,color:msg.ok?C.accent:C.text,lineHeight:1.5}}>{msg.text}</div>
+      <div role="status" style={{fontSize:13,color:msg.ok?C.accent:C.text,lineHeight:1.5}}>{msg.text}</div>
     </Card>}
     <div style={{fontSize:11,color:C.muted,lineHeight:1.6,marginTop:8}}>{t("premium_note")}</div>
-    {onNav&&<div onClick={()=>onNav("terms",{section:"premium"})}
-      style={{fontSize:12,color:C.accent,marginTop:10,cursor:"pointer"}}>{t("terms_premium_link")} ›</div>}
+    {onNav&&<button type="button" onClick={()=>onNav("terms",{section:"premium"})}
+      style={{display:"block",background:"none",border:"none",padding:0,font:"inherit",textAlign:"left",fontSize:12,color:C.accent,marginTop:10,cursor:"pointer"}}>{t("terms_premium_link")} ›</button>}
   </div>;
 }
 
@@ -11277,7 +11383,7 @@ function MeasurementsScreen({onBack,tgId}){
           <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
             <div>
               <div style={{fontSize:13,color:C.muted,fontFamily:"monospace",marginBottom:6}}>{f.label.toUpperCase()}</div>
-              <input type="number" value={form[f.key]} onChange={e=>setForm(p=>({...p,[f.key]:e.target.value}))} placeholder="0"
+              <input type="number" value={form[f.key]} onChange={e=>setForm(p=>({...p,[f.key]:e.target.value}))} placeholder="0" aria-label={f.label}
                 style={{background:"none",border:"none",color:C.accent,fontSize:22,fontFamily:"monospace",fontWeight:700,width:80,outline:"none"}}/>
             </div>
             <span style={{fontFamily:"monospace",fontSize:14,color:C.muted}}>{t("meas_sm")}</span>
@@ -11341,12 +11447,12 @@ function CheckinScreen({onBack,tgId}){
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:12}}>
           <Card>
             <div style={{fontSize:12,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("weight_kg")}</div>
-            <input type="number" step="0.1" value={form.weight} onChange={e=>setForm(p=>({...p,weight:e.target.value}))} placeholder="0.0"
+            <input type="number" step="0.1" value={form.weight} onChange={e=>setForm(p=>({...p,weight:e.target.value}))} placeholder="0.0" aria-label={t("weight_kg")}
               style={{background:"none",border:"none",color:C.accent,fontSize:26,fontFamily:"monospace",fontWeight:700,width:"100%",outline:"none"}}/>
           </Card>
           <Card>
             <div style={{fontSize:12,color:C.muted,fontFamily:"monospace",marginBottom:8}}>{t("sleep_hours")}</div>
-            <input type="number" step="0.5" min="0" max="24" value={form.sleep_hours} onChange={e=>setForm(p=>({...p,sleep_hours:e.target.value}))} placeholder="7.5"
+            <input type="number" step="0.5" min="0" max="24" value={form.sleep_hours} onChange={e=>setForm(p=>({...p,sleep_hours:e.target.value}))} placeholder="7.5" aria-label={t("sleep_hours")}
               style={{background:"none",border:"none",color:C.accent,fontSize:26,fontFamily:"monospace",fontWeight:700,width:"100%",outline:"none"}}/>
           </Card>
         </div>
@@ -11359,7 +11465,7 @@ function CheckinScreen({onBack,tgId}){
               </div>
               <div style={{display:"flex",gap:6,alignItems:"center"}}>
                 <span style={{fontSize:14}}>{s.lo}</span>
-                <input type="range" min={1} max={5} value={form[s.key]} onChange={e=>setForm(p=>({...p,[s.key]:+e.target.value}))} style={{flex:1,accentColor:C.accent}}/>
+                <input type="range" min={1} max={5} value={form[s.key]} onChange={e=>setForm(p=>({...p,[s.key]:+e.target.value}))} aria-label={s.label} style={{flex:1,accentColor:C.accent}}/>
                 <span style={{fontSize:14}}>{s.hi}</span>
               </div>
             </Card>
@@ -11438,7 +11544,7 @@ function GoalsScreen({tgId,onBack}){
         <input type="number" value={form.target_value} onChange={e=>setForm(p=>({...p,target_value:e.target.value}))} placeholder={t("goal_target")} style={{flex:2,background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 12px",color:C.accent,fontSize:14,fontFamily:"monospace",outline:"none"}}/>
         <input value={form.unit} onChange={e=>setForm(p=>({...p,unit:e.target.value}))} placeholder={t("goal_unit")} style={{flex:1,background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 12px",color:C.muted,fontSize:14,outline:"none"}}/>
       </div>
-      <input type="date" value={form.deadline} onChange={e=>setForm(p=>({...p,deadline:e.target.value}))} style={{colorScheme:"dark",background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 12px",color:C.muted,fontSize:13,outline:"none"}}/>
+      <input type="date" value={form.deadline} onChange={e=>setForm(p=>({...p,deadline:e.target.value}))} aria-label={t("a11y_deadline")} style={{colorScheme:"dark",background:C.bg,border:`0.5px solid ${C.border}`,borderRadius:8,padding:"10px 12px",color:C.muted,fontSize:13,outline:"none"}}/>
       <div style={{display:"flex",gap:8}}><Btn full onClick={()=>setAdding(false)} style={{flex:1}}>{t("cancel_btn2")}</Btn><Btn accent full onClick={add} disabled={saving||!form.description.trim()} style={{flex:2}}>{saving?"...":t("save_profile")}</Btn></div>
     </div></Card>}
     {active.length===0&&!adding&&<Card style={{marginBottom:12}}><div style={{textAlign:"center",padding:"16px 0",color:C.muted}}>{t("no_goals")}</div></Card>}
@@ -11690,11 +11796,12 @@ function WhatsNew({tgId,newUser,seen=null,onClose,onGo}){
   const touchX=useRef(null);
   const closeRef=useRef(onClose);
   closeRef.current=onClose;
+  // Фокус на окно при открытии (диктор читает заголовок), Escape закрывает
+  const dlgRef=useRef(null);
+  useDialogFocus(dlgRef,()=>closeRef.current());
   useEffect(()=>{
     const prevOverflow=document.body.style.overflow;
     document.body.style.overflow="hidden";
-    const onKey=e=>{if(e.key==="Escape")closeRef.current();};
-    document.addEventListener("keydown",onKey);
     // Системная «Назад» в Telegram закрывает подборку, а не приложение
     const bb=tg?.BackButton;
     let bbOk=false;
@@ -11703,7 +11810,6 @@ function WhatsNew({tgId,newUser,seen=null,onClose,onGo}){
     if(bbOk){try{bb.onClick(onBack);bb.show();}catch{}}
     return()=>{
       document.body.style.overflow=prevOverflow;
-      document.removeEventListener("keydown",onKey);
       if(bbOk){try{bb.offClick(onBack);bb.hide();}catch{}}
     };
   },[]);
@@ -11713,14 +11819,16 @@ function WhatsNew({tgId,newUser,seen=null,onClose,onGo}){
     setI(n);
     try{tg?.HapticFeedback?.selectionChanged();}catch{}
   }
-  return <div role="dialog" aria-modal="true" aria-labelledby="wn-title"
+  return <div ref={dlgRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="wn-title"
     onTouchStart={e=>{touchX.current=e.touches[0].clientX;}}
     onTouchEnd={e=>{const x0=touchX.current;touchX.current=null;if(x0==null)return;const dx=e.changedTouches[0].clientX-x0;if(dx<-50)go(1);else if(dx>50)go(-1);}}
     style={{position:"fixed",inset:0,zIndex:400,background:C.bg,color:C.text,display:"flex",flexDirection:"column",overflowY:"auto",
-      padding:"calc(14px + env(safe-area-inset-top, 0px)) 20px calc(20px + env(safe-area-inset-bottom, 0px))",boxSizing:"border-box"}}>
+      padding:"calc(14px + env(safe-area-inset-top, 0px)) 20px calc(20px + env(safe-area-inset-bottom, 0px))",boxSizing:"border-box",outline:"none"}}>
     <style>{"@keyframes wnIn{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}"}</style>
     <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
       <div style={{fontFamily:"monospace",fontSize:11,letterSpacing:2,color:C.accent}}>{t(newUser?"wn_kicker_new":"wn_kicker")} · {idx+1}/{slides.length}</div>
+      {/* Новый слайд по «Далее»/свайпу — диктор зачитает его заголовок */}
+      <span aria-live="polite" style={SR_ONLY}>{idx>0?`${idx+1}/${slides.length}. ${sl.title}`:""}</span>
       <button type="button" onClick={onClose} style={{background:"none",border:"none",color:C.muted,fontSize:13,cursor:"pointer",padding:"10px 0 10px 16px"}}>{t("wn_skip")}</button>
     </div>
     <div key={sl.key} style={{flex:1,display:"flex",flexDirection:"column",justifyContent:"center",padding:"20px 0 24px",animation:"wnIn .25s ease"}}>
@@ -11760,6 +11868,9 @@ export default function App(){
   // каталог будет запрошен не на том языке, на котором рисуется интерфейс.
   // Функцией, а не вызовом: иначе localStorage читался бы на каждом рендере.
   const [lang,setLang]=useState(readStoredLang);
+  // Язык страницы = язык интерфейса: диктор читает текст с нужным произношением
+  // (в index.html стоит ru). Казахский в стандарте — kk, у нас в коде — kz.
+  useEffect(()=>{try{document.documentElement.lang=lang==="kz"?"kk":(lang||"ru");}catch{}},[lang]);
   const [workouts,setWorkouts]=useState(null);
   const [stats,setStats]=useState(null);
   const [exercises,setExercises]=useState(null);
@@ -12052,16 +12163,16 @@ export default function App(){
   }
 
   // Онбординг для новых пользователей
-  if(user?._not_found)return<OnboardingScreen tgId={tgId} tgUser={tg?.initDataUnsafe?.user} onComplete={()=>{setUser(null);loadUser();}}/>;
+  if(user?._not_found)return<main><OnboardingScreen tgId={tgId} tgUser={tg?.initDataUnsafe?.user} onComplete={()=>{setUser(null);loadUser();}}/></main>;
   // Согласие у тех, кто зарегистрировался до его появления: новые дают его
   // в онбординге, а существующие иначе остались бы без отметки навсегда.
   // Профиль не загрузился (нет связи, сервер недоступен). Раньше заглушка без
   // отметок о согласии попадала на экран согласия, и человек думал, что оно
   // слетело, а нажать «Принимаю» без сети всё равно нельзя.
-  if(user?._error)return<OfflineScreen onRetry={()=>{setUser(null);loadUser();}}/>;
-  if(user&&!(user.consents?.terms&&user.consents?.basic))return<ConsentGateScreen tgId={tgId} onDone={()=>{setUser(null);loadUser();}}/>;
+  if(user?._error)return<main><OfflineScreen onRetry={()=>{setUser(null);loadUser();}}/></main>;
+  if(user&&!(user.consents?.terms&&user.consents?.basic))return<main><ConsentGateScreen tgId={tgId} onDone={()=>{setUser(null);loadUser();}}/></main>;
   // Загрузка
-  if(!user)return<div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:C.bg}}><Loader text={t("loading")}/></div>;
+  if(!user)return<main style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:C.bg}}><Loader text={t("loading")}/></main>;
 
   return <div style={{background:C.bg,minHeight:"100vh",color:C.text,fontFamily:"-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif",position:"relative"}}>
     <div style={{
@@ -12072,9 +12183,11 @@ export default function App(){
       backgroundSize:"min(420px, 90vw)",
     }}/>
     <div style={{position:"relative",zIndex:1}}>
-      {render()}
+      <main>
+        {render()}
+        {wn&&tab==="menu"&&!screen&&<WhatsNew tgId={tgId} newUser={wn.newUser} seen={wn.seen} onClose={closeWn} onGo={(s,p)=>{closeWn();push("menu",s,p||{});}}/>}
+      </main>
       <NavBar active={tab} onChange={handleTabChange}/>
-      {wn&&tab==="menu"&&!screen&&<WhatsNew tgId={tgId} newUser={wn.newUser} seen={wn.seen} onClose={closeWn} onGo={(s,p)=>{closeWn();push("menu",s,p||{});}}/>}
     </div>
   </div>;
 }
