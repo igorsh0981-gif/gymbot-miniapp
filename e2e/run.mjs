@@ -150,7 +150,8 @@ await scenario("14_prime_then_offline_sheet", VIEWPORTS[1], { liteSaved: true },
 await scenario("15_sheet_offline_no_cache", VIEWPORTS[1], { liteSaved: true, net: { setMode: "ok", setBodies: [], counts: {}, detailsFail: true } }, async (page, net) => {
   await page.locator('button[aria-label^="ТЕХНИКА ВЫПОЛНЕНИЯ"]').click();
   await page.getByRole("dialog").waitFor();
-  await page.waitForTimeout(600);
+  // Обрыв связи повторяется один раз (через 0,6 с) — сообщение появляется после повтора
+  await page.getByText(/Техника загрузится, когда появится связь/).waitFor({ timeout: 4000 }).catch(() => {});
   const msg = await page.getByText(/Техника загрузится, когда появится связь/).count();
   net.detailsFail = false;
   await page.evaluate(() => window.dispatchEvent(new Event("online")));
