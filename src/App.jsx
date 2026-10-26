@@ -9,6 +9,33 @@ const API = (import.meta.env && import.meta.env.VITE_API_URL) || "https://web-pr
 // бэкенд проверяет эту подпись и не доверяет просто tg_id из URL. Оборачиваем fetch один раз
 // здесь, а не в каждом из сотен вызовов fetch() по всему файлу — гарантированно покрывает всё.
 const _originalFetch = window.fetch.bind(window);
+
+// Чтение со своего API — с ограничением по времени и одним повтором.
+// Без этого запрос, ушедший в момент смены сети (Wi-Fi → мобильная, утром из
+// дома), висел бесконечно: экран показывал вчерашнее с диска, а свежие данные
+// не приходили до перезапуска — повторы ждали, пока «летящий» запрос закончится.
+// Срок — до прихода заголовков ответа: тело большого каталога на медленной
+// связи качается дольше, и обрывать его незачем. Изменяющие запросы не трогаем:
+// повтор POST мог бы записать дважды (у очереди подходов свой срок и свой повтор).
+const GET_TIMEOUT_MS = [10000, 20000];   // первая попытка, повтор
+const GET_NO_TIMEOUT = [/\/export(\?|$)/];   // выгрузка всех данных собирается долго
+function _getWithTimeout(url, opts, attempt = 0) {
+  if (typeof AbortController === "undefined") return _originalFetch(url, opts);
+  const ctl = new AbortController();
+  let timedOut = false;
+  const timer = setTimeout(() => { timedOut = true; ctl.abort(); }, GET_TIMEOUT_MS[attempt]);
+  return _originalFetch(url, { ...opts, signal: ctl.signal }).then(
+    r => { clearTimeout(timer); return r; },
+    e => {
+      clearTimeout(timer);
+      // Повторяем обрыв связи и своё истечение срока; без сети — сразу ошибка,
+      // экраны покажут «нет связи» и повторят сами, когда она вернётся.
+      const retry = attempt === 0 && (timedOut || e?.name === "TypeError") && navigator.onLine !== false;
+      if (!retry) throw (timedOut ? new TypeError("timeout") : e);
+      return new Promise(ok => setTimeout(ok, 600)).then(() => _getWithTimeout(url, opts, 1));
+    });
+}
+
 window.fetch = (url, options = {}) => {
   const urlStr = typeof url === "string" ? url : (url?.url || "");
   const isOwn = urlStr.startsWith(API);
@@ -16,6 +43,8 @@ window.fetch = (url, options = {}) => {
   const opts = (isOwn && tg?.initData)
     ? { ...options, headers: { ...(options.headers || {}), "X-Telegram-Init-Data": tg.initData } }
     : options;
+  if (isOwn && method === "GET" && !options.signal && !GET_NO_TIMEOUT.some(re => re.test(urlStr)))
+    return _getWithTimeout(url, opts);
   const res = _originalFetch(url, opts);
   // Любой изменяющий запрос к своему API сбрасывает затронутые записи кэша.
   // Делаем это здесь, а не в двадцати местах по экранам: про половину точек
@@ -730,7 +759,7 @@ const T = {
     consent_i_terms:"Мне 18 лет, принимаю правила использования", consent_i_terms_h:"Решения о нагрузке, питании и добавках принимаю сам, с учётом своего здоровья. Ответ AI — не медицинское назначение.",
     consent_i_basic:"Обработка данных аккаунта и тренировок", consent_i_basic_h:"Профиль, дневники, цели и статистика. Хранятся на серверах за рубежом.",
     consent_i_health:"Обработка сведений о здоровье", consent_i_health_h:"Противопоказания, аллергии, лекарства, заболевания. Без этого ограничения не будут учитываться.",
-    consent_i_ai:"Передача данных AI-сервису в США", consent_i_ai_h:"Профиль, история и медицинские ограничения передаются Anthropic при каждом обращении к тренеру. Без этого AI-тренер и распознавание еды недоступны.",
+    consent_i_ai:"Обработка данных AI-сервисом по месту нахождения сервера", consent_i_ai_h:"Профиль, история и медицинские ограничения передаются Anthropic при каждом обращении к тренеру. Без этого AI-тренер и распознавание еды недоступны.",
     consent_required_note:"* обязательны для работы приложения. Остальные можно отозвать в профиле в любой момент.",
     consent_no_ai_note:"Без согласия на передачу данных AI-тренер и распознавание еды по фото работать не будут.",
     consent_not_given:"не дано", consent_withdraw:"отозвать", consent_req_note:"обязательно",
@@ -1632,7 +1661,7 @@ const T = {
     consent_i_terms:"I am 18+ and accept the terms of use", consent_i_terms_h:"I decide on loads, nutrition and supplements myself, considering my health. AI answers are not medical prescriptions.",
     consent_i_basic:"Processing of account and training data", consent_i_basic_h:"Profile, logs, goals and statistics. Stored on servers abroad.",
     consent_i_health:"Processing of health data", consent_i_health_h:"Conditions, allergies, medications, illnesses. Without this, limitations will not be taken into account.",
-    consent_i_ai:"Transfer of data to an AI service in the USA", consent_i_ai_h:"Profile, history and medical limitations are sent to Anthropic on every coach request. Without this, the AI coach and food recognition are unavailable.",
+    consent_i_ai:"Data processing by the AI service where its servers are located", consent_i_ai_h:"Profile, history and medical limitations are sent to Anthropic on every coach request. Without this, the AI coach and food recognition are unavailable.",
     consent_required_note:"* required for the app to work. The others can be withdrawn in your profile at any time.",
     consent_no_ai_note:"Without this consent the AI coach and photo food recognition will not work.",
     consent_not_given:"not given", consent_withdraw:"withdraw", consent_req_note:"required",
@@ -2530,7 +2559,7 @@ const T = {
     consent_i_terms:"Menga 18 yosh toldi, foydalanish qoidalarini qabul qilaman", consent_i_terms_h:"Yuklama, ovqatlanish va qoshimchalar boyicha qarorni ozim qabul qilaman. AI javobi tibbiy tayinlov emas.",
     consent_i_basic:"Hisob va mashq malumotlarini qayta ishlash", consent_i_basic_h:"Profil, kundaliklar, maqsadlar va statistika. Chet eldagi serverlarda saqlanadi.",
     consent_i_health:"Sogliq malumotlarini qayta ishlash", consent_i_health_h:"Qarshi korsatmalar, allergiyalar, dorilar, kasalliklar. Busiz cheklovlar hisobga olinmaydi.",
-    consent_i_ai:"Malumotlarni AQShdagi AI-xizmatga uzatish", consent_i_ai_h:"Profil, tarix va tibbiy cheklovlar har bir murojaatda Anthropicga uzatiladi. Busiz AI-murabbiy va ovqatni aniqlash ishlamaydi.",
+    consent_i_ai:"Ma'lumotlarni AI-xizmat serveri joylashgan joyda qayta ishlash", consent_i_ai_h:"Profil, tarix va tibbiy cheklovlar har bir murojaatda Anthropicga uzatiladi. Busiz AI-murabbiy va ovqatni aniqlash ishlamaydi.",
     consent_required_note:"* ilova ishlashi uchun majburiy. Qolganlarini profilda istalgan vaqtda qaytarib olish mumkin.",
     consent_no_ai_note:"Bu rozilik bolmasa AI-murabbiy va surat boyicha ovqatni aniqlash ishlamaydi.",
     consent_not_given:"berilmagan", consent_withdraw:"qaytarib olish", consent_req_note:"majburiy",
@@ -3428,7 +3457,7 @@ const T = {
     consent_i_terms:"Маған 18 жас толды, пайдалану ережелерін қабылдаймын", consent_i_terms_h:"Жүктеме, тамақтану және қоспалар туралы шешімді өзім қабылдаймын. AI жауабы медициналық тағайындау емес.",
     consent_i_basic:"Аккаунт және жаттығу деректерін өңдеу", consent_i_basic_h:"Профиль, күнделіктер, мақсаттар және статистика. Шетелдегі серверлерде сақталады.",
     consent_i_health:"Денсаулық мәліметтерін өңдеу", consent_i_health_h:"Қарсы көрсетілімдер, аллергиялар, дәрілер, аурулар. Онсыз шектеулер ескерілмейді.",
-    consent_i_ai:"Деректерді АҚШ-тағы AI-қызметке беру", consent_i_ai_h:"Профиль, тарих және медициналық шектеулер әрбір сұрауда Anthropic-ке беріледі. Онсыз AI-жаттықтырушы мен тамақты тану қолжетімсіз.",
+    consent_i_ai:"Деректерді AI-қызмет сервері орналасқан жерде өңдеу", consent_i_ai_h:"Профиль, тарих және медициналық шектеулер әрбір сұрауда Anthropic-ке беріледі. Онсыз AI-жаттықтырушы мен тамақты тану қолжетімсіз.",
     consent_required_note:"* қолданба жұмысы үшін міндетті. Қалғандарын профильде кез келген уақытта қайтарып алуға болады.",
     consent_no_ai_note:"Бұл келісімсіз AI-жаттықтырушы мен сурет бойынша тамақты тану жұмыс істемейді.",
     consent_not_given:"берілмеген", consent_withdraw:"қайтарып алу", consent_req_note:"міндетті",
@@ -4867,6 +4896,16 @@ function MenuScreen({user,onNav,activeWorkout=false}){
     apiGet(`${API}/home/${tgId}`)
       .then(d=>setHome(d))
       .catch(()=>{if(!_cachedHome(tgId))setFailed(true);});
+    // Вернулись в приложение или появилась связь — подтягиваем свежее. Пока
+    // ответ в кэше не устарел, apiGet отдаёт его без запроса, так что это дёшево;
+    // а если первый запрос не дошёл, экран не остаётся со вчерашним до перезапуска.
+    const again=()=>{
+      if(document.visibilityState==="hidden")return;
+      apiGet(`${API}/home/${tgId}`).then(d=>{setFailed(false);setHome(d);}).catch(()=>{});
+    };
+    window.addEventListener("online",again);
+    document.addEventListener("visibilitychange",again);
+    return()=>{window.removeEventListener("online",again);document.removeEventListener("visibilitychange",again);};
   },[tgId]);
 
   if(failed)return <div style={{padding:"16px 16px 100px"}}>

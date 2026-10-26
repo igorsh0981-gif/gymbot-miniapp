@@ -609,6 +609,28 @@ await scenario("71_referral_pending", VIEWPORTS[0], { tab: "menu", screen: "refe
            step: await page.getByText("Друг регистрируется и проводит первую тренировку").count() };
 });
 
+// ── Запрос повис при смене сети: через 10 с обрывается и повторяется, главный обновляется ──
+await scenario("73_get_hang_retry", VIEWPORTS[1], { tab: "menu", screen: null,
+  swr: { [API + "/home/" + TG_ID]: HOME },
+  before: async (page) => { await page.clock.install(); },
+  net: { setMode: "ok", setBodies: [], counts: {}, homeHangOnce: true, home: { ...HOME, week: { done: 3, target: 3 } } } }, async (page, net) => {
+  const before = await page.getByText(/2 из 3/).count();
+  await page.clock.fastForward(10500);
+  await page.clock.fastForward(1000);
+  await page.getByText(/3 из 3/).waitFor({ timeout: 5000 });
+  const requests = net.counts["GET /home/{tg}"] || 0;
+  if (net.release) net.release();
+  return { before, after: 1, requests };
+});
+
+// ── Согласия при входе: пункт про AI — без «передачи в США» ──
+await scenario("74_consent_gate_ai_label", VIEWPORTS[0], { tab: "menu", screen: null,
+  net: { setMode: "ok", setBodies: [], counts: {}, home: HOME,
+    user: { id: 1, telegram_id: TG_ID, first_name: "Игорь", profile_complete: true, lang: "ru", consents: {}, ai_requests_today: 0 } } }, async (page) => {
+  await page.getByText("Обработка данных AI-сервисом по месту нахождения сервера").waitFor({ timeout: 5000 });
+  return { label: 1, usa: await page.getByText(/США/).count() };
+});
+
 await browser.close();
 fs.writeFileSync(path.join(OUT, "results.json"), JSON.stringify(results, null, 2));
 
