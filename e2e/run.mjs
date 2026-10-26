@@ -150,7 +150,8 @@ await scenario("14_prime_then_offline_sheet", VIEWPORTS[1], { liteSaved: true },
 await scenario("15_sheet_offline_no_cache", VIEWPORTS[1], { liteSaved: true, net: { setMode: "ok", setBodies: [], counts: {}, detailsFail: true } }, async (page, net) => {
   await page.locator('button[aria-label^="ТЕХНИКА ВЫПОЛНЕНИЯ"]').click();
   await page.getByRole("dialog").waitFor();
-  await page.waitForTimeout(600);
+  // Обрыв связи повторяется один раз (через 0,6 с) — сообщение появляется после повтора
+  await page.getByText(/Техника загрузится, когда появится связь/).waitFor({ timeout: 4000 }).catch(() => {});
   const msg = await page.getByText(/Техника загрузится, когда появится связь/).count();
   net.detailsFail = false;
   await page.evaluate(() => window.dispatchEvent(new Event("online")));
@@ -609,6 +610,28 @@ await scenario("71_referral_pending", VIEWPORTS[0], { tab: "menu", screen: "refe
            step: await page.getByText("Друг регистрируется и проводит первую тренировку").count() };
 });
 
+// ── Запрос повис при смене сети: через 10 с обрывается и повторяется, главный обновляется ──
+await scenario("73_get_hang_retry", VIEWPORTS[1], { tab: "menu", screen: null,
+  swr: { [API + "/home/" + TG_ID]: HOME },
+  before: async (page) => { await page.clock.install(); },
+  net: { setMode: "ok", setBodies: [], counts: {}, homeHangOnce: true, home: { ...HOME, week: { done: 3, target: 3 } } } }, async (page, net) => {
+  const before = await page.getByText(/2 из 3/).count();
+  await page.clock.fastForward(10500);
+  await page.clock.fastForward(1000);
+  await page.getByText(/3 из 3/).waitFor({ timeout: 5000 });
+  const requests = net.counts["GET /home/{tg}"] || 0;
+  if (net.release) net.release();
+  return { before, after: 1, requests };
+});
+
+// ── Согласия при входе: пункт про AI — без «передачи в США» ──
+await scenario("74_consent_gate_ai_label", VIEWPORTS[0], { tab: "menu", screen: null,
+  net: { setMode: "ok", setBodies: [], counts: {}, home: HOME,
+    user: { id: 1, telegram_id: TG_ID, first_name: "Игорь", profile_complete: true, lang: "ru", consents: {}, ai_requests_today: 0 } } }, async (page) => {
+  await page.getByText("Обработка данных AI-сервисом по месту нахождения сервера").waitFor({ timeout: 5000 });
+  return { label: 1, usa: await page.getByText(/США/).count() };
+});
+
 await browser.close();
 fs.writeFileSync(path.join(OUT, "results.json"), JSON.stringify(results, null, 2));
 
@@ -621,7 +644,11 @@ for (const r of results) {
   const check = CHECKS[r.name];
   if (!check) problems.push("нет проверки в checks.mjs");
   else { try { problems.push(...(check(r) || [])); } catch (e) { problems.push("проверка упала: " + e.message); } }
-  if (problems.length) { failed++; console.log(`✗ ${r.name} ${r.vp}: ${problems.join("; ")}`); }
+  if (problems.length) {
+    failed++; console.log(`✗ ${r.name} ${r.vp}: ${problems.join("; ")}`);
+    // В CI — ещё и аннотацией: её видно в проверке PR без скачивания логов
+    if (process.env.GITHUB_ACTIONS) console.log(`::error title=e2e ${r.name}::${r.vp}: ${problems.join("; ").replace(/\r?\n/g, " ")}`);
+  }
   else console.log(`✓ ${r.name} ${r.vp}`);
 }
 console.log(failed ? `\nНе прошло: ${failed}` : `\nВсе ${results.length} прошли`);

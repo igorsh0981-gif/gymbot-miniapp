@@ -122,6 +122,8 @@ export const CHECKS = {
   "70_team_hidden_member": r => all(eq("скрыл тренировки", r.hidden, 1), eq("без null", r.nullText, 0)),
   "72_whats_new_referral_achievements": r => all(eq("один слайд", r.only, 1), eq("заголовок", r.title, "Друзья — в достижения"),
                                                 eq("отметка", r.posts, ["2026-10-25d"]), eq("экран приглашения", r.referral, 1)),
+  "73_get_hang_retry": r => all(eq("сначала с диска", r.before, 1), eq("обновился", r.after, 1), eq("два запроса", r.requests, 2)),
+  "74_consent_gate_ai_label": r => all(eq("новый текст", r.label, 1), eq("без США", r.usa, 0)),
   "71_referral_pending": r => all(eq("ждёт тренировки", r.pending, 1), eq("начислено", r.plus, 1), eq("шаг 2", r.step, 1)),
   "66_friend_nudge_errors": r => all(eq("окно осталось", r.stillOpen, 1), eq("пустой — нельзя", r.disabled, true), eq("запросы", r.nudges, [3, 5])),
 };

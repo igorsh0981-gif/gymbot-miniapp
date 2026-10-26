@@ -120,6 +120,7 @@ export async function setup(page, { lang = "ru", ls = null, setFails = false, cu
       const key = req.method() + " " + p.replace(/\d{6,}/, "{tg}");
       net.counts[key] = (net.counts[key] || 0) + 1;
       if (p === `/user/${TG_ID}` && net.userFail) return route.abort("internetdisconnected");
+      if (p === `/user/${TG_ID}` && net.user) return json(route, net.user);
       if (p === `/user/${TG_ID}`) return json(route, { id: 1, telegram_id: TG_ID, first_name: "Игорь", profile_complete: true, lang, consents: { terms: true, basic: true, health: true, ai: true }, ai_requests_today: 0, user_rank: "athlete", total_points: 250, medical_conditions: ["hypertension"], allergies: ["lactose"] });
       if (p === "/exercises" && net.catalogFail) return route.abort("internetdisconnected");
       if (p === "/exercises/details") {
@@ -143,6 +144,13 @@ export async function setup(page, { lang = "ru", ls = null, setFails = false, cu
         return e ? json(route, { id: e.id, description: e.description, technique: e.technique }) : json(route, { detail: "nf" }, 404);
       }
       if (p === `/home/${TG_ID}`) {
+        // Первый запрос «повисает» (смена сети на телефоне): ни ответа, ни ошибки
+        if (net.homeHangOnce && !net.homeHung) {
+          net.homeHung = true;
+          await new Promise(r => { net.release = r; });
+          try { await json(route, net.home || {}); } catch {}
+          return;
+        }
         if (net.homeDelay) await new Promise(r => setTimeout(r, net.homeDelay));
         return json(route, net.home || {});
       }
