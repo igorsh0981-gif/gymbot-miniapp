@@ -643,7 +643,11 @@ for (const r of results) {
   const check = CHECKS[r.name];
   if (!check) problems.push("нет проверки в checks.mjs");
   else { try { problems.push(...(check(r) || [])); } catch (e) { problems.push("проверка упала: " + e.message); } }
-  if (problems.length) { failed++; console.log(`✗ ${r.name} ${r.vp}: ${problems.join("; ")}`); }
+  if (problems.length) {
+    failed++; console.log(`✗ ${r.name} ${r.vp}: ${problems.join("; ")}`);
+    // В CI — ещё и аннотацией: её видно в проверке PR без скачивания логов
+    if (process.env.GITHUB_ACTIONS) console.log(`::error title=e2e ${r.name}::${r.vp}: ${problems.join("; ").replace(/\r?\n/g, " ")}`);
+  }
   else console.log(`✓ ${r.name} ${r.vp}`);
 }
 console.log(failed ? `\nНе прошло: ${failed}` : `\nВсе ${results.length} прошли`);
