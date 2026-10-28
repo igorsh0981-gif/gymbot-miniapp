@@ -124,6 +124,7 @@ export const CHECKS = {
                                                 eq("отметка", r.posts, ["2026-10-25d"]), eq("экран приглашения", r.referral, 1)),
   "73_get_hang_retry": r => all(eq("сначала с диска", r.before, 1), eq("обновился", r.after, 1), eq("два запроса", r.requests, 2)),
   "74_consent_gate_ai_label": r => all(eq("новый текст", r.label, 1), eq("без США", r.usa, 0)),
+  "75_ai_input_grows_voice": r => all(r.h1 >= r.h0 + 30 ? [] : [`поле не выросло: ${r.h0} → ${r.h1}`], eq("текст виден целиком", r.fits, 1)),
   "71_referral_pending": r => all(eq("ждёт тренировки", r.pending, 1), eq("начислено", r.plus, 1), eq("шаг 2", r.step, 1)),
   "66_friend_nudge_errors": r => all(eq("окно осталось", r.stillOpen, 1), eq("пустой — нельзя", r.disabled, true), eq("запросы", r.nudges, [3, 5])),
 };

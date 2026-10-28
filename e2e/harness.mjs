@@ -197,6 +197,7 @@ export async function setup(page, { lang = "ru", ls = null, setFails = false, cu
         return route.fulfill({ status: 200, contentType: "text/event-stream", headers: { "access-control-allow-origin": "*" },
           body: ev({ type: "delta", text: "Хорошая работа: " }) + ev({ type: "delta", text: "жим прибавил 2,5 кг." }) + ev({ type: "done", answer: "Хорошая работа: жим прибавил 2,5 кг." }) });
       }
+      if (p === "/voice/transcribe") return json(route, { text: net.voiceText || "Привет" });
       if (p === "/ai/ask") { (net.aiCalls = net.aiCalls || []).push("ask"); return json(route, { answer: "Запасной разбор тренировки." }); }
       if (p === "/workout/77/ai-review") {
         // текст разбора — в теле запроса, не в адресе (адрес попадает в журнал сервера)
