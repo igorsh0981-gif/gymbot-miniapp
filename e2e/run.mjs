@@ -632,6 +632,34 @@ await scenario("74_consent_gate_ai_label", VIEWPORTS[0], { tab: "menu", screen: 
   return { label: 1, usa: await page.getByText(/США/).count() };
 });
 
+// ── Тренер: длинный текст из голоса — поле раздвигается, текст виден целиком ──
+// Микрофон подменён: тест проверяет поле ввода, а не запись звука
+const FAKE_MIC = () => {
+  Object.defineProperty(navigator, "mediaDevices", { configurable: true,
+    value: { getUserMedia: async () => ({ getTracks: () => [{ stop() {} }] }) } });
+  window.MediaRecorder = class {
+    static isTypeSupported(t) { return t === "audio/webm"; }
+    constructor() { this.mimeType = "audio/webm"; this.state = "inactive"; }
+    start() { this.state = "recording"; }
+    requestData() {}
+    stop() { this.state = "inactive"; this.ondataavailable?.({ data: new Blob(["x"], { type: "audio/webm" }) }); this.onstop?.(); }
+  };
+};
+await scenario("75_ai_input_grows_voice", VIEWPORTS[0], { tab: "ai", screen: null,
+  before: async (page) => { await page.addInitScript(FAKE_MIC); },
+  net: { setMode: "ok", setBodies: [], counts: {}, home: HOME,
+    voiceText: "Тренировка ноги и плечи: ноги четыре упражнения, плечи три, по три подхода. Сколько отдыхать между подходами?" } }, async (page) => {
+  const ta = page.getByRole("textbox", { name: "СПРОСИ ЧТО УГОДНО..." });
+  await ta.waitFor({ timeout: 5000 });
+  const h0 = await ta.evaluate(el => el.offsetHeight);
+  await page.getByRole("button", { name: "Записать голосом" }).click();
+  await page.getByRole("button", { name: "Остановить запись" }).click();
+  await page.waitForFunction(() => (document.querySelector("textarea")?.value || "").length > 50, null, { timeout: 5000 });
+  await page.waitForTimeout(100);
+  const m = await ta.evaluate(el => ({ h: el.offsetHeight, sh: el.scrollHeight, ch: el.clientHeight }));
+  return { h0, h1: m.h, fits: m.sh <= m.ch + 1 ? 1 : 0 };
+});
+
 await browser.close();
 fs.writeFileSync(path.join(OUT, "results.json"), JSON.stringify(results, null, 2));
 

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, Fragment } from "react";
+import { useState, useEffect, useLayoutEffect, useRef, Fragment } from "react";
 
 const tg = window.Telegram?.WebApp;
 // Адрес API задаётся при сборке (VITE_API_URL) — для тестового контура.
@@ -9253,6 +9253,19 @@ function VoiceRecorder({tgId,onTranscribed,disabled=false}){
 function AIScreen({user,tgId,onNav,exercises=[]}){
   const [q,setQ]=useState("");
   const qTaRef=useRef(null);
+  const inputBarRef=useRef(null);
+  const [inputBarH,setInputBarH]=useState(0);
+  // Поле вопроса растёт под текст до 120 px, дальше — прокрутка внутри.
+  // По значению, а не в onChange: текст приходит и из голоса, и из быстрых
+  // вопросов, мимо onChange, — и раньше оставался в одной строке, обрезанный сверху.
+  useLayoutEffect(()=>{
+    const el=qTaRef.current;
+    if(el){el.style.height="auto";el.style.height=Math.min(el.scrollHeight,120)+"px";}
+    // Блок ввода закреплён внизу и вырос — отступ ленты растёт вместе с ним,
+    // иначе последние сообщения уходят под поле.
+    const h=inputBarRef.current?.offsetHeight||0;
+    setInputBarH(prev=>prev===h?prev:h);
+  },[q]);
   const [answer,setAnswer]=useState(null);
   const [limitHit,setLimitHit]=useState(false);   // упёрлись в суточный лимит — покажем Premium
   const [aiBlocked,setAiBlocked]=useState(false); // отозвано согласие на передачу данных
@@ -9540,7 +9553,7 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
     finally{setSaving(false);}
   }
 
-  return <div style={{padding:"16px 16px 160px"}}>
+  return <div style={{padding:`16px 16px ${Math.max(160,inputBarH+84)}px`}}>
     <Kicker>{t("ai_trainer_title")}</Kicker><Hero>{t("ai_trainer_online")}</Hero>
     <div style={{color:C.muted,fontSize:13,marginTop:6,marginBottom:16,fontFamily:"monospace"}}>{t("requests_left")} <Mono size={13}>{requestsLeft}</Mono></div>
     {/* История чата */}
@@ -9608,20 +9621,15 @@ function AIScreen({user,tgId,onNav,exercises=[]}){
     </div>}
 
     {/* Фиксированный блок ввода внизу */}
-    <div style={{position:"fixed",bottom:"calc(60px + env(safe-area-inset-bottom))",left:0,right:0,background:C.surface,borderTop:`0.5px solid ${C.border}`,padding:"10px 12px",zIndex:50}}>
+    <div ref={inputBarRef} style={{position:"fixed",bottom:"calc(60px + env(safe-area-inset-bottom))",left:0,right:0,background:C.surface,borderTop:`0.5px solid ${C.border}`,padding:"10px 12px",zIndex:50}}>
       <div style={{display:"flex",gap:8,alignItems:"center",marginBottom:4}}>
         <VoiceRecorder tgId={tgId} disabled={loading} onTranscribed={text=>setQ(prev=>prev?prev+" "+text:text)}/>
         <div style={{flex:1,background:C.card,border:`0.5px solid ${C.border}`,borderRadius:8,display:"flex",alignItems:"flex-end"}}>
           <textarea ref={qTaRef} value={q} rows={1}
-            onChange={e=>{
-              setQ(e.target.value);
-              const el=e.target;
-              el.style.height="auto";
-              el.style.height=Math.min(el.scrollHeight,120)+"px";
-            }}
-            onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();ask(q);if(qTaRef.current){qTaRef.current.style.height="auto";}}}}
-            placeholder={t("ai_sprosi_chto_ugodno")} aria-label={t("ai_sprosi_chto_ugodno")} style={{flex:1,background:"none",border:"none",padding:"10px 14px",color:C.text,fontSize:13,fontFamily:"monospace",outline:"none",resize:"none",maxHeight:120,lineHeight:1.4}}/>
-          <button onClick={()=>{ask(q);if(qTaRef.current){qTaRef.current.style.height="auto";}}} disabled={loading||!q.trim()} aria-label={t("a11y_send")}
+            onChange={e=>setQ(e.target.value)}
+            onKeyDown={e=>{if(e.key==="Enter"&&!e.shiftKey){e.preventDefault();ask(q);}}}
+            placeholder={t("ai_sprosi_chto_ugodno")} aria-label={t("ai_sprosi_chto_ugodno")} style={{flex:1,background:"none",border:"none",padding:"10px 14px",color:C.text,fontSize:13,fontFamily:"monospace",outline:"none",resize:"none",maxHeight:120,lineHeight:1.4,boxSizing:"border-box",display:"block"}}/>
+          <button onClick={()=>ask(q)} disabled={loading||!q.trim()} aria-label={t("a11y_send")}
             style={{background:C.accent,border:"none",borderRadius:"0 8px 8px 0",padding:"10px 16px",color:C.bg,fontWeight:700,fontSize:14,cursor:"pointer",opacity:loading||!q.trim()?0.5:1,alignSelf:"stretch"}}>→</button>
         </div>
       </div>
