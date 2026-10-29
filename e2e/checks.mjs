@@ -125,6 +125,8 @@ export const CHECKS = {
   "73_get_hang_retry": r => all(eq("сначала с диска", r.before, 1), eq("обновился", r.after, 1), eq("два запроса", r.requests, 2)),
   "74_consent_gate_ai_label": r => all(eq("новый текст", r.label, 1), eq("без США", r.usa, 0)),
   "75_ai_input_grows_voice": r => all(r.h1 >= r.h0 + 30 ? [] : [`поле не выросло: ${r.h0} → ${r.h1}`], eq("текст виден целиком", r.fits, 1)),
+  "76_progress_week_multi": r => all(eq("чт: зал и падел", r.thu, ["чт", "зал", "падел"]), eq("пт: повторы", r.fri, ["пт", "зал ×2", "бег ×2"]),
+    eq("сб: старый ответ API", r.sat, ["сб", "теннис"]), eq("вс: пусто", r.sun, ["вс", "—"]), eq("вт: только падел", r.tue, ["вт", "падел"])),
   "71_referral_pending": r => all(eq("ждёт тренировки", r.pending, 1), eq("начислено", r.plus, 1), eq("шаг 2", r.step, 1)),
   "66_friend_nudge_errors": r => all(eq("окно осталось", r.stillOpen, 1), eq("пустой — нельзя", r.disabled, true), eq("запросы", r.nudges, [3, 5])),
 };
