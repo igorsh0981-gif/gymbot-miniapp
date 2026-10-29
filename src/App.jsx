@@ -8173,6 +8173,20 @@ const SPORT_SHORT_KEYS={padel:"sps_padel",football:"sps_futbol",basketball:"sps_
   boxing:"sps_boks",swimming:"sps_plav",cycling:"sps_velo",running:"sps_beg",
   crossfit:"sps_krossfit",yoga:"sps_yoga",pilates:"sps_pilates",skiing:"sps_lyzhi",climbing:"sps_skalolaz"};
 const SPORT_SHORT_RAW={mma:"MMA"};   // одинаково на всех языках, ключ не нужен
+/** Подписи дня недели на «Прогрессе»: каждое занятие своей строкой — «зал»
+ *  и «падел», если в один день было и то и другое; повтор — «зал ×2».
+ *  Словом, а не символом: безымянная отметка читается как пропуск.
+ *  sport_types и gym_count приходят от API с 29.10; до этого — один вид спорта. */
+function weekDayLabels(d){
+  const out=[];
+  if(d.gym){const n=d.gym_count||1;out.push(n>1?`${t("week_gym")} ×${n}`:t("week_gym"));}
+  const types=Array.isArray(d.sport_types)?d.sport_types:(d.sport?[d.sport_type]:[]);
+  const seen=new Map();   // подпись → сколько раз, в порядке занятий
+  for(const x of types){const l=sportLabel(x)||t("week_sport");seen.set(l,(seen.get(l)||0)+1);}
+  for(const [l,n] of seen)out.push(n>1?`${l} ×${n}`:l);
+  return out;
+}
+
 function sportLabel(code){
   if(!code)return null;
   const k=SPORT_SHORT_KEYS[code];
@@ -8940,14 +8954,12 @@ function ProgressScreen({stats,tgId,onNav}){
           const bg=d.gym?C.accent:C.card;
           const bd=d.gym?C.accent:d.sport?C.accent:C.border;
           const col=d.gym?C.bg:d.sport?C.accent:C.muted;
-          // Подписываем словом: безымянный символ читается как пропуск,
-          // хотя в этот день была тренировка, просто не в зале.
-          const label=d.gym?t("week_gym"):d.sport?(sportLabel(d.sport_type)||t("week_sport")):"—";
-          return <div key={i} style={{flex:1,borderRadius:8,padding:"7px 2px",textAlign:"center",
+          const labels=weekDayLabels(d);
+          return <div key={i} style={{flex:1,minWidth:0,borderRadius:8,padding:"7px 2px",textAlign:"center",
             background:bg,border:`${d.is_today?1:0.5}px solid ${d.is_today?"#fff":bd}`}}>
             <div style={{fontSize:10,color:col,opacity:0.8}}>{wd}</div>
-            <div style={{fontSize:9,color:col,marginTop:3,lineHeight:1.1,
-              overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{label}</div>
+            {(labels.length?labels:["—"]).map((l,j)=><div key={j} style={{fontSize:9,color:col,marginTop:j?2:3,lineHeight:1.1,
+              overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{l}</div>)}
           </div>;
         })}
       </div>

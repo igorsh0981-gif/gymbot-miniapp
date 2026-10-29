@@ -660,6 +660,23 @@ await scenario("75_ai_input_grows_voice", VIEWPORTS[0], { tab: "ai", screen: nul
   return { h0, h1: m.h, fits: m.sh <= m.ch + 1 ? 1 : 0 };
 });
 
+// ── «Прогресс», текущая неделя: в один день и зал, и падел — подписаны оба ──
+const WEEK_DAY = (i, x) => ({ date: `2026-10-${26 + i}`, weekday: i, gym: false, gym_count: 0, sport: false, sport_type: null, sport_types: [], is_today: i === 3, ...x });
+await scenario("76_progress_week_multi", VIEWPORTS[0], { tab: "progress", screen: null,
+  net: { setMode: "ok", setBodies: [], counts: {}, home: { ...HOME, week: { done: 4, target: 4, sport_count: 3, days: [
+    WEEK_DAY(0, { gym: true, gym_count: 1 }),
+    WEEK_DAY(1, { sport: true, sport_type: "padel", sport_types: ["padel"] }),
+    WEEK_DAY(2, { gym: true, gym_count: 1 }),
+    WEEK_DAY(3, { gym: true, gym_count: 1, sport: true, sport_type: "padel", sport_types: ["padel"] }),
+    WEEK_DAY(4, { gym: true, gym_count: 2, sport: true, sport_type: "running", sport_types: ["running", "running"] }),
+    { date: "2026-10-31", weekday: 5, gym: false, sport: true, sport_type: "tennis", is_today: false },   // ответ старого API
+    WEEK_DAY(6, {}) ] } } } }, async (page) => {
+  await page.getByText("ТЕКУЩАЯ НЕДЕЛЯ").waitFor({ timeout: 5000 });
+  const cell = (wd) => page.getByText(wd, { exact: true }).locator("..").innerText();
+  return { thu: (await cell("чт")).split("\n"), fri: (await cell("пт")).split("\n"), sat: (await cell("сб")).split("\n"),
+           sun: (await cell("вс")).split("\n"), tue: (await cell("вт")).split("\n") };
+});
+
 await browser.close();
 fs.writeFileSync(path.join(OUT, "results.json"), JSON.stringify(results, null, 2));
 
