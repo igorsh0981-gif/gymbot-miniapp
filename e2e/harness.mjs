@@ -49,7 +49,9 @@ window.Telegram={WebApp:{
   openInvoice(url,cb){(window.__tgCalls=window.__tgCalls||[]).push(["openInvoice",url]);setTimeout(()=>cb&&cb(window.__invoiceStatus||"paid"),50)},
   shareToStory(url,opts){(window.__tgCalls=window.__tgCalls||[]).push(["shareToStory",url,opts||null])},
   shareMessage(id,cb){(window.__tgCalls=window.__tgCalls||[]).push(["shareMessage",id]);cb&&cb(true)},
-  onEvent(){}, offEvent(){}, setHeaderColor(){}, setBackgroundColor(){}, enableClosingConfirmation(){}, disableClosingConfirmation(){},
+  onEvent(n,f){var e=window.__tgEv=window.__tgEv||{};(e[n]=e[n]||[]).push(f)}, offEvent(n,f){var e=window.__tgEv||{};e[n]=(e[n]||[]).filter(function(x){return x!==f})},
+  addToHomeScreen(){(window.__tgCalls=window.__tgCalls||[]).push(["addToHomeScreen"])},
+  checkHomeScreenStatus(cb){setTimeout(function(){cb&&cb(window.__hsStatus||"missed")},20)}, setHeaderColor(){}, setBackgroundColor(){}, enableClosingConfirmation(){}, disableClosingConfirmation(){},
   HapticFeedback:{impactOccurred(s){(window.__haptics=window.__haptics||[]).push("impact:"+s)},notificationOccurred(t){(window.__haptics=window.__haptics||[]).push("notify:"+t)},selectionChanged(){(window.__haptics=window.__haptics||[]).push("select")}},
   BackButton:{isVisible:false,_h:[],onClick(f){this._h.push(f)},offClick(f){this._h=this._h.filter(x=>x!==f)},show(){this.isVisible=true},hide(){this.isVisible=false}},
   MainButton:{text:"",color:"",textColor:"",isVisible:false,isActive:true,isProgressVisible:false,_h:[],
@@ -64,7 +66,9 @@ window.Telegram={WebApp:{
     setText(t){this.text=t;this._render();return this},enable(){this.isActive=true;this._render();return this},disable(){this.isActive=false;this._render();return this},
     showProgress(){this.isProgressVisible=true;this._render();return this},hideProgress(){this.isProgressVisible=false;this._render();return this},
     onClick(f){this._h.push(f);window.__mbh=this._h.length;return this},offClick(f){this._h=this._h.filter(function(x){return x!==f});window.__mbh=this._h.length;return this}},
-}};`;
+}};
+// Компьютер / старый Telegram: значка на главный экран нет
+if(window.__noHomeScreen){delete window.Telegram.WebApp.addToHomeScreen;delete window.Telegram.WebApp.checkHomeScreenStatus;}`;
 
 // «Подход выполнен» — кнопка в странице. dispatchEvent — потому что поверх
 // после первого подхода лежит таймер отдыха.

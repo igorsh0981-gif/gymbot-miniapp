@@ -436,12 +436,12 @@ await scenario("57_team_join_board", VIEWPORTS[1], { tab: "menu", screen: "socia
 // ── «Что нового» ──
 await scenario("58_whats_new_tour", VIEWPORTS[1], { tab: "menu", screen: null, net: WN_NET() }, async (page, net) => {
   await page.getByRole("dialog").waitFor({ timeout: 5000 });
-  const first = await page.getByText("ЧТО НОВОГО · 1/8").count();
+  const first = await page.getByText("ЧТО НОВОГО · 1/9").count();
   const title1 = await page.locator("#wn-title").textContent();
   const levels = await page.getByText("от «Старт» до «Элита»", { exact: false }).count();
   const bb = await page.evaluate(() => window.Telegram.WebApp.BackButton.isVisible);
   const titles = [title1];
-  for (let k = 0; k < 7; k++) { await page.getByRole("button", { name: "ДАЛЕЕ" }).click(); await page.waitForTimeout(120); titles.push(await page.locator("#wn-title").textContent()); }
+  for (let k = 0; k < 8; k++) { await page.getByRole("button", { name: "ДАЛЕЕ" }).click(); await page.waitForTimeout(120); titles.push(await page.locator("#wn-title").textContent()); }
   const trialCta = await page.getByRole("button", { name: /Попробовать 7 дн\. бесплатно/i }).count();
   const perks = await page.getByText("До 30 вопросов AI-тренеру в день").count();
   await page.screenshot({ path: path.join(OUT, "58b_whats_new_premium.png") });
@@ -463,7 +463,7 @@ await scenario("59_whats_new_cta_opens_feature", VIEWPORTS[0], { tab: "menu", sc
 });
 await scenario("60_whats_new_swipe_and_back", VIEWPORTS[2], { tab: "menu", screen: null, net: { ...WN_NET(), wn: { seen: "2026-01-01", new_user: true } } }, async (page, net) => {
   await page.getByRole("dialog").waitFor({ timeout: 5000 });
-  const kicker = await page.getByText("ПОЛЕЗНО ЗНАТЬ · 1/8").count();
+  const kicker = await page.getByText("ПОЛЕЗНО ЗНАТЬ · 1/9").count();
   const box = await page.getByRole("dialog").boundingBox();
   const swipe = async (from, to) => {
     await page.dispatchEvent('[role="dialog"]', "touchstart", { touches: [{ identifier: 1, clientX: from, clientY: 400 }], changedTouches: [{ identifier: 1, clientX: from, clientY: 400 }] });
@@ -471,14 +471,14 @@ await scenario("60_whats_new_swipe_and_back", VIEWPORTS[2], { tab: "menu", scree
     await page.waitForTimeout(150);
   };
   await swipe(box.width - 40, 60);
-  const afterLeft = await page.getByText("ПОЛЕЗНО ЗНАТЬ · 2/8").count();
+  const afterLeft = await page.getByText("ПОЛЕЗНО ЗНАТЬ · 2/9").count();
   await swipe(60, box.width - 40);
-  const afterRight = await page.getByText("ПОЛЕЗНО ЗНАТЬ · 1/8").count();
+  const afterRight = await page.getByText("ПОЛЕЗНО ЗНАТЬ · 1/9").count();
   await page.evaluate(() => window.Telegram.WebApp.BackButton._h.forEach(f => f()));
   await page.waitForTimeout(300);
   return { kicker, afterLeft, afterRight, dialogAfterBack: await page.getByRole("dialog").count(), posts: net.wnPosts || [] };
 });
-await scenario("61_whats_new_not_again", VIEWPORTS[1], { tab: "menu", screen: null, ls: { gymbot_wn_seen_123456789: "2026-10-25d" }, net: WN_NET() }, async (page, net) => {
+await scenario("61_whats_new_not_again", VIEWPORTS[1], { tab: "menu", screen: null, ls: { gymbot_wn_seen_123456789: "2026-11-08" }, net: WN_NET() }, async (page, net) => {
   await page.waitForTimeout(800);
   return { gets: net.wnGets || 0, dialog: await page.getByRole("dialog").count() };
 });
@@ -489,7 +489,7 @@ await scenario("62_whats_new_not_over_deeplink", VIEWPORTS[1], { tab: "menu", sc
 await scenario("63_whats_new_from_more_uz", VIEWPORTS[0], { lang: "uz", tab: "menu", screen: "more", net: { ...WN_NET(), wn: { seen: "2099-01-01", new_user: false } } }, async (page, net) => {
   await page.getByText("Yangiliklar", { exact: true }).click();
   await page.getByRole("dialog").waitFor({ timeout: 4000 });
-  const kicker = await page.getByText("YANGILIKLAR · 1/8").count();
+  const kicker = await page.getByText("YANGILIKLAR · 1/9").count();
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth);
   await page.getByRole("button", { name: "MENING DARAJAM" }).click();
   await page.waitForTimeout(400);
@@ -499,7 +499,7 @@ await scenario("63_whats_new_from_more_uz", VIEWPORTS[0], { lang: "uz", tab: "me
 // ── «Что нового»: видел прошлую подборку — только новый слайд ──
 await scenario("64_whats_new_only_new", VIEWPORTS[1], { tab: "menu", screen: null, net: { ...WN_NET(), wn: { seen: "2026-10-25", new_user: false }, social: SOCIAL_NUDGE, feed: FEED } }, async (page, net) => {
   await page.getByRole("dialog").waitFor({ timeout: 5000 });
-  const only = await page.getByText("ЧТО НОВОГО · 1/3").count();
+  const only = await page.getByText("ЧТО НОВОГО · 1/4").count();
   const title = await page.locator("#wn-title").textContent();
   await page.screenshot({ path: path.join(OUT, "64b_whats_new_nudge.png") });
   await page.getByRole("button", { name: "Открыть друзей" }).click();
@@ -544,7 +544,7 @@ await scenario("66_friend_nudge_errors", VIEWPORTS[1], { tab: "menu", screen: "s
 // ── «Что нового»: видел подборку с напоминаниями — только слайд настроек ──
 await scenario("67_whats_new_friends_settings", VIEWPORTS[0], { tab: "menu", screen: null, net: { ...WN_NET(), wn: { seen: "2026-10-25b", new_user: false }, social: SOCIAL_NUDGE, feed: FEED } }, async (page, net) => {
   await page.getByRole("dialog").waitFor({ timeout: 5000 });
-  const only = await page.getByText("ЧТО НОВОГО · 1/2").count();
+  const only = await page.getByText("ЧТО НОВОГО · 1/3").count();
   const title = await page.locator("#wn-title").textContent();
   await page.screenshot({ path: path.join(OUT, "67b_whats_new_friends_settings_360x740.png") });
   await page.getByRole("button", { name: "Открыть настройки" }).click();
@@ -591,7 +591,7 @@ await scenario("70_team_hidden_member", VIEWPORTS[0], { tab: "menu", screen: "so
 // ── «Что нового»: достижения за друзей; кнопка открывает экран приглашения ──
 await scenario("72_whats_new_referral_achievements", VIEWPORTS[0], { tab: "menu", screen: null, net: { ...WN_NET(), wn: { seen: "2026-10-25c", new_user: false } } }, async (page, net) => {
   await page.getByRole("dialog").waitFor({ timeout: 5000 });
-  const only = await page.getByText("ЧТО НОВОГО · 1/1").count();
+  const only = await page.getByText("ЧТО НОВОГО · 1/2").count();
   const title = await page.locator("#wn-title").textContent();
   await page.screenshot({ path: path.join(OUT, "72b_whats_new_referral_achievements_360x740.png") });
   await page.getByRole("button", { name: "Пригласить друга" }).click();
@@ -675,6 +675,49 @@ await scenario("76_progress_week_multi", VIEWPORTS[0], { tab: "progress", screen
   const cell = (wd) => page.getByText(wd, { exact: true }).locator("..").innerText();
   return { thu: (await cell("чт")).split("\n"), fri: (await cell("пт")).split("\n"), sat: (await cell("сб")).split("\n"),
            sun: (await cell("вс")).split("\n"), tue: (await cell("вт")).split("\n") };
+});
+
+// ── «Что нового»: значок на главном экране — кнопка открывает окно Telegram ──
+await scenario("77_whats_new_home_screen", VIEWPORTS[0], { tab: "menu", screen: null, net: { ...WN_NET(), wn: { seen: "2026-10-25d", new_user: false } } }, async (page, net) => {
+  await page.getByRole("dialog").waitFor({ timeout: 5000 });
+  const only = await page.getByText("ЧТО НОВОГО · 1/1").count();
+  const title = await page.locator("#wn-title").textContent();
+  await page.screenshot({ path: path.join(OUT, "77b_whats_new_home_screen_360x740.png") });
+  await page.getByRole("button", { name: "Добавить значок" }).click();
+  await page.waitForTimeout(300);
+  return { only, title, calls: await page.evaluate(() => (window.__tgCalls || []).filter(c => c[0] === "addToHomeScreen")),
+           dialog: await page.getByRole("dialog").count(), posts: net.wnPosts || [] };
+});
+// значок уже стоит / компьютер — новое не про этот телефон: подборку не показываем, просмотр отмечаем
+await scenario("78_whats_new_home_screen_already", VIEWPORTS[0], { tab: "menu", screen: null,
+  before: async (page) => { await page.addInitScript(() => { window.__hsStatus = "added"; }); },
+  net: { ...WN_NET(), wn: { seen: "2026-10-25d", new_user: false } } }, async (page, net) => {
+  await page.waitForTimeout(1200);
+  return { dialog: await page.getByRole("dialog").count(), posts: net.wnPosts || [],
+           ls: await page.evaluate(() => localStorage.getItem("gymbot_wn_seen_123456789")) };
+});
+await scenario("79_whats_new_desktop", VIEWPORTS[1], { tab: "menu", screen: null,
+  before: async (page) => { await page.addInitScript(() => { window.__noHomeScreen = true; }); },
+  net: { ...WN_NET(), wn: { seen: "2026-10-25d", new_user: false } } }, async (page, net) => {
+  await page.waitForTimeout(1200);
+  return { dialog: await page.getByRole("dialog").count(), posts: net.wnPosts || [] };
+});
+// «Сервисы»: пункт есть, пока значка нет; после добавления пропадает
+await scenario("80_more_home_screen", VIEWPORTS[0], { tab: "menu", screen: "more", net: { setMode: "ok", setBodies: [], counts: {} } }, async (page) => {
+  const item = page.getByText("Значок на главный экран", { exact: true });
+  await item.waitFor({ timeout: 4000 });
+  const n = await item.count();
+  await page.screenshot({ path: path.join(OUT, "80b_more_home_screen_360x740.png") });
+  await item.click();
+  const calls = await page.evaluate(() => (window.__tgCalls || []).filter(c => c[0] === "addToHomeScreen"));
+  await page.evaluate(() => ((window.__tgEv || {}).homeScreenAdded || []).forEach(f => f()));
+  await page.waitForTimeout(200);
+  const after = await page.getByText("Значок на главный экран", { exact: true }).count();
+  await page.addInitScript(() => { window.__hsStatus = "added"; });
+  await page.reload();
+  await page.getByText("Что нового", { exact: true }).waitFor({ timeout: 5000 });
+  await page.waitForTimeout(300);
+  return { item: n, calls, after, addedItem: await page.getByText("Значок на главный экран", { exact: true }).count() };
 });
 
 await browser.close();
