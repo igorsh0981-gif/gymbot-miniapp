@@ -720,6 +720,29 @@ await scenario("80_more_home_screen", VIEWPORTS[0], { tab: "menu", screen: "more
   return { item: n, calls, after, addedItem: await page.getByText("Значок на главный экран", { exact: true }).count() };
 });
 
+// ── Настройки: «Добавить на главный экран» → после добавления «Уже на главном экране ✓» ──
+await scenario("81_settings_home_screen", VIEWPORTS[0], { tab: "menu", screen: "profile", net: { setMode: "ok", setBodies: [], counts: {} } }, async (page) => {
+  const add = page.getByText("Добавить на главный экран", { exact: true });
+  await add.waitFor({ timeout: 5000 });
+  await add.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: path.join(OUT, "81b_settings_home_screen_add_360x740.png") });
+  await add.click();
+  const calls = await page.evaluate(() => (window.__tgCalls || []).filter(c => c[0] === "addToHomeScreen"));
+  await page.evaluate(() => ((window.__tgEv || {}).homeScreenAdded || []).forEach(f => f()));
+  const done = page.getByText("Уже на главном экране", { exact: true });
+  await done.waitFor({ timeout: 3000 });
+  await done.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: path.join(OUT, "81c_settings_home_screen_added_360x740.png") });
+  const doneBtn = await done.locator("xpath=ancestor::*[@role='button'][1]").count();
+  return { calls, done: await done.count(), addLeft: await add.count(), doneBtn };
+});
+await scenario("82_settings_home_screen_desktop", VIEWPORTS[1], { tab: "menu", screen: "profile",
+  before: async (page) => { await page.addInitScript(() => { window.__noHomeScreen = true; }); },
+  net: { setMode: "ok", setBodies: [], counts: {} } }, async (page) => {
+  await page.getByText("Выгрузить мои данные", { exact: true }).waitFor({ timeout: 5000 });
+  return { block: await page.getByText("Главный экран", { exact: true }).count() + await page.getByText("Добавить на главный экран", { exact: true }).count() };
+});
+
 await browser.close();
 fs.writeFileSync(path.join(OUT, "results.json"), JSON.stringify(results, null, 2));
 
