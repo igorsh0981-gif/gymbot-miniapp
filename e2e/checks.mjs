@@ -133,6 +133,8 @@ export const CHECKS = {
   "79_whats_new_desktop": r => all(eq("не показана", r.dialog, 0), eq("отметка", r.posts, ["2026-11-08"])),
   "80_more_home_screen": r => all(eq("пункт есть", r.item, 1), eq("окно Telegram", r.calls, [["addToHomeScreen"]]), eq("после добавления скрыт", r.after, 0),
                                   eq("когда уже стоит", r.addedItem, 0)),
+  "81_settings_home_screen": r => all(eq("окно Telegram", r.calls, [["addToHomeScreen"]]), eq("уже на экране", r.done, 1), eq("кнопки больше нет", r.addLeft, 0), eq("отметка не кнопка", r.doneBtn, 0)),
+  "82_settings_home_screen_desktop": r => all(eq("блока нет", r.block, 0)),
   "71_referral_pending": r => all(eq("ждёт тренировки", r.pending, 1), eq("начислено", r.plus, 1), eq("шаг 2", r.step, 1)),
   "66_friend_nudge_errors": r => all(eq("окно осталось", r.stillOpen, 1), eq("пустой — нельзя", r.disabled, true), eq("запросы", r.nudges, [3, 5])),
 };
