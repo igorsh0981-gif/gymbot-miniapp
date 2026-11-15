@@ -16,7 +16,9 @@
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
       * { margin: 0; padding: 0; box-sizing: border-box; }
-      body { background: #0F0F0F; overflow-x: hidden; }
+      /* Нижний отступ: системный, а в полном экране на iPhone — и от Telegram */
+      :root { --gb-bottom: max(env(safe-area-inset-bottom, 0px), var(--gb-fs-bottom, 0px)); }
+      body { background: #0F0F0F; overflow-x: hidden; padding-top: var(--gb-top, 0px); } /* полный экран на iPhone: вырез и кнопки Telegram */
 
       /* Splash screen - shown until React mounts */
       #splash {

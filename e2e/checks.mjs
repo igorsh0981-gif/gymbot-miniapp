@@ -135,6 +135,10 @@ export const CHECKS = {
                                   eq("когда уже стоит", r.addedItem, 0)),
   "81_settings_home_screen": r => all(eq("окно Telegram", r.calls, [["addToHomeScreen"]]), eq("уже на экране", r.done, 1), eq("кнопки больше нет", r.addLeft, 0), eq("отметка не кнопка", r.doneBtn, 0)),
   "82_settings_home_screen_desktop": r => all(eq("блока нет", r.block, 0)),
+  "83_ios_fullscreen": r => all(eq("вызовы", r.calls, ["setHeaderColor", "disableVerticalSwipes", "requestFullscreen"]), eq("отступ", r.top, "105px"), eq("меню над полосой «домой»", r.navPadBottom, "42px"),
+                                r.firstTop >= 105 ? [] : [`контент под кнопками Telegram: top=${r.firstTop}`]),
+  "84_android_no_fullscreen": r => all(eq("без полного экрана", r.calls, []), eq("отступ", r.top, "0px"), eq("контент сверху", r.firstTop, 0), eq("низ меню как был", r.navPadBottom, "8px")),
+  "85_ios_home_screen_hint": r => all(eq("подсказка про Safari", r.hint, 1)),
   "71_referral_pending": r => all(eq("ждёт тренировки", r.pending, 1), eq("начислено", r.plus, 1), eq("шаг 2", r.step, 1)),
   "66_friend_nudge_errors": r => all(eq("окно осталось", r.stillOpen, 1), eq("пустой — нельзя", r.disabled, true), eq("запросы", r.nudges, [3, 5])),
 };
