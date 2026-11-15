@@ -51,7 +51,13 @@ window.Telegram={WebApp:{
   shareMessage(id,cb){(window.__tgCalls=window.__tgCalls||[]).push(["shareMessage",id]);cb&&cb(true)},
   onEvent(n,f){var e=window.__tgEv=window.__tgEv||{};(e[n]=e[n]||[]).push(f)}, offEvent(n,f){var e=window.__tgEv||{};e[n]=(e[n]||[]).filter(function(x){return x!==f})},
   addToHomeScreen(){(window.__tgCalls=window.__tgCalls||[]).push(["addToHomeScreen"])},
-  checkHomeScreenStatus(cb){setTimeout(function(){cb&&cb(window.__hsStatus||"missed")},20)}, setHeaderColor(){}, setBackgroundColor(){}, enableClosingConfirmation(){}, disableClosingConfirmation(){},
+  checkHomeScreenStatus(cb){setTimeout(function(){cb&&cb(window.__hsStatus||"missed")},20)},
+  setHeaderColor(c){(window.__tgCalls=window.__tgCalls||[]).push(["setHeaderColor",c])}, setBackgroundColor(){},
+  isFullscreen:false, safeAreaInset:{top:0,bottom:0,left:0,right:0}, contentSafeAreaInset:{top:0,bottom:0,left:0,right:0},
+  disableVerticalSwipes(){(window.__tgCalls=window.__tgCalls||[]).push(["disableVerticalSwipes"])},
+  requestFullscreen(){var w=window.Telegram.WebApp;(window.__tgCalls=window.__tgCalls||[]).push(["requestFullscreen"]);
+    setTimeout(function(){w.isFullscreen=true;w.safeAreaInset={top:59,bottom:34,left:0,right:0};w.contentSafeAreaInset={top:46,bottom:0,left:0,right:0};
+      ((window.__tgEv||{}).fullscreenChanged||[]).forEach(function(f){f()})},30)}, enableClosingConfirmation(){}, disableClosingConfirmation(){},
   HapticFeedback:{impactOccurred(s){(window.__haptics=window.__haptics||[]).push("impact:"+s)},notificationOccurred(t){(window.__haptics=window.__haptics||[]).push("notify:"+t)},selectionChanged(){(window.__haptics=window.__haptics||[]).push("select")}},
   BackButton:{isVisible:false,_h:[],onClick(f){this._h.push(f)},offClick(f){this._h=this._h.filter(x=>x!==f)},show(){this.isVisible=true},hide(){this.isVisible=false}},
   MainButton:{text:"",color:"",textColor:"",isVisible:false,isActive:true,isProgressVisible:false,_h:[],

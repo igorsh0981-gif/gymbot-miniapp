@@ -743,6 +743,36 @@ await scenario("82_settings_home_screen_desktop", VIEWPORTS[1], { tab: "menu", s
   return { block: await page.getByText("Главный экран", { exact: true }).count() + await page.getByText("Добавить на главный экран", { exact: true }).count() };
 });
 
+// ── iPhone: полный экран, контент ниже выреза и кнопок Telegram; Android — как было ──
+const FS_PROBE = async (page) => {
+  await page.getByText("Фото еды").first().waitFor({ timeout: 5000 });
+  await page.waitForTimeout(200);
+  return page.evaluate(() => ({
+    calls: (window.__tgCalls || []).map(c => c[0]).filter(n => ["requestFullscreen", "disableVerticalSwipes", "setHeaderColor"].includes(n)),
+    top: getComputedStyle(document.documentElement).getPropertyValue("--gb-top").trim(),
+    firstTop: Math.round(document.querySelector("main").getBoundingClientRect().top),
+    navGap: Math.round(window.innerHeight - document.querySelector("nav").getBoundingClientRect().bottom),
+    navPadBottom: getComputedStyle(document.querySelector("nav")).paddingBottom,
+  }));
+};
+await scenario("83_ios_fullscreen", VIEWPORTS[0], { tab: "menu", screen: null,
+  before: async (page) => { await page.addInitScript(() => { window.__platform = "ios"; }); },
+  net: { setMode: "ok", setBodies: [], counts: {}, home: HOME } }, async (page) => {
+  const r = await FS_PROBE(page);
+  await page.screenshot({ path: path.join(OUT, "83b_ios_fullscreen_360x740.png") });
+  return r;
+});
+await scenario("84_android_no_fullscreen", VIEWPORTS[0], { tab: "menu", screen: null,
+  net: { setMode: "ok", setBodies: [], counts: {}, home: HOME } }, FS_PROBE);
+// iPhone: в настройках — что делать в Safari
+await scenario("85_ios_home_screen_hint", VIEWPORTS[0], { tab: "menu", screen: "profile",
+  before: async (page) => { await page.addInitScript(() => { window.__platform = "ios"; }); },
+  net: { setMode: "ok", setBodies: [], counts: {} } }, async (page) => {
+  const add = page.getByText("Добавить на главный экран", { exact: true });
+  await add.waitFor({ timeout: 5000 });
+  return { hint: await page.getByText("Откроется Safari: «Поделиться» → «На экран „Домой“» → «Добавить»", { exact: true }).count() };
+});
+
 await browser.close();
 fs.writeFileSync(path.join(OUT, "results.json"), JSON.stringify(results, null, 2));
 
